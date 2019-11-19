@@ -29,7 +29,7 @@ public class Sector : MonoBehaviour
     public void GenerateSector(int numClusters, int clusterSpacing, int numSystemsAvg, float numSystemsVar, int sizePlanetsAvg, int sizePlanetsVar)
     {
         // Generate an unweighted noise map with a size based on the number of clusters
-        int mapWidth = numClusters * 50;
+        int mapWidth = numClusters * clusterSpacing * 2;
         float[,] weightMap = new float[mapWidth, mapWidth];
         for (int i = 0; i < mapWidth; i++)
         {
@@ -38,7 +38,7 @@ public class Sector : MonoBehaviour
                 weightMap[i,j] = 1f;
             }
         }
-        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(weightMap, 1f);
+        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(weightMap, 10f);
 
         // Log the noise map
         /*for (int i = 0; i < mapWidth; i++)
