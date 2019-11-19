@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
+    public NameManager nameManager;
     // Galaxy generation default settings
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar, clusterSpacing;
     public Sector sector;
@@ -18,6 +19,8 @@ public class GameManager : MonoBehaviour
         else
         {
             gameManager = this;
+            float nameSeed = Random.value;
+            nameManager = new NameManager(nameSeed);
         }
     }
 
@@ -26,8 +29,6 @@ public class GameManager : MonoBehaviour
     {
         // Create the sector using perlin noise maps
         sector.GenerateSector(numClusters, clusterSpacing, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
-        // Set the camera position
-        Camera.main.GetComponent<CameraController>().SetCameraPosition(0);
     }
 
     // Update is called once per frame

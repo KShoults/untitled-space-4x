@@ -453,11 +453,6 @@ PrefabInstance:
       propertyPath: sector
       value: 
       objectReference: {fileID: 2087383175760257960}
-    - target: {fileID: 7977364891536752231, guid: 9b579bf4d30ea422c9290e84e328651f,
-        type: 3}
-      propertyPath: numClusters
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b579bf4d30ea422c9290e84e328651f, type: 3}
 --- !u!1001 &2087383175760257959

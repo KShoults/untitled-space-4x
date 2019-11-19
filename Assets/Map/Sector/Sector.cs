@@ -5,7 +5,7 @@ using UnityEngine;
 public class Sector : MonoBehaviour
 {
     public GameObject ClusterPrefab;
-    public List<GameObject> clusters;
+    public List<Cluster> clusters;
 
     // Start is called before the first frame update
     void Start()
@@ -51,7 +51,7 @@ public class Sector : MonoBehaviour
             Debug.Log(row);
         }*/
 
-        clusters = new List<GameObject>();
+        clusters = new List<Cluster>();
         // For each cluster, find the largest point in the noise map and place a cluster
         for (int cluster = 0; cluster < numClusters; cluster++)
         {
@@ -72,7 +72,9 @@ public class Sector : MonoBehaviour
             }
 
             // Create and add the cluster
-            clusters.Add(GameObject.Instantiate(ClusterPrefab, new Vector3(bestX, bestY, 0), Quaternion.identity, transform));
+            Cluster newCluster = GameObject.Instantiate(ClusterPrefab, new Vector3(bestX, bestY, 0), Quaternion.identity, transform).GetComponent<Cluster>();
+            newCluster.clusterName = GenerateClusterName();
+            clusters.Add(newCluster);
 
             // Prevent other clusters from spawning too close
             for (int i = 0-clusterSpacing; i < clusterSpacing; i++)
@@ -88,5 +90,10 @@ public class Sector : MonoBehaviour
                 }
             }
         }
+    }
+
+    private string GenerateClusterName()
+    {
+        return GameManager.gameManager.nameManager.GetName();
     }
 }

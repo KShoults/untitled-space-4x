@@ -11,6 +11,8 @@ public class CameraController : MonoBehaviour
     {
         numClusters = GameManager.gameManager.numClusters;
         clusterSpacing = GameManager.gameManager.clusterSpacing;
+        // Set the starting camera position
+        SetCameraPosition(0);
     }
 
     // Update is called once per frame
