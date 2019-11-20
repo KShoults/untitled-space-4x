@@ -36,7 +36,7 @@ public class CameraController : MonoBehaviour
             case 0:     // Sector View
                 newPosition.x = numClusters * clusterSpacing;
                 newPosition.y = numClusters * clusterSpacing;
-                newSize = numClusters * clusterSpacing;
+                newSize = (int)Mathf.Floor(numClusters * clusterSpacing * 1.1f);
                 break;
 
             case 1:     // Cluster View
