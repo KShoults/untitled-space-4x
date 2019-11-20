@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     // Galaxy generation default settings
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar, clusterSpacing;
     public Sector sector;
+    public float nameSeed = 0;
 
     void Awake()
     {
@@ -19,7 +20,10 @@ public class GameManager : MonoBehaviour
         else
         {
             gameManager = this;
-            float nameSeed = Random.value;
+            if (nameSeed == 0f)
+            {
+                float nameSeed = Random.value;
+            }
             nameManager = new NameManager(nameSeed);
         }
     }

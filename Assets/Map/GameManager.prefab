@@ -50,3 +50,4 @@ MonoBehaviour:
   sizePlanetsVar: 200
   clusterSpacing: 25
   sector: {fileID: 0}
+  nameSeed: 0
