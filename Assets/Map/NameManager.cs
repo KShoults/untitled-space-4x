@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using System.Linq;
 
+// Handles name management of clusters for the sector.
 public class NameManager
 {
     private List<string> nameList;
@@ -44,7 +45,7 @@ public class NameManager
     private List<string> GenerateNameList(float seed)
     {
         List<string> newNameList = new List<string>();
-        using (StreamReader sr = File.OpenText("Assets/Map/Namelists/Namelist.txt"))
+        using (StreamReader sr = File.OpenText("Assets/Map/Namelists/Clusterlist.txt"))
         {
             string name;
             while ((name = sr.ReadLine()) != null)
