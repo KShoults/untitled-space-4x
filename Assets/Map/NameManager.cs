@@ -45,7 +45,7 @@ public class NameManager
     private List<string> GenerateNameList(float seed)
     {
         List<string> newNameList = new List<string>();
-        using (StreamReader sr = File.OpenText("Assets/Map/Namelists/Clusterlist.txt"))
+        using (StreamReader sr = File.OpenText("Assets/Map/NameLists/ClusterList.txt"))
         {
             string name;
             while ((name = sr.ReadLine()) != null)

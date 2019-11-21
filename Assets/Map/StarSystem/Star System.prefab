@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6998784160778755890
+--- !u!1 &1748162412883981647
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,56 +8,51 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7048348881293853637}
-  - component: {fileID: 6784340534400677308}
-  - component: {fileID: 119417905782126692}
-  - component: {fileID: -689460406290805486}
-  m_Layer: 8
-  m_Name: Cluster
+  - component: {fileID: 4939600354903099720}
+  - component: {fileID: 821951837416586552}
+  - component: {fileID: 8464957106659891930}
+  - component: {fileID: -6630016868995743492}
+  m_Layer: 9
+  m_Name: Star System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7048348881293853637
+--- !u!4 &4939600354903099720
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6998784160778755890}
+  m_GameObject: {fileID: 1748162412883981647}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6784340534400677308
+--- !u!114 &821951837416586552
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6998784160778755890}
+  m_GameObject: {fileID: 1748162412883981647}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aea0593d61f67202bec20461b0ac27a, type: 3}
+  m_Script: {fileID: 11500000, guid: 29c52f39ae6d90e00ad0c04687a33991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clusterName: 
-  StarSystemPrefab: {fileID: 1748162412883981647, guid: 5c9d220a84d6e51de91c9195d2ec1177,
-    type: 3}
-  ClusterStarPrefab: {fileID: 4051436662184306395, guid: e345d49ced2f88a0fbf3c046c3206804,
-    type: 3}
-  starSystems: []
---- !u!212 &119417905782126692
+  starSystemName: 
+--- !u!212 &8464957106659891930
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6998784160778755890}
+  m_GameObject: {fileID: 1748162412883981647}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -89,8 +84,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b4f0c7ded70d7824caa67c9d809feb85, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 8db1cec90a65099d39578df227f216d8, type: 3}
+  m_Color: {r: 0.8790163, g: 0.8867924, b: 0.32627267, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -100,13 +95,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &-689460406290805486
+--- !u!58 &-6630016868995743492
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6998784160778755890}
+  m_GameObject: {fileID: 1748162412883981647}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}

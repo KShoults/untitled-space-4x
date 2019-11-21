@@ -74,6 +74,7 @@ public class Sector : MonoBehaviour
             // Create and add the cluster
             Cluster newCluster = GameObject.Instantiate(ClusterPrefab, new Vector3(bestX, bestY, 0), Quaternion.identity, transform).GetComponent<Cluster>();
             newCluster.clusterName = GenerateClusterName();
+            newCluster.GenerateCluster(numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
             clusters.Add(newCluster);
 
             // Prevent other clusters from spawning too close
