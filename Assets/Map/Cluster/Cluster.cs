@@ -119,7 +119,7 @@ public class Cluster : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            Camera.main.GetComponent<CameraController>().SetCameraTargetPosition(1, transform.position);
+            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(1, this);
         }
     }
 

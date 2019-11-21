@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
-    public Text SelectedObjectNameText;
+    public Text SelectedObjectNameText, LabelViewText;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +23,7 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            Camera.main.GetComponent<CameraController>().SetCameraTargetPosition(0, Vector3.zero);
+            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(0, null);
         }
     }
 
@@ -54,5 +54,29 @@ public class InputManager : MonoBehaviour
     {
         SelectedObjectNameText.text = "";
         SelectedObjectNameText.gameObject.SetActive(false);
+    }
+
+    // Triggers all of the UI changes that should occur when the view changes
+    // viewType refers to Sector/Cluster/System view.
+    // o is the cluster or system we are viewing or null for sector view.
+    public void ChangeView(int viewType, MonoBehaviour o)
+    {
+        switch (viewType)
+        {
+            default:
+            case 0:
+                LabelViewText.text = "";
+                LabelViewText.gameObject.SetActive(false);
+                break;
+
+            case 1:
+                Cluster cluster = o as Cluster;
+                LabelViewText.text = cluster.clusterName;
+                LabelViewText.gameObject.SetActive(true);
+                break;
+
+            case 2:
+                break;
+        }
     }
 }

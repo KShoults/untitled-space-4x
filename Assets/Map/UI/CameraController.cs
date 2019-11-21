@@ -18,7 +18,7 @@ public class CameraController : MonoBehaviour
         clusterSpacing = GameManager.gameManager.clusterSpacing;
         mainCamera = GetComponent<Camera>();
         // Set the starting camera position
-        SetCameraPosition(0, Vector3.zero);
+        SetCameraTarget(0, null);
     }
 
     // Update is called once per frame
@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour
     /* Set the camera to one of three preset positions without a transition
     /  position: preset position to move the camera to; 0 = Sector View, 1 = Cluster View, 2 = System View
     */ 
-    public void SetCameraPosition(int position, Vector3 objectPosition)
+    public void SetCameraTarget(int position, MonoBehaviour o)
     {
         Vector3 newPosition = Vector3.zero;
         newPosition.z = -10;
@@ -52,6 +52,7 @@ public class CameraController : MonoBehaviour
                 break;
 
             case 1:     // Cluster View
+                Vector3 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
                 newSize = 5;
@@ -68,13 +69,14 @@ public class CameraController : MonoBehaviour
         targetPosition = newPosition;
         mainCamera.orthographicSize = newSize;
         targetSize = newSize;
+        GetComponent<InputManager>().ChangeView(position, o);
     }
 
     /* Set the camera target position to one of three preset positions.
     /  The camera will move smoothly to the target position.
     /  position: preset position to move the camera to; 0 = Sector View, 1 = Cluster View, 2 = System View
     */ 
-    public void SetCameraTargetPosition(int position, Vector3 objectPosition)
+    public void SetCameraTargetSmooth(int position, MonoBehaviour o)
     {
         targetPosition.z = -10;
 
@@ -89,6 +91,7 @@ public class CameraController : MonoBehaviour
                 break;
 
             case 1:     // Cluster View
+                Vector3 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
                 targetSize = 5;
@@ -106,6 +109,8 @@ public class CameraController : MonoBehaviour
         {
             mainCamera.cullingMask = targetLayerMask;
         }
+
+        GetComponent<InputManager>().ChangeView(position, o);
     }
 
     private void MoveTowardTargetPosition()
@@ -116,7 +121,7 @@ public class CameraController : MonoBehaviour
         mainCamera.orthographicSize = newSize;
         
         // When zooming out the mask should be applied when finished.
-        if (targetSize - mainCamera.orthographicSize < 1)
+        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < 1)
         {
             mainCamera.cullingMask = targetLayerMask;
         }
