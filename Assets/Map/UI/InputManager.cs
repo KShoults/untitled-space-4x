@@ -35,7 +35,7 @@ public class InputManager : MonoBehaviour
             SelectedObjectNameText.text = cluster.clusterName;
             Vector3 worldPosition = cluster.transform.position;
             Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
-            SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 20, 0);
+            SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 40, 0);
             SelectedObjectNameText.gameObject.SetActive(true);
         }
 

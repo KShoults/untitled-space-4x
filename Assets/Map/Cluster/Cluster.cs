@@ -6,8 +6,11 @@ using System.IO;
 public class Cluster : MonoBehaviour
 {
     public string clusterName;
-    public GameObject StarSystemPrefab;
+    public GameObject StarSystemPrefab, ClusterStarPrefab;
+    // The star systems in this cluster
     public List<StarSystem> starSystems;
+    // The SpriteRenderers used to show this cluster in the sector view
+    private List<SpriteRenderer> clusterStars;
     // Ordered list of names used for additional starSystems
     private List<string> starSystemNames;
 
@@ -43,6 +46,7 @@ public class Cluster : MonoBehaviour
 
 
         starSystems = new List<StarSystem>();
+        clusterStars = new List<SpriteRenderer>();
         // For each system, find the largest point in the noise map and place a system
         for (int system = 0; system < numSystems; system++)
         {
@@ -73,6 +77,15 @@ public class Cluster : MonoBehaviour
             newSystem.starSystemName = GenerateSystemName();
             //newSystem.GeneratePlanets(sizePlanetsAvg, sizePlanetsVar);
             starSystems.Add(newSystem);
+
+            // Create and add a sprite to this cluster for the sector view
+            xPosition = transform.position.x + (bestX - mapWidth / 2f) / 25f;
+            yPosition = transform.position.y + (bestY - mapWidth / 2f) / 25f;
+
+            SpriteRenderer newSprite = GameObject.Instantiate(ClusterStarPrefab).GetComponent<SpriteRenderer>();
+            newSprite.transform.parent = transform;
+            newSprite.transform.position = new Vector3(xPosition, yPosition, 0);
+            clusterStars.Add(newSprite);
 
             // Prevent other systems from spawning too close
             int systemSpacing = (int) Mathf.Floor((float)mapWidth / (float)numSystems / 2f);
