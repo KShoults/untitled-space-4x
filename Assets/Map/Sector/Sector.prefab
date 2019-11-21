@@ -45,3 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ClusterPrefab: {fileID: 6998784160778755890, guid: b6c1f7c2dfc4e830ab557acdc8ac5899,
     type: 3}
+  clusters: []

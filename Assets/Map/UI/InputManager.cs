@@ -16,7 +16,15 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        HandleMouseButtons();
+    }
+
+    public void HandleMouseButtons()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Camera.main.GetComponent<CameraController>().SetCameraTargetPosition(0, Vector3.zero);
+        }
     }
 
     public void HoverEnter(MonoBehaviour o)
@@ -30,14 +38,21 @@ public class InputManager : MonoBehaviour
             SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 20, 0);
             SelectedObjectNameText.gameObject.SetActive(true);
         }
+
+        else if (o is StarSystem)
+        {
+            StarSystem starSystem = o as StarSystem;
+            SelectedObjectNameText.text = starSystem.starSystemName;
+            Vector3 worldPosition = starSystem.transform.position;
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+            SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 20, 0);
+            SelectedObjectNameText.gameObject.SetActive(true);
+        }
     }
 
     public void HoverExit(MonoBehaviour o)
     {
-        if (o is Cluster)
-        {
-            SelectedObjectNameText.text = "";
-            SelectedObjectNameText.gameObject.SetActive(false);
-        }
+        SelectedObjectNameText.text = "";
+        SelectedObjectNameText.gameObject.SetActive(false);
     }
 }

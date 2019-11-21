@@ -92,14 +92,22 @@ public class Cluster : MonoBehaviour
     }
 
     // Alert the InputManager when this is hovered over
-    void OnMouseEnter ()
+    void OnMouseEnter()
     {
         Camera.main.GetComponent<InputManager>().HoverEnter(this);
     }
 
-    void OnMouseExit ()
+    void OnMouseExit()
     {
         Camera.main.GetComponent<InputManager>().HoverExit(this);
+    }
+
+    void OnMouseDown()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Camera.main.GetComponent<CameraController>().SetCameraTargetPosition(1, transform.position);
+        }
     }
 
     private string GenerateSystemName()
