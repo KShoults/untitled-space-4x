@@ -75,7 +75,7 @@ public class Cluster : MonoBehaviour
             newSystem.transform.parent = transform;
             newSystem.transform.position = new Vector3(xPosition, yPosition, 0);
             newSystem.starSystemName = GenerateSystemName();
-            //newSystem.GeneratePlanets(sizePlanetsAvg, sizePlanetsVar);
+            newSystem.GenerateStarSystem(sizePlanetsAvg, sizePlanetsVar);
             starSystems.Add(newSystem);
 
             // Create and add a sprite to this cluster for the sector view

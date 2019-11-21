@@ -5,6 +5,8 @@ using UnityEngine;
 public class StarSystem : MonoBehaviour
 {
     public string starSystemName;
+    public GameObject StarPrefab;
+    public Star star;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +18,15 @@ public class StarSystem : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void GenerateStarSystem(int sizePlanetsAvg, int sizePlanetsVar)
+    {
+        // Create the star
+        star = Instantiate(StarPrefab).GetComponent<Star>();
+        star.transform.parent = transform;
+        star.transform.position = transform.position;
+        star.StarName = starSystemName;
     }
 
     // Alert the InputManager when this is hovered over

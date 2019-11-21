@@ -48,7 +48,7 @@ public class CameraController : MonoBehaviour
                 newPosition.x = numClusters * clusterSpacing;
                 newPosition.y = numClusters * clusterSpacing;
                 newSize = numClusters * clusterSpacing * 1.1f;
-                newLayerMask = 1 << 9;
+                newLayerMask = 1 << 8;
                 break;
 
             case 1:     // Cluster View
@@ -56,14 +56,12 @@ public class CameraController : MonoBehaviour
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
                 newSize = 5;
-                newLayerMask = 1 << 8;
+                newLayerMask = 1 << 9;
                 break;
 
             case 2:     // System View
                 break;
         }
-
-        newLayerMask = ~newLayerMask;
         mainCamera.cullingMask = newLayerMask;
         transform.position = newPosition;
         targetPosition = newPosition;
@@ -87,7 +85,7 @@ public class CameraController : MonoBehaviour
                 targetPosition.x = numClusters * clusterSpacing;
                 targetPosition.y = numClusters * clusterSpacing;
                 targetSize = numClusters * clusterSpacing * 1.1f;
-                targetLayerMask = 1 << 9;
+                targetLayerMask = 1 << 8;
                 break;
 
             case 1:     // Cluster View
@@ -95,14 +93,12 @@ public class CameraController : MonoBehaviour
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
                 targetSize = 5;
-                targetLayerMask = 1 << 8;
+                targetLayerMask = 1 << 9;
                 break;
 
             case 2:     // System View
                 break;
         }
-
-        targetLayerMask = ~targetLayerMask;
 
         // When zooming in the mask should be applied immediately
         if (targetSize < mainCamera.orthographicSize)
