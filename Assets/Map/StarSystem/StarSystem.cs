@@ -39,4 +39,12 @@ public class StarSystem : MonoBehaviour
     {
         Camera.main.GetComponent<InputManager>().HoverExit(this);
     }
+
+    void OnMouseDown()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(2, this);
+        }
+    }
 }

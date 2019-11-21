@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
+    private CameraController cameraController;
+    private MonoBehaviour viewObject;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        cameraController = GetComponent<CameraController>();
     }
 
     // Update is called once per frame
@@ -23,7 +25,22 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(0, null);
+
+            switch (cameraController.viewType)
+            {
+                default:
+                case 0:
+                    break;
+                case 1:
+                    GetComponent<CameraController>().SetCameraTargetSmooth(0, null);
+                    break;
+                case 2:
+                    if (viewObject != null)
+                    {
+                        GetComponent<CameraController>().SetCameraTargetSmooth(1, viewObject.GetComponentInParent<Cluster>());
+                    }
+                    break;
+            }
         }
     }
 
@@ -76,7 +93,11 @@ public class InputManager : MonoBehaviour
                 break;
 
             case 2:
+                StarSystem starSystem = o as StarSystem;
+                LabelViewText.text = starSystem.starSystemName;
+                LabelViewText.gameObject.SetActive(true);
                 break;
         }
+        viewObject = o;
     }
 }
