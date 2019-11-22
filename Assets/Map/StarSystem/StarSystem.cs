@@ -26,7 +26,10 @@ public class StarSystem : MonoBehaviour
         star = Instantiate(StarPrefab).GetComponent<Star>();
         star.transform.parent = transform;
         star.transform.position = transform.position;
-        star.StarName = starSystemName;
+        star.starName = starSystemName;
+        star.starClass = GenerateStarClass();
+        star.GetComponent<SpriteRenderer>().color = StarClassUtil.StarColor[star.starClass];
+        GetComponent<SpriteRenderer>().color = StarClassUtil.StarColor[star.starClass];
     }
 
     // Alert the InputManager when this is hovered over
@@ -45,6 +48,39 @@ public class StarSystem : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(2, this);
+        }
+    }
+
+    private StarClass GenerateStarClass()
+    {
+        float r = Random.value * 7;
+        if (r < 1)
+        {
+            return StarClass.O;
+        }
+        else if (r < 2)
+        {
+            return StarClass.B;
+        }
+        else if (r < 3)
+        {
+            return StarClass.A;
+        }
+        else if (r < 4)
+        {
+            return StarClass.F;
+        }
+        else if (r < 5)
+        {
+            return StarClass.G;
+        }
+        else if (r < 6)
+        {
+            return StarClass.K;
+        }
+        else
+        {
+            return StarClass.M;
         }
     }
 }

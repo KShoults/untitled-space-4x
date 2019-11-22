@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Star : MonoBehaviour
 {
-    public string StarName;
+    public string starName;
+    public StarClass starClass;
     // Start is called before the first frame update
     void Start()
     {

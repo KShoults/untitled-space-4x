@@ -85,6 +85,7 @@ public class Cluster : MonoBehaviour
             SpriteRenderer newSprite = GameObject.Instantiate(ClusterStarPrefab).GetComponent<SpriteRenderer>();
             newSprite.transform.parent = transform;
             newSprite.transform.position = new Vector3(xPosition, yPosition, 0);
+            newSprite.color = StarClassUtil.StarColor[newSystem.star.starClass];
             clusterStars.Add(newSprite);
 
             // Prevent other systems from spawning too close
