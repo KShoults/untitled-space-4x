@@ -48,7 +48,10 @@ MonoBehaviour:
   starSystemName: 
   StarPrefab: {fileID: 6636518792039647014, guid: 5a7794e9a8889592981491b3076b0270,
     type: 3}
+  PlanetPrefab: {fileID: 7282589716559489325, guid: 1dd4270722d2e53328aea83315f792a1,
+    type: 3}
   star: {fileID: 0}
+  planets: []
 --- !u!212 &8464957106659891930
 SpriteRenderer:
   m_ObjectHideFlags: 0

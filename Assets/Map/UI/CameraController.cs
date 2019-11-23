@@ -66,7 +66,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
-                newSize = .02f;
+                newSize = .1f;
                 newLayerMask = 1 << 10;
                 break;
         }
@@ -110,7 +110,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
-                targetSize = .02f;
+                targetSize = .1f;
                 targetLayerMask = 1 << 10;
                 break;
         }

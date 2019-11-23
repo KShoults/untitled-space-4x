@@ -65,6 +65,16 @@ public class InputManager : MonoBehaviour
             SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 20, 0);
             SelectedObjectNameText.gameObject.SetActive(true);
         }
+
+        else if (o is Planet)
+        {
+            Planet planet = o as Planet;
+            SelectedObjectNameText.text = planet.planetName;
+            Vector3 worldPosition = planet.transform.position;
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+            SelectedObjectNameText.transform.position = new Vector3 (screenPosition.x, screenPosition.y + 20, 0);
+            SelectedObjectNameText.gameObject.SetActive(true);
+        }
     }
 
     public void HoverExit(MonoBehaviour o)
