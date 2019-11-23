@@ -46,8 +46,7 @@ MonoBehaviour:
   numClusters: 10
   numSystemsAvg: 15
   numSystemsVar: 5
-  sizePlanetsAvg: 400
-  sizePlanetsVar: 200
-  clusterSpacing: 25
+  sizePlanetsAvg: 200
+  sizePlanetsVar: 100
   sector: {fileID: 0}
   nameSeed: 0

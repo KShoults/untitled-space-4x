@@ -5,6 +5,8 @@ using System.IO;
 
 public class StarSystem : MonoBehaviour
 {
+    // The position of this StarSystem relative to its parent cluster
+    public Vector2 position;
     public string starSystemName;
     public GameObject StarPrefab, PlanetPrefab;
     public Star star;
@@ -59,7 +61,7 @@ public class StarSystem : MonoBehaviour
             Vector3 orbitalDirection = new Vector3(Random.value - .5f, Random.value - .5f, 0);
             orbitalDirection = orbitalDirection.normalized;
             // Remember to convert back to light years/Unity units
-            newPlanet.transform.position = transform.position + (orbitalDirection * orbitalDistance / 200);
+            newPlanet.transform.position = transform.position + (orbitalDirection * orbitalDistance / 20);
             planets.Add(newPlanet);
             currentSystemSize += 50;
         }

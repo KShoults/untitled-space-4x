@@ -5,6 +5,8 @@ using System.IO;
 
 public class Cluster : MonoBehaviour
 {
+    // The position of this Cluster relative to the center of the sector
+    public Vector2 position;
     public string clusterName;
     public GameObject StarSystemPrefab, ClusterStarPrefab;
     // The star systems in this cluster
@@ -47,6 +49,7 @@ public class Cluster : MonoBehaviour
 
         starSystems = new List<StarSystem>();
         clusterStars = new List<SpriteRenderer>();
+        Transform clusterStarParent = transform.Find("ClusterStars");
         // For each system, find the largest point in the noise map and place a system
         for (int system = 0; system < numSystems; system++)
         {
@@ -66,14 +69,19 @@ public class Cluster : MonoBehaviour
                 }
             }
 
-            // Convert the noise map position to world coordinates
-            float xPosition = transform.position.x + (bestX - mapWidth / 2f) / 100f;
-            float yPosition = transform.position.y + (bestY - mapWidth / 2f) / 100f;
+            // Convert the noise map position to unity coordinates
+            float unityXPosition = transform.position.x + (bestX - mapWidth / 2f) / 10f;
+            float unityYPosition = transform.position.y + (bestY - mapWidth / 2f) / 10f;
+
+            // Actual game coordinates of systems are based on the game coordinates of the cluster
+            float xPosition = position.x + (bestX - mapWidth / 2f) * 3 / 50f;
+            float yPosition = position.y + (bestY - mapWidth / 2f) * 3 / 50f;
 
             // Create and add the system
             StarSystem newSystem = GameObject.Instantiate(StarSystemPrefab).GetComponent<StarSystem>();
             newSystem.transform.parent = transform;
-            newSystem.transform.position = new Vector3(xPosition, yPosition, 0);
+            newSystem.transform.position = new Vector3(unityXPosition, unityYPosition, 0);
+            newSystem.position = new Vector2(xPosition, yPosition);
             newSystem.starSystemName = GenerateSystemName();
             newSystem.GenerateStarSystem(sizePlanetsAvg, sizePlanetsVar);
             starSystems.Add(newSystem);
@@ -83,13 +91,13 @@ public class Cluster : MonoBehaviour
             yPosition = transform.position.y + (bestY - mapWidth / 2f) / 25f;
 
             SpriteRenderer newSprite = GameObject.Instantiate(ClusterStarPrefab).GetComponent<SpriteRenderer>();
-            newSprite.transform.parent = transform;
+            newSprite.transform.parent = clusterStarParent;
             newSprite.transform.position = new Vector3(xPosition, yPosition, 0);
             newSprite.color = StarClassUtil.StarColor[newSystem.star.starClass];
             clusterStars.Add(newSprite);
 
             // Prevent other systems from spawning too close
-            int systemSpacing = (int) Mathf.Floor((float)mapWidth / (float)numSystems / 2f);
+            int systemSpacing = (int) Mathf.Floor((float)mapWidth / (float)numSystems / 2f) * 2;
             for (int i = 0-systemSpacing; i < systemSpacing; i++)
             {
                 for (int j = 0-systemSpacing; j < systemSpacing; j++)

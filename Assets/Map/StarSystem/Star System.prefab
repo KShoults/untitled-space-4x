@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1748162412883981647}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29c52f39ae6d90e00ad0c04687a33991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  position: {x: 0, y: 0}
   starSystemName: 
   StarPrefab: {fileID: 6636518792039647014, guid: 5a7794e9a8889592981491b3076b0270,
     type: 3}

@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager gameManager;
     public NameManager nameManager;
     // Galaxy generation default settings
-    public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar, clusterSpacing;
+    public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar;
     public Sector sector;
     public float nameSeed = 0;
 
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // Create the sector using perlin noise maps
-        sector.GenerateSector(numClusters, clusterSpacing, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
+        sector.GenerateSector(numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
     }
 
     // Update is called once per frame

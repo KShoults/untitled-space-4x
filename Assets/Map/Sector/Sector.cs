@@ -26,10 +26,10 @@ public class Sector : MonoBehaviour
     /  sizePlanetsAvg: The average total aggregate size of planets in each system
     /  sizePlanetsVar: The variance in the total aggregate size of planets in each system
     */
-    public void GenerateSector(int numClusters, int clusterSpacing, int numSystemsAvg, float numSystemsVar, int sizePlanetsAvg, int sizePlanetsVar)
+    public void GenerateSector(int numClusters, int numSystemsAvg, float numSystemsVar, int sizePlanetsAvg, int sizePlanetsVar)
     {
         // Generate an unweighted noise map with a size based on the number of clusters
-        int mapWidth = numClusters * clusterSpacing * 2;
+        int mapWidth = 500;
         float[,] weightMap = new float[mapWidth, mapWidth];
         for (int i = 0; i < mapWidth; i++)
         {
@@ -71,13 +71,25 @@ public class Sector : MonoBehaviour
                 }
             }
 
+            // Convert the noise map position to unity coordinates
+            float unityXPosition = (bestX - mapWidth / 2f) * 2;
+            float unityYPosition = (bestY - mapWidth / 2f) * 2;
+
+            // Actual game coordinates of clusters are different than unity coordinates
+            float xPosition = (bestX - mapWidth / 2f) * 1.5f;
+            float yPosition = (bestY - mapWidth / 2f) * 1.5f;
+
             // Create and add the cluster
-            Cluster newCluster = GameObject.Instantiate(ClusterPrefab, new Vector3(bestX, bestY, 0), Quaternion.identity, transform).GetComponent<Cluster>();
+            Cluster newCluster = GameObject.Instantiate(ClusterPrefab).GetComponent<Cluster>();
+            newCluster.transform.parent = transform;
+            newCluster.transform.position = new Vector3(unityXPosition, unityYPosition, 0);
+            newCluster.position = new Vector2(xPosition, yPosition);
             newCluster.clusterName = GenerateClusterName();
             newCluster.GenerateCluster(numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
             clusters.Add(newCluster);
 
             // Prevent other clusters from spawning too close
+            int clusterSpacing = (int) Mathf.Floor((float)mapWidth / (float)numClusters / 2f) * 2;
             for (int i = 0-clusterSpacing; i < clusterSpacing; i++)
             {
                 for (int j = 0-clusterSpacing; j < clusterSpacing; j++)

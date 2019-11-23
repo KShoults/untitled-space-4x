@@ -7,7 +7,6 @@ public class CameraController : MonoBehaviour
     public float TransitionSpeed;
     // Refers to Sector:0, Cluster:1, StarSystem:2
     public int viewType;
-    private int numClusters, clusterSpacing;
     private Camera mainCamera;
     private Vector3 targetPosition;
     private float targetSize;
@@ -16,8 +15,6 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        numClusters = GameManager.gameManager.numClusters;
-        clusterSpacing = GameManager.gameManager.clusterSpacing;
         mainCamera = GetComponent<Camera>();
         // Set the starting camera position
         SetCameraTarget(0, null);
@@ -48,9 +45,9 @@ public class CameraController : MonoBehaviour
         {
             default:
             case 0:     // Sector View
-                newPosition.x = numClusters * clusterSpacing;
-                newPosition.y = numClusters * clusterSpacing;
-                newSize = numClusters * clusterSpacing * 1.1f;
+                newPosition.x = 0;
+                newPosition.y = 0;
+                newSize = 550;
                 newLayerMask = 1 << 8;
                 break;
 
@@ -58,7 +55,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
-                newSize = 5;
+                newSize = 50;
                 newLayerMask = 1 << 9;
                 break;
 
@@ -66,7 +63,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
-                newSize = .1f;
+                newSize = 1;
                 newLayerMask = 1 << 10;
                 break;
         }
@@ -92,9 +89,9 @@ public class CameraController : MonoBehaviour
         {
             default:
             case 0:     // Sector View
-                targetPosition.x = numClusters * clusterSpacing;
-                targetPosition.y = numClusters * clusterSpacing;
-                targetSize = numClusters * clusterSpacing * 1.1f;
+                targetPosition.x = 0;
+                targetPosition.y = 0;
+                targetSize = 550;
                 targetLayerMask = 1 << 8;
                 break;
 
@@ -102,7 +99,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
-                targetSize = 5;
+                targetSize = 50;
                 targetLayerMask = 1 << 9;
                 break;
 
@@ -110,7 +107,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
-                targetSize = .1f;
+                targetSize = 1;
                 targetLayerMask = 1 << 10;
                 break;
         }
