@@ -8,9 +8,12 @@ public class StarSystem : MonoBehaviour
     // The position of this StarSystem relative to its parent cluster
     public Vector2 position;
     public string starSystemName;
-    public GameObject StarPrefab, PlanetPrefab;
+    public GameObject StarPrefab, PlanetPrefab, RegionPrefab;
     public Star star;
     public List<Planet> planets;
+    // The list contains a sequence of orbital regions
+    public List<Region[]> orbitalRegions;
+    public List<Region> planetaryRegions;
     private List<string> planetNames;
 
     // Start is called before the first frame update
@@ -42,6 +45,16 @@ public class StarSystem : MonoBehaviour
         // Create and add the planets
         planets = new List<Planet>();
         int currentSystemSize = 0;
+
+        // Create the innermost orbital region sequence
+        orbitalRegions = new List<Region[]>();
+        AddOrbitalSequence(ref orbitalRegions);
+        AddOrbitalSequence(ref orbitalRegions);
+        AddOrbitalSequence(ref orbitalRegions);
+        /*AddOrbitalSequence(ref orbitalRegions);
+        AddOrbitalSequence(ref orbitalRegions);
+        AddOrbitalSequence(ref orbitalRegions);*/
+
         // Planets are created from the inner orbit out until the systemSize is reached
         while (currentSystemSize < systemSize)
         {
@@ -57,12 +70,21 @@ public class StarSystem : MonoBehaviour
             newPlanet.transform.parent = transform;
             newPlanet.orbitalDistance = orbitalDistance;
             newPlanet.planetName = GeneratePlanetName();
+
             // Figure out where to show the planet in its orbit
             Vector3 orbitalDirection = new Vector3(Random.value - .5f, Random.value - .5f, 0);
             orbitalDirection = orbitalDirection.normalized;
-            // Remember to convert back to light years/Unity units
+
+            // Remember to convert back to Unity units
             newPlanet.transform.position = transform.position + (orbitalDirection * orbitalDistance / 20);
             planets.Add(newPlanet);
+
+            // Add an orbital region
+            //Region orbitalRegion = Instantiate(RegionPrefab).GetComponent<Region>();
+            //orbitalRegion.transform.parent = transform;
+            //orbitalRegion.transform.position = transform.position;
+            //orbitalRegion.transform.localScale = new Vector3(orbitalDistance / 10, orbitalDistance / 10, orbitalDistance / 10);
+
             currentSystemSize += 50;
         }
     }
@@ -144,5 +166,65 @@ public class StarSystem : MonoBehaviour
             }
         }
         return newNameList;
+    }
+
+    private void AddOrbitalSequence(ref List<Region[]> regions)
+    {
+        int numRegions = (int)Mathf.Pow(2, regions.Count+1);
+        Region[] newSequence = new Region[numRegions];
+        Transform regionMap = transform.Find("RegionMap");
+        float sequenceAngleOffset = 360f / numRegions / 2f;
+        for (int i = 0; i < numRegions; i++)
+        {
+            Region newRegion = Instantiate(RegionPrefab).GetComponent<Region>();
+            newRegion.transform.parent = regionMap;
+            Vector3 regionPosition = transform.position;
+            regionPosition.z = 3 + regions.Count;
+            newRegion.transform.position = regionPosition;
+            float regionAngle = 360f / numRegions;
+            Quaternion regionRotation = Quaternion.AngleAxis(regionAngle * i + sequenceAngleOffset, Vector3.back);
+            newRegion.transform.rotation = regionRotation;
+            Mesh regionMesh = GenerateRegionMesh(regions.Count+1);
+            newRegion.GetComponent<MeshFilter>().mesh = regionMesh;
+            newRegion.GetComponent<MeshCollider>().sharedMesh = regionMesh;
+            newSequence[i] = newRegion;
+        }
+        regions.Add(newSequence);
+    }
+
+    // Returns the region mesh for a region in the specified orbital sequence
+    private Mesh GenerateRegionMesh(int orbitalSequence)
+    {
+        float r = 2 * orbitalSequence; // The outer curve radius
+        int curveVertices = 20; // The number of vertices in the outer curve
+        Mesh newMesh = new Mesh();
+        Vector3[] newVertices = new Vector3[curveVertices + 2];
+        Vector2[] newUV = new Vector2[curveVertices + 2];
+        int[] newTriangles = new int[(curveVertices - 1) * 3];
+        float angle = 360f / (float)(curveVertices - 1) / Mathf.Pow(2, orbitalSequence);
+
+        // Create the outer curve
+        for (int i = 0; i < curveVertices; i++)
+        {
+            newVertices[i] = Quaternion.AngleAxis(angle * i, Vector3.back) * Vector3.up * r;
+            newUV[i] = new Vector2(i / (float)(curveVertices - 1), 1);
+        }
+
+        // Create the bottom vertex
+        newVertices[curveVertices] = Vector3.zero;
+        newUV[curveVertices] = new Vector2(.5f, 0);
+
+        // Create the triangles
+        for (int i = 0; i < curveVertices - 1; i++)
+        {
+            newTriangles[3 * i] = curveVertices; // The bottom vertex
+            newTriangles[3 * i + 1] = i;
+            newTriangles[3 * i + 2] = i + 1;
+        }
+
+        newMesh.vertices = newVertices;
+        newMesh.uv = newUV;
+        newMesh.triangles = newTriangles;
+        return newMesh;
     }
 }
