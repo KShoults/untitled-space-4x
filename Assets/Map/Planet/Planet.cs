@@ -9,7 +9,7 @@ public class Planet : MonoBehaviour
     public float orbitalDistance;
     // Planet size is an integer from 1 - 100;
     public int planetSize;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,5 +31,15 @@ public class Planet : MonoBehaviour
     void OnMouseExit()
     {
         Camera.main.GetComponent<InputManager>().HoverExit(this);
+    }
+
+    // Alert the InputManager whe this is clicked on
+
+    void OnMouseDown()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Camera.main.GetComponent<InputManager>().SelectPlanet(this);
+        }
     }
 }
