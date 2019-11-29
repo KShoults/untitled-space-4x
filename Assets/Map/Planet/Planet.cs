@@ -7,6 +7,9 @@ public class Planet : MonoBehaviour
     public string planetName;
     // orbital distance is measured in light minutes
     public float orbitalDistance;
+    // Planet size is an integer from 1 - 100;
+    public int planetSize;
+    
     // Start is called before the first frame update
     void Start()
     {
