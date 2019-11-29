@@ -8,9 +8,12 @@ public class StarSystem : MonoBehaviour
     // The position of this StarSystem relative to its parent cluster
     public Vector2 position;
     public string starSystemName;
-    public GameObject StarPrefab, PlanetPrefab;
+    public GameObject StarPrefab, PlanetPrefab, OrbitalRegionPrefab, PlanetaryRegionPrefab;
     public Star star;
     public List<Planet> planets;
+    // The list contains a sequence of orbital regions
+    public List<OrbitalRegion[]> orbitalRegions;
+    public List<PlanetaryRegion> planetaryRegions;
     private List<string> planetNames;
 
     // Start is called before the first frame update
@@ -42,6 +45,12 @@ public class StarSystem : MonoBehaviour
         // Create and add the planets
         planets = new List<Planet>();
         int currentSystemSize = 0;
+
+        // Create the innermost orbital region sequence
+        orbitalRegions = new List<OrbitalRegion[]>();
+        AddOrbitalSequence(ref orbitalRegions);
+        planetaryRegions = new List<PlanetaryRegion>();
+
         // Planets are created from the inner orbit out until the systemSize is reached
         while (currentSystemSize < systemSize)
         {
@@ -50,19 +59,96 @@ public class StarSystem : MonoBehaviour
             // Adjust outward for existing planets
             if (planets.Count > 0)
             {
-                orbitalDistance = orbitalDistance + planets[planets.Count - 1].orbitalDistance;
+                orbitalDistance += planets[planets.Count - 1].orbitalDistance;
             }
 
             Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
             newPlanet.transform.parent = transform;
             newPlanet.orbitalDistance = orbitalDistance;
             newPlanet.planetName = GeneratePlanetName();
-            // Figure out where to show the planet in its orbit
-            Vector3 orbitalDirection = new Vector3(Random.value - .5f, Random.value - .5f, 0);
-            orbitalDirection = orbitalDirection.normalized;
-            // Remember to convert back to light years/Unity units
-            newPlanet.transform.position = transform.position + (orbitalDirection * orbitalDistance / 20);
+
+            // Create planetary region
+            PlanetaryRegion planetaryRegion = Instantiate(PlanetaryRegionPrefab).GetComponent<PlanetaryRegion>();
+            planetaryRegion.transform.parent = transform.Find("RegionMap");
+            // Determine which orbital region to start looking in to place the planetary region
+            int desiredOrbitalSequence = (int)Mathf.Floor(orbitalDistance / 6);
+            // Create the orbital sequence if necessary
+            while (orbitalRegions.Count <= desiredOrbitalSequence)
+            {
+                AddOrbitalSequence(ref orbitalRegions);
+            }
+            // Generate the number of orbital regions to skip from 0 to the number of regions in that sequence
+            int regionsToSkip = (int)Mathf.Floor(orbitalRegions[desiredOrbitalSequence].Length * Random.value);
+
+            // Find an orbital region in which to place the planetary region
+            int skippedRegions = 0;
+            bool regionFound = false;
+            int foundRegion = 0;
+            do
+            {
+                for (int i = 0; i < orbitalRegions[desiredOrbitalSequence].Length; i++)
+                {
+                    if (orbitalRegions[desiredOrbitalSequence][i].planetaryRegion == null)
+                    {
+                        if (skippedRegions == regionsToSkip)
+                        {
+                            orbitalRegions[desiredOrbitalSequence][i].planetaryRegion = planetaryRegion;
+                            regionFound = true;
+                            foundRegion = i;
+                        }
+                        else
+                        {
+                            skippedRegions++;
+                        }
+                    }
+                }
+            } while (skippedRegions != 0 && regionFound == false);
+
+            // Create a new sequence if the desired one was full
+            if (regionFound == false)
+            {
+                AddOrbitalSequence(ref orbitalRegions);
+
+                desiredOrbitalSequence++;
+                for (int i = 0; i < orbitalRegions[desiredOrbitalSequence].Length; i++)
+                {
+                    if (orbitalRegions[desiredOrbitalSequence][i].planetaryRegion == null)
+                    {
+                        if (skippedRegions == regionsToSkip)
+                        {
+                            orbitalRegions[desiredOrbitalSequence][i].planetaryRegion = planetaryRegion;
+                        }
+                        else
+                        {
+                            skippedRegions++;
+                        }
+                    }
+                }
+            }
+
+            // Generate the planetary region's mesh
+            Mesh planetaryRegionMesh = GeneratePlanetaryRegionMesh();
+            planetaryRegion.GetComponent<MeshFilter>().mesh = planetaryRegionMesh;
+            planetaryRegion.GetComponent<MeshCollider>().sharedMesh = planetaryRegionMesh;
+
+            // Set the region's position
+            Vector3 regionPosition = transform.Find("RegionMap").position;
+            float regionAngle = 360f * foundRegion / (float)orbitalRegions[desiredOrbitalSequence].Length;
+            float r = (desiredOrbitalSequence * .2f) + .1f;
+            regionPosition += Quaternion.AngleAxis(regionAngle, Vector3.back) * Vector3.up * r;
+            regionPosition.z = 2;
+            planetaryRegion.transform.position = regionPosition;
+
+            planetaryRegions.Add(planetaryRegion);
+
+            // Place the planet in its planetary region
+            Vector3 planetPosition = regionPosition;
+            planetPosition.z = 1;
+            newPlanet.transform.position = planetPosition;
             planets.Add(newPlanet);
+
+
+
             currentSystemSize += 50;
         }
     }
@@ -144,5 +230,102 @@ public class StarSystem : MonoBehaviour
             }
         }
         return newNameList;
+    }
+
+    private void AddOrbitalSequence(ref List<OrbitalRegion[]> regions)
+    {
+        int numRegions = (int)Mathf.Pow(2, regions.Count+1);
+        OrbitalRegion[] newSequence = new OrbitalRegion[numRegions];
+        Transform regionMap = transform.Find("RegionMap");
+        float sequenceAngleOffset = 360f / numRegions / 2f;
+        for (int i = 0; i < numRegions; i++)
+        {
+            OrbitalRegion newRegion = Instantiate(OrbitalRegionPrefab).GetComponent<OrbitalRegion>();
+            newRegion.transform.parent = regionMap;
+            Vector3 regionPosition = transform.position;
+            regionPosition.z = 3 + regions.Count;
+            newRegion.transform.position = regionPosition;
+            float regionAngle = 360f / numRegions;
+            Quaternion regionRotation = Quaternion.AngleAxis(regionAngle * i + sequenceAngleOffset, Vector3.back);
+            newRegion.transform.rotation = regionRotation;
+            Mesh regionMesh = GenerateOrbitalRegionMesh(regions.Count+1);
+            newRegion.GetComponent<MeshFilter>().mesh = regionMesh;
+            newRegion.GetComponent<MeshCollider>().sharedMesh = regionMesh;
+            newSequence[i] = newRegion;
+        }
+        regions.Add(newSequence);
+    }
+
+    // Returns the region mesh for a region in the specified orbital sequence
+    private Mesh GenerateOrbitalRegionMesh(int orbitalSequence)
+    {
+        float r = 2 * orbitalSequence; // The outer curve radius
+        int curveVertices = 20; // The number of vertices in the outer curve
+        Mesh newMesh = new Mesh();
+        Vector3[] newVertices = new Vector3[curveVertices + 2];
+        Vector2[] newUV = new Vector2[curveVertices + 2];
+        int[] newTriangles = new int[(curveVertices - 1) * 3];
+        float angle = 360f / (float)(curveVertices - 1) / Mathf.Pow(2, orbitalSequence);
+
+        // Create the outer curve
+        for (int i = 0; i < curveVertices; i++)
+        {
+            newVertices[i] = Quaternion.AngleAxis(angle * i, Vector3.back) * Vector3.up * r;
+            newUV[i] = new Vector2(i / (float)(curveVertices - 1), 1);
+        }
+
+        // Create the bottom vertex
+        newVertices[curveVertices] = Vector3.zero;
+        newUV[curveVertices] = new Vector2(.5f, 0);
+
+        // Create the triangles
+        for (int i = 0; i < curveVertices - 1; i++)
+        {
+            newTriangles[3 * i] = curveVertices; // The bottom vertex
+            newTriangles[3 * i + 1] = i;
+            newTriangles[3 * i + 2] = i + 1;
+        }
+
+        newMesh.vertices = newVertices;
+        newMesh.uv = newUV;
+        newMesh.triangles = newTriangles;
+        return newMesh;
+    }
+
+    private Mesh GeneratePlanetaryRegionMesh()
+    {
+        int curveVertices = 20;
+        Mesh newMesh = new Mesh();
+        Vector3[] newVertices = new Vector3[curveVertices + 1];
+        Vector2[] newUV = new Vector2[curveVertices + 1];
+        int[] newTriangles = new int[3 * curveVertices];
+        float angle = 360f / (float)(curveVertices - 1);
+        float r = .1f;
+
+        // Create a circular mesh
+        for (int i = 0; i < curveVertices; i++)
+        {
+            Vector3 vertex = Quaternion.AngleAxis(angle * i, Vector3.back) * Vector3.up;
+            newVertices[i] = vertex * r;
+
+            newUV[i] = new Vector2((vertex.x + 1 ) / 2f, (vertex.y + 1 ) / 2f);
+        }
+
+        // Create the center vertex
+        newVertices[curveVertices] = Vector3.zero;
+        newUV[curveVertices] = new Vector2(.5f, .5f);
+
+        // Create the triangles
+        for (int i = 0; i < curveVertices - 1; i++)
+        {
+            newTriangles[3 * i] = curveVertices; // The center vertex
+            newTriangles[3 * i + 1] = i;
+            newTriangles[3 * i + 2] = i + 1;
+        }
+
+        newMesh.vertices = newVertices;
+        newMesh.uv = newUV;
+        newMesh.triangles = newTriangles;
+        return newMesh;
     }
 }
