@@ -9,6 +9,10 @@ public class Planet : MonoBehaviour
     public float orbitalDistance;
     // Planet size is an integer from 1 - 100;
     public int planetSize;
+    // The units for resources are the same as planet size.
+    public Dictionary<Resource, float> resources;
+    // The mineral quality can be common:0, uncommon:1, rare:2
+    public int mineralQuality;
 
     // Start is called before the first frame update
     void Start()
