@@ -99,6 +99,7 @@ public class StarSystem : MonoBehaviour
                             orbitalRegions[desiredOrbitalSequence][i].planetaryRegion = planetaryRegion;
                             regionFound = true;
                             foundRegion = i;
+                            break;
                         }
                         else
                         {
