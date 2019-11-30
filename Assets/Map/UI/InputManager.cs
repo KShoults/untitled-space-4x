@@ -7,7 +7,7 @@ public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
     // Planet Panel Texts
-    public Text PlanetNameText, PlanetSizeText;
+    public Text PlanetNameText, PlanetSizeText, PlanetHabitabilityText;
     // Resource Panel Texts
     public Text EnergyText, WaterText, FoodText, MineralText;
     // Dictionary for quick lookup of resourceTexts
@@ -126,6 +126,7 @@ public class InputManager : MonoBehaviour
         PlanetPanel.gameObject.SetActive(true);
         PlanetNameText.text = planet.planetName;
         PlanetSizeText.text = "Size: " + planet.planetSize;
+        PlanetHabitabilityText.text = "Hab: " + planet.habitability;
         // Set the resource panel texts
         Dictionary<Resource, string> resourceStrings = ResourceUtil.ResourceString;
         foreach (KeyValuePair<Resource, float> kvp in planet.resources)
