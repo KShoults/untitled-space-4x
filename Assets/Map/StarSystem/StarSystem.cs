@@ -171,14 +171,14 @@ public class StarSystem : MonoBehaviour
             // Zero out any resources that are below a certain threshold
             for (int i = 0; i < 4; i++)
             {
-                if (planetResources[(Resource)i] < 5)
+                if (planetResources[(Resource)i] < 2.5f)
                 {
                     planetResources[(Resource)i] = 0;
                 }
             }
 
             // Calculate the highest maximum possible size multiplier between all resources
-            float maxMultiplier = planetSize;
+            float maxMultiplier = planetSize / 8f;
             foreach (KeyValuePair<Resource, float> kvp in planetResources)
             {
                 if (planetSize / kvp.Value < maxMultiplier)
@@ -191,6 +191,11 @@ public class StarSystem : MonoBehaviour
             for (int i = 0; i < 4; i++)
             {
                 planetResources[(Resource)i] *= maxMultiplier;
+                // Floor any values that are less than 1
+                if (planetResources[(Resource)i] < 1)
+                {
+                    planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
+                } 
             }
 
             newPlanet.resources = planetResources;
