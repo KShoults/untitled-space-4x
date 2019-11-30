@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
-    public Text SelectedObjectNameText, LabelViewText;
+    public Text SelectedObjectNameText, LabelViewText, PlanetNameText, PlanetSizeText;
+    public RectTransform PlanetPanel;
     private CameraController cameraController;
     private MonoBehaviour viewObject;
 
@@ -100,6 +101,7 @@ public class InputManager : MonoBehaviour
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
+                PlanetPanel.gameObject.SetActive(false);
                 break;
 
             case 2:
@@ -109,5 +111,13 @@ public class InputManager : MonoBehaviour
                 break;
         }
         viewObject = o;
+    }
+
+    // Triggers the UI changes that should occur when a planet is selected
+    public void SelectPlanet(Planet planet)
+    {
+        PlanetPanel.gameObject.SetActive(true);
+        PlanetNameText.text = planet.planetName;
+        PlanetSizeText.text = "Size: " + planet.planetSize;
     }
 }

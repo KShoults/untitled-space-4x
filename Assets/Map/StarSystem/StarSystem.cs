@@ -54,6 +54,9 @@ public class StarSystem : MonoBehaviour
         // Planets are created from the inner orbit out until the systemSize is reached
         while (currentSystemSize < systemSize)
         {
+            // Generate the planet's size
+            int planetSize = (int)Mathf.Floor(Random.value * 99 + 1);
+
             // Figure orbital distance in light minutes
             float orbitalDistance = 2 + (Random.value * 2);
             // Adjust outward for existing planets
@@ -66,6 +69,7 @@ public class StarSystem : MonoBehaviour
             newPlanet.transform.parent = transform;
             newPlanet.orbitalDistance = orbitalDistance;
             newPlanet.planetName = GeneratePlanetName();
+            newPlanet.planetSize = planetSize;
 
             // Create planetary region
             PlanetaryRegion planetaryRegion = Instantiate(PlanetaryRegionPrefab).GetComponent<PlanetaryRegion>();
@@ -149,7 +153,7 @@ public class StarSystem : MonoBehaviour
 
 
 
-            currentSystemSize += 50;
+            currentSystemSize += planetSize;
         }
     }
 
