@@ -52,4 +52,23 @@ public static class StarClassUtil
             return _starResources;
         }
     }
+
+    private static readonly Dictionary<StarClass, int> _starHabitability = new Dictionary<StarClass, int>
+    {
+        {StarClass.O, 1},
+        {StarClass.B, 2},
+        {StarClass.A, 4},
+        {StarClass.F, 6},
+        {StarClass.G, 8},
+        {StarClass.K, 6},
+        {StarClass.M, 4}
+    };
+
+    public static Dictionary<StarClass, int> StarHabitability
+    {
+        get
+        {
+            return _starHabitability;
+        }
+    }
 }

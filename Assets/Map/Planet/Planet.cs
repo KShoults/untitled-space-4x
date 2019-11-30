@@ -13,6 +13,8 @@ public class Planet : MonoBehaviour
     public Dictionary<Resource, float> resources;
     // The mineral quality can be common:0, uncommon:1, rare:2
     public int mineralQuality;
+    // The habitability is from 1 - 100
+    public int habitability;
 
     // Start is called before the first frame update
     void Start()

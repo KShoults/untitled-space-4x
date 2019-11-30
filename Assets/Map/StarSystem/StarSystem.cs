@@ -215,6 +215,24 @@ public class StarSystem : MonoBehaviour
                 }
             }
 
+            // Generate planet habitability
+            float habitability = Random.value;
+
+            // Adjust for star class
+            habitability *= StarClassUtil.StarHabitability[star.starClass];
+
+            // Place this habitability on a curve that makes high habitability rare
+            // The curve is the function (1.25x)^4 / 100
+            habitability = Mathf.Pow(1.25f * habitability, 4) / 100f;
+
+            // Minimum habitability should be 1
+            if (habitability < 1)
+            {
+                habitability = 1;
+            }
+
+            newPlanet.habitability = (int)Mathf.Round(habitability);
+
             currentSystemSize += planetSize;
         }
     }
