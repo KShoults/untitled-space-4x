@@ -151,7 +151,63 @@ public class StarSystem : MonoBehaviour
             newPlanet.transform.position = planetPosition;
             planets.Add(newPlanet);
 
+            // Generate planet resources
+            Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
+            // Generate a random value for each resource
+            for (int i = 0; i < 4; i++)
+            {
+                planetResources[(Resource)i] = Random.value;
+            }
+            
+            // Modify each resource by the star class
+            Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
+            foreach (KeyValuePair<Resource, int> kvp in classResources)
+            {
+                planetResources[kvp.Key] *= kvp.Value;
+            }
+            // Increase the mineral amounts to bring it to the same level as the rest
+            planetResources[Resource.Minerals] *= 10;
 
+            // Zero out any resources that are below a certain threshold
+            for (int i = 0; i < 4; i++)
+            {
+                if (planetResources[(Resource)i] < 5)
+                {
+                    planetResources[(Resource)i] = 0;
+                }
+            }
+
+            // Calculate the highest maximum possible size multiplier between all resources
+            float maxMultiplier = planetSize;
+            foreach (KeyValuePair<Resource, float> kvp in planetResources)
+            {
+                if (planetSize / kvp.Value < maxMultiplier)
+                {
+                    maxMultiplier = planetSize / kvp.Value;
+                }
+            }
+
+            // Adjust resources for planet size
+            for (int i = 0; i < 4; i++)
+            {
+                planetResources[(Resource)i] *= maxMultiplier;
+            }
+
+            newPlanet.resources = planetResources;
+
+            // Generate mineral quality
+            if (planetResources[Resource.Minerals] > 0)
+            {
+                float mineralQuality = Random.value;
+                if (mineralQuality >= .5f)
+                {
+                    newPlanet.mineralQuality = 2;
+                }
+                else if (mineralQuality >= .15f)
+                {
+                    newPlanet.mineralQuality = 1;
+                }
+            }
 
             currentSystemSize += planetSize;
         }
