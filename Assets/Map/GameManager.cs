@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
     public NameManager nameManager;
+    public Text TurnCounterText;
+    public int turnCounter;
     // Galaxy generation default settings
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar;
     public Sector sector;
@@ -33,11 +36,18 @@ public class GameManager : MonoBehaviour
     {
         // Create the sector using perlin noise maps
         sector.GenerateSector(numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
+        TurnCounterText.text = "Turn: " + turnCounter;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void EndTurn()
+    {
+        turnCounter++;
+        TurnCounterText.text = "Turn: " + turnCounter;
     }
 }
