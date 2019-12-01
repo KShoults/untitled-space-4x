@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar;
     public Sector sector;
     public float nameSeed = 0;
+    public StarSystem homeSystem;
 
     void Awake()
     {
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour
     {
         // Create the sector using perlin noise maps
         sector.GenerateSector(numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar);
+        CreateHomeworld();
         TurnCounterText.text = "Turn: " + turnCounter;
     }
 
@@ -49,5 +51,27 @@ public class GameManager : MonoBehaviour
     {
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;
+    }
+
+    private void CreateHomeworld()
+    {
+        // Find a random planet in the home system to designate as the home planet
+        Planet homeworld = homeSystem.planets[(int)Mathf.Floor(Random.value * homeSystem.planets.Count)];
+
+        // Overwrite its size, habitability, and resources
+        homeworld.planetSize = 50;
+        homeworld.habitability = 90;
+
+        Dictionary<Resource, float> resources = new Dictionary<Resource, float>();
+        resources.Add(Resource.Energy, 10f);
+        resources.Add(Resource.Water, 20f);
+        resources.Add(Resource.Food, 20f);
+        resources.Add(Resource.Minerals, 20f);
+
+        homeworld.resources = resources;
+        homeworld.mineralQuality = 0;
+
+        // Center the view on the home system
+        Camera.main.GetComponent<CameraController>().SetCameraTarget(2, homeSystem);
     }
 }

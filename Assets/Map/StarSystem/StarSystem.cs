@@ -39,6 +39,12 @@ public class StarSystem : MonoBehaviour
         star.GetComponent<SpriteRenderer>().color = StarClassUtil.StarColor[star.starClass];
         GetComponent<SpriteRenderer>().color = StarClassUtil.StarColor[star.starClass];
 
+        // If this is the first G-class star designate it as the player's home system
+        if (star.starClass == StarClass.G && GameManager.gameManager.homeSystem == null)
+        {
+            GameManager.gameManager.homeSystem = this;
+        }
+
         // Determine the total size of planets to add to the system
         int systemSize = sizePlanetsAvg + (int) Mathf.Round((Random.value * sizePlanetsVar * 2) - sizePlanetsVar);
 
