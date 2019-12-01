@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar;
     public Sector sector;
     public float nameSeed = 0;
+    public StarSystem homeSystem;
 
     void Awake()
     {
@@ -54,12 +55,8 @@ public class GameManager : MonoBehaviour
 
     private void CreateHomeworld()
     {
-        // Find a random planet to designate the home planet
-        int homeCluster = (int)Mathf.Floor(Random.value * numClusters);
-        int homeSystem = (int)Mathf.Floor(Random.value * sector.clusters[homeCluster].starSystems.Count);
-        int homePlanet = (int)Mathf.Floor(Random.value * sector.clusters[homeCluster].starSystems[homeSystem].planets.Count);
-
-        Planet homeworld = sector.clusters[homeCluster].starSystems[homeSystem].planets[homePlanet];
+        // Find a random planet in the home system to designate as the home planet
+        Planet homeworld = homeSystem.planets[(int)Mathf.Floor(Random.value * homeSystem.planets.Count)];
 
         // Overwrite its size, habitability, and resources
         homeworld.planetSize = 50;
@@ -74,6 +71,7 @@ public class GameManager : MonoBehaviour
         homeworld.resources = resources;
         homeworld.mineralQuality = 0;
 
-        Debug.Log("Homeworld: " + homeworld.planetName);
+        // Center the view on the home system
+        Camera.main.GetComponent<CameraController>().SetCameraTarget(2, homeSystem);
     }
 }

@@ -15,9 +15,10 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mainCamera = GetComponent<Camera>();
-        // Set the starting camera position
-        SetCameraTarget(0, null);
+        if (mainCamera == null)
+        {
+            mainCamera = GetComponent<Camera>();
+        }
     }
 
     // Update is called once per frame
@@ -35,6 +36,12 @@ public class CameraController : MonoBehaviour
     */ 
     public void SetCameraTarget(int position, MonoBehaviour o)
     {
+        // It's possible for this to be called before start by the GameManager
+        if (mainCamera == null)
+        {
+            mainCamera = GetComponent<Camera>();
+        }
+
         Vector3 objectPosition;
         Vector3 newPosition = Vector3.zero;
         newPosition.z = -10;
