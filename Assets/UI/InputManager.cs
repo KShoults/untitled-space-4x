@@ -6,13 +6,7 @@ using UnityEngine.UI;
 public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
-    // Planet Panel Texts
-    public Text PlanetNameText, PlanetSizeText, PlanetHabitabilityText;
-    // Resource Panel Texts
-    public Text EnergyText, WaterText, FoodText, MineralText;
-    // Dictionary for quick lookup of resourceTexts
-    public Dictionary<Resource, Text> resourceTexts;
-    public RectTransform PlanetPanel;
+    public PlanetPanel planetPanel;
     private CameraController cameraController;
     private MonoBehaviour viewObject;
 
@@ -20,7 +14,6 @@ public class InputManager : MonoBehaviour
     void Start()
     {
         cameraController = GetComponent<CameraController>();
-        InitializeResourceTexts();
     }
 
     // Update is called once per frame
@@ -108,7 +101,7 @@ public class InputManager : MonoBehaviour
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
-                PlanetPanel.gameObject.SetActive(false);
+                planetPanel.gameObject.SetActive(false);
                 break;
 
             case 2:
@@ -123,34 +116,7 @@ public class InputManager : MonoBehaviour
     // Triggers the UI changes that should occur when a planet is selected
     public void SelectPlanet(Planet planet)
     {
-        PlanetPanel.gameObject.SetActive(true);
-        PlanetNameText.text = planet.planetName;
-        PlanetSizeText.text = "Size: " + planet.planetSize;
-        PlanetHabitabilityText.text = "Hab: " + planet.habitability;
-        // Set the resource panel texts
-        Dictionary<Resource, string> resourceStrings = ResourceUtil.ResourceString;
-        foreach (KeyValuePair<Resource, float> kvp in planet.resources)
-        {
-            if (kvp.Value == 0)
-            {
-                resourceTexts[kvp.Key].gameObject.SetActive(false);
-            }
-            else
-            {
-                resourceTexts[kvp.Key].gameObject.SetActive(true);
-                resourceTexts[kvp.Key].text = resourceStrings[kvp.Key] + ": " + (int)Mathf.Floor(kvp.Value);
-            }
-        }
-    }
-
-    private void InitializeResourceTexts()
-    {
-        resourceTexts = new Dictionary<Resource, Text>
-        {
-            {Resource.Energy, EnergyText},
-            {Resource.Water, WaterText},
-            {Resource.Food, FoodText},
-            {Resource.Minerals, MineralText}
-        };
+        planetPanel.gameObject.SetActive(true);
+        planetPanel.SelectPlanet(planet);
     }
 }
