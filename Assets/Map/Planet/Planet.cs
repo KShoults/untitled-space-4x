@@ -15,17 +15,11 @@ public class Planet : MonoBehaviour
     public int mineralQuality;
     // The habitability is from 1 - 100
     public int habitability;
+    public Dictionary<Resource, Industry> industries;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        industries = new Dictionary<Resource, Industry>();
     }
 
     // Alert the InputManager when this is hovered over
