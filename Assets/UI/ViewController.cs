@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public enum View
+{
+    Sector,
+    Cluster,
+    System,
+    Region
+}
+
+public class ViewController : MonoBehaviour
 {
     public float TransitionSpeed;
     // Refers to Sector:0, Cluster:1, StarSystem:2
-    public int viewType;
+    public View view;
     private Camera mainCamera;
     private Vector3 targetPosition;
     private float targetSize;
@@ -32,9 +40,9 @@ public class CameraController : MonoBehaviour
     }
 
     /* Set the camera to one of three preset positions without a transition
-    /  position: preset position to move the camera to; 0 = Sector View, 1 = Cluster View, 2 = System View
+    /  view: which view to move the camera to
     */ 
-    public void SetCameraTarget(int position, MonoBehaviour o)
+    public void SetCameraTarget(View newView, MonoBehaviour o)
     {
         // It's possible for this to be called before start by the GameManager
         if (mainCamera == null)
@@ -48,17 +56,17 @@ public class CameraController : MonoBehaviour
         float newSize = 0;
         int newLayerMask = 0;
 
-        switch (position)
+        switch (newView)
         {
             default:
-            case 0:     // Sector View
+            case View.Sector:     // Sector View
                 newPosition.x = 0;
                 newPosition.y = 0;
                 newSize = 550;
                 newLayerMask = 1 << 8;
                 break;
 
-            case 1:     // Cluster View
+            case View.Cluster:     // Cluster View
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
@@ -66,7 +74,7 @@ public class CameraController : MonoBehaviour
                 newLayerMask = 1 << 9;
                 break;
 
-            case 2:     // System View
+            case View.System:     // System View
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
@@ -79,30 +87,30 @@ public class CameraController : MonoBehaviour
         targetPosition = newPosition;
         mainCamera.orthographicSize = newSize;
         targetSize = newSize;
-        GetComponent<InputManager>().ChangeView(position, o);
-        viewType = position;
+        GetComponent<InputManager>().ChangeView(newView, o);
+        view = newView;
     }
 
     /* Set the camera target position to one of three preset positions.
     /  The camera will move smoothly to the target position.
-    /  position: preset position to move the camera to; 0 = Sector View, 1 = Cluster View, 2 = System View
+    /  view: which view to move the camera to
     */ 
-    public void SetCameraTargetSmooth(int position, MonoBehaviour o)
+    public void SetCameraTargetSmooth(View newView, MonoBehaviour o)
     {
         Vector3 objectPosition;
         targetPosition.z = -10;
 
-        switch (position)
+        switch (newView)
         {
             default:
-            case 0:     // Sector View
+            case View.Sector:     // Sector View
                 targetPosition.x = 0;
                 targetPosition.y = 0;
                 targetSize = 550;
                 targetLayerMask = 1 << 8;
                 break;
 
-            case 1:     // Cluster View
+            case View.Cluster:     // Cluster View
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
@@ -110,7 +118,7 @@ public class CameraController : MonoBehaviour
                 targetLayerMask = 1 << 9;
                 break;
 
-            case 2:     // System View
+            case View.System:     // System View
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
@@ -125,8 +133,8 @@ public class CameraController : MonoBehaviour
             mainCamera.cullingMask = targetLayerMask;
         }
 
-        GetComponent<InputManager>().ChangeView(position, o);
-        viewType = position;
+        GetComponent<InputManager>().ChangeView(newView, o);
+        view = newView;
     }
 
     private void MoveTowardTargetPosition()

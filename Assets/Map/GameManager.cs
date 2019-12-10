@@ -72,6 +72,6 @@ public class GameManager : MonoBehaviour
         homeworld.mineralQuality = 0;
 
         // Center the view on the home system
-        Camera.main.GetComponent<CameraController>().SetCameraTarget(2, homeSystem);
+        Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
     }
 }

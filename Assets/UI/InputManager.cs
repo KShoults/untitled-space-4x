@@ -7,13 +7,13 @@ public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
     public PlanetPanel planetPanel;
-    private CameraController cameraController;
+    private ViewController viewController;
     private MonoBehaviour viewObject;
 
     // Start is called before the first frame update
     void Start()
     {
-        cameraController = GetComponent<CameraController>();
+        viewController = GetComponent<ViewController>();
     }
 
     // Update is called once per frame
@@ -27,18 +27,18 @@ public class InputManager : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
 
-            switch (cameraController.viewType)
+            switch (viewController.view)
             {
                 default:
-                case 0:
+                case View.Sector:
                     break;
-                case 1:
-                    GetComponent<CameraController>().SetCameraTargetSmooth(0, null);
+                case View.Cluster:
+                    viewController.SetCameraTargetSmooth(View.Sector, null);
                     break;
-                case 2:
+                case View.System:
                     if (viewObject != null)
                     {
-                        GetComponent<CameraController>().SetCameraTargetSmooth(1, viewObject.GetComponentInParent<Cluster>());
+                        viewController.SetCameraTargetSmooth(View.Cluster, viewObject.GetComponentInParent<Cluster>());
                     }
                     break;
             }
@@ -87,24 +87,24 @@ public class InputManager : MonoBehaviour
     // Triggers all of the UI changes that should occur when the view changes
     // viewType refers to Sector/Cluster/System view.
     // o is the cluster or system we are viewing or null for sector view.
-    public void ChangeView(int viewType, MonoBehaviour o)
+    public void ChangeView(View newView, MonoBehaviour o)
     {
-        switch (viewType)
+        switch (newView)
         {
             default:
-            case 0:
+            case View.Sector:
                 LabelViewText.text = "";
                 LabelViewText.gameObject.SetActive(false);
                 break;
 
-            case 1:
+            case View.Cluster:
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
-                planetPanel.gameObject.SetActive(false);
+                //planetPanel.gameObject.SetActive(false);
                 break;
 
-            case 2:
+            case View.System:
                 StarSystem starSystem = o as StarSystem;
                 LabelViewText.text = starSystem.starSystemName;
                 LabelViewText.gameObject.SetActive(true);
@@ -116,7 +116,7 @@ public class InputManager : MonoBehaviour
     // Triggers the UI changes that should occur when a planet is selected
     public void SelectPlanet(Planet planet)
     {
-        planetPanel.gameObject.SetActive(true);
-        planetPanel.SelectPlanet(planet);
+        //planetPanel.gameObject.SetActive(true);
+        //planetPanel.SelectPlanet(planet);
     }
 }

@@ -258,7 +258,7 @@ public class StarSystem : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(2, this);
+            Camera.main.GetComponent<ViewController>().SetCameraTargetSmooth(View.System, this);
         }
     }
 
