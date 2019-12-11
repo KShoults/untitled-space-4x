@@ -41,6 +41,13 @@ public class InputManager : MonoBehaviour
                         viewController.SetCameraTargetSmooth(View.Cluster, viewObject.GetComponentInParent<Cluster>());
                     }
                     break;
+                case View.Region:
+                case View.Planet:
+                    if (viewObject != null)
+                    {
+                        viewController.SetCameraTargetSmooth(View.System, viewObject.GetComponentInParent<StarSystem>());
+                    }
+                    break;
             }
         }
     }
@@ -107,6 +114,18 @@ public class InputManager : MonoBehaviour
             case View.System:
                 StarSystem starSystem = o as StarSystem;
                 LabelViewText.text = starSystem.starSystemName;
+                LabelViewText.gameObject.SetActive(true);
+                break;
+
+            case View.Region:
+                Region region = o as Region;
+                //LabelViewText.text = region.regionName;
+                LabelViewText.gameObject.SetActive(false);
+                break;
+            
+            case View.Planet:
+                Planet planet = o as Planet;
+                LabelViewText.text = planet.planetName;
                 LabelViewText.gameObject.SetActive(true);
                 break;
         }

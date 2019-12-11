@@ -33,13 +33,13 @@ public class Planet : MonoBehaviour
         Camera.main.GetComponent<InputManager>().HoverExit(this);
     }
 
-    // Alert the InputManager whe this is clicked on
+    // Alert the InputManager when this is clicked on
 
     void OnMouseDown()
     {
         if (Input.GetMouseButton(0))
         {
-            Camera.main.GetComponent<InputManager>().SelectPlanet(this);
+            Camera.main.GetComponent<ViewController>().SetCameraTargetSmooth(View.Planet, this);
         }
     }
 }

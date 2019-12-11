@@ -7,13 +7,13 @@ public enum View
     Sector,
     Cluster,
     System,
-    Region
+    Region,
+    Planet
 }
 
 public class ViewController : MonoBehaviour
 {
     public float TransitionSpeed;
-    // Refers to Sector:0, Cluster:1, StarSystem:2
     public View view;
     private Camera mainCamera;
     private Vector3 targetPosition;
@@ -32,8 +32,8 @@ public class ViewController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.position, targetPosition) >= .1f ||
-            mainCamera.orthographicSize - targetSize >= .1f * targetSize)
+        if (Vector3.Distance(transform.position, targetPosition) >= .01f ||
+            Mathf.Abs(mainCamera.orthographicSize - targetSize) >= .01f * targetSize)
         {
             MoveTowardTargetPosition();
         }
@@ -59,14 +59,14 @@ public class ViewController : MonoBehaviour
         switch (newView)
         {
             default:
-            case View.Sector:     // Sector View
+            case View.Sector:   // Sector View
                 newPosition.x = 0;
                 newPosition.y = 0;
                 newSize = 550;
                 newLayerMask = 1 << 8;
                 break;
 
-            case View.Cluster:     // Cluster View
+            case View.Cluster:  // Cluster View
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
@@ -74,12 +74,28 @@ public class ViewController : MonoBehaviour
                 newLayerMask = 1 << 9;
                 break;
 
-            case View.System:     // System View
+            case View.System:   // System View
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
                 newSize = 1;
                 newLayerMask = 1 << 10;
+                break;
+
+            case View.Region:   // The Region View
+                objectPosition = o.transform.position;
+                newPosition.x = objectPosition.x;
+                newPosition.y = objectPosition.y;
+                newSize = .1f;
+                newLayerMask = 1 << 11;
+                break;
+
+            case View.Planet:   // The Planet View
+                objectPosition = o.transform.position;
+                newPosition.x = objectPosition.x;
+                newPosition.y = objectPosition.y;
+                newSize = .1f;
+                newLayerMask = 1 << 12;
                 break;
         }
         mainCamera.cullingMask = newLayerMask;
@@ -103,14 +119,14 @@ public class ViewController : MonoBehaviour
         switch (newView)
         {
             default:
-            case View.Sector:     // Sector View
+            case View.Sector:   // Sector View
                 targetPosition.x = 0;
                 targetPosition.y = 0;
                 targetSize = 550;
                 targetLayerMask = 1 << 8;
                 break;
 
-            case View.Cluster:     // Cluster View
+            case View.Cluster:  // Cluster View
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
@@ -118,12 +134,28 @@ public class ViewController : MonoBehaviour
                 targetLayerMask = 1 << 9;
                 break;
 
-            case View.System:     // System View
+            case View.System:   // System View
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
                 targetSize = 1;
                 targetLayerMask = 1 << 10;
+                break;
+
+            case View.Region:   // The Region View
+                objectPosition = o.transform.position;
+                targetPosition.x = objectPosition.x;
+                targetPosition.y = objectPosition.y;
+                targetSize = .1f;
+                targetLayerMask = 1 << 11;
+                break;
+
+            case View.Planet:   // The Planet View
+                objectPosition = o.transform.position;
+                targetPosition.x = objectPosition.x;
+                targetPosition.y = objectPosition.y;
+                targetSize = .1f;
+                targetLayerMask = 1 << 12;
                 break;
         }
 
@@ -145,7 +177,7 @@ public class ViewController : MonoBehaviour
         mainCamera.orthographicSize = newSize;
         
         // When zooming out the mask should be applied when finished.
-        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .25f * targetSize)
+        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .1f * targetSize)
         {
             mainCamera.cullingMask = targetLayerMask;
         }
