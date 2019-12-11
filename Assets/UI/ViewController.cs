@@ -180,7 +180,8 @@ public class ViewController : MonoBehaviour
         mainCamera.orthographicSize = newSize;
         
         // When zooming out the mask should be applied when finished.
-        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .1f * targetSize)
+        if (targetSize - mainCamera.orthographicSize > 0 &&
+            targetSize - mainCamera.orthographicSize < .1f * targetSize)
         {
             mainCamera.cullingMask = targetLayerMask;
             GetComponent<InputManager>().ChangeView(view, viewObject);

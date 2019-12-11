@@ -182,7 +182,6 @@ public class InputManager : MonoBehaviour
             // Activate any OverlayObjects in the new overlay
             foreach(OverlayObject o in overlayLists[view][overlay])
             {
-                o.gameObject.SetActive(true);
                 o.Initialize(viewObject);
             }
         }

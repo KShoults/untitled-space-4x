@@ -16,6 +16,7 @@ public abstract class OverlayObject : MonoBehaviour
     // Registers this overlay object and then disables it so that it is ready to be called by input manager.
     protected void RegisterOverlayObject(View view, Overlay overlay)
     {
+        GetComponent<Canvas>().worldCamera = Camera.main;
         Camera.main.GetComponent<InputManager>().overlayLists[view][overlay].Add(this);
         gameObject.SetActive(false);
     }
