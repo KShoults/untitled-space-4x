@@ -19,6 +19,7 @@ public class ViewController : MonoBehaviour
     private Vector3 targetPosition;
     private float targetSize;
     private int targetLayerMask;
+    private MonoBehaviour viewObject;
 
     // Start is called before the first frame update
     void Start()
@@ -105,6 +106,7 @@ public class ViewController : MonoBehaviour
         targetSize = newSize;
         GetComponent<InputManager>().ChangeView(newView, o);
         view = newView;
+        viewObject = o;
     }
 
     /* Set the camera target position to one of three preset positions.
@@ -163,10 +165,11 @@ public class ViewController : MonoBehaviour
         if (targetSize < mainCamera.orthographicSize)
         {
             mainCamera.cullingMask = targetLayerMask;
+            GetComponent<InputManager>().ChangeView(newView, o);
         }
 
-        GetComponent<InputManager>().ChangeView(newView, o);
         view = newView;
+        viewObject = o;
     }
 
     private void MoveTowardTargetPosition()
@@ -180,6 +183,7 @@ public class ViewController : MonoBehaviour
         if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .1f * targetSize)
         {
             mainCamera.cullingMask = targetLayerMask;
+            GetComponent<InputManager>().ChangeView(view, viewObject);
         }
     }
 }

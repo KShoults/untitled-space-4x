@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,8 +8,16 @@ public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
     public PlanetPanel planetPanel;
+    public Dictionary<View, Dictionary<Overlay, List<OverlayObject>>> overlayLists;
+    private Overlay activeOverlay;
+    private View activeView;
     private ViewController viewController;
     private MonoBehaviour viewObject;
+
+    void Awake()
+    {
+        InitializeOverlayLists();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +28,10 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (activeOverlay == Overlay.None)
+        {
+            SetOverlay(activeView, Overlay.Development);
+        }
         HandleMouseButtons();
     }
 
@@ -27,7 +40,7 @@ public class InputManager : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
 
-            switch (viewController.view)
+            switch (activeView)
             {
                 default:
                 case View.Sector:
@@ -130,6 +143,7 @@ public class InputManager : MonoBehaviour
                 break;
         }
         viewObject = o;
+        SetOverlay(newView, activeOverlay);
     }
 
     // Triggers the UI changes that should occur when a planet is selected
@@ -137,5 +151,43 @@ public class InputManager : MonoBehaviour
     {
         //planetPanel.gameObject.SetActive(true);
         //planetPanel.SelectPlanet(planet);
+    }
+
+    private void InitializeOverlayLists()
+    {
+        overlayLists = new Dictionary<View, Dictionary<Overlay, List<OverlayObject>>>();
+        foreach(View view in Enum.GetValues(typeof(View)))
+        {
+            overlayLists.Add(view, new Dictionary<Overlay, List<OverlayObject>>());
+            foreach(Overlay overlay in Enum.GetValues(typeof(Overlay)))
+            {
+                overlayLists[view].Add(overlay, new List<OverlayObject>());
+            }
+        }
+    }
+    
+    private void SetOverlay(View view, Overlay overlay)
+    {
+        if (activeOverlay != Overlay.None)
+        {
+            // Deactivate any OverlayObjects in the old overlay
+            foreach(OverlayObject o in overlayLists[activeView][activeOverlay])
+            {
+                o.gameObject.SetActive(false);
+            }
+        }
+
+        if (overlay != Overlay.None)
+        {
+            // Activate any OverlayObjects in the new overlay
+            foreach(OverlayObject o in overlayLists[view][overlay])
+            {
+                o.gameObject.SetActive(true);
+                o.Initialize(viewObject);
+            }
+        }
+
+        activeOverlay = overlay;
+        activeView = view;
     }
 }
