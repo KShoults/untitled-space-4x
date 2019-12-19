@@ -52,13 +52,10 @@ MonoBehaviour:
     type: 3}
   PlanetPrefab: {fileID: 7282589716559489325, guid: 1dd4270722d2e53328aea83315f792a1,
     type: 3}
-  OrbitalRegionPrefab: {fileID: 631026344179955578, guid: f6e45dfce483d1a5d935bcb7203d5626,
-    type: 3}
-  PlanetaryRegionPrefab: {fileID: 6802966389680382050, guid: 2af74b45ba682823eb448c07987dc2cc,
+  RegionPrefab: {fileID: 631026344179955578, guid: f6e45dfce483d1a5d935bcb7203d5626,
     type: 3}
   star: {fileID: 0}
   planets: []
-  planetaryRegions: []
 --- !u!212 &8464957106659891930
 SpriteRenderer:
   m_ObjectHideFlags: 0
