@@ -7,7 +7,7 @@ public class Planet : MonoBehaviour
     public string planetName;
     // The region that contains this planet
     public Region parentRegion;
-    // Planet size is an integer from 1 - 100;
+    // Planet size is an integer from 1 - 10;
     public int planetSize;
     // The units for resources are the same as planet size.
     public Dictionary<Resource, float> resources;

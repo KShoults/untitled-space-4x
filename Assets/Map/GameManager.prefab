@@ -43,10 +43,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8613a131fcba0395187c6d7bb104beee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TurnCounterText: {fileID: 0}
+  turnCounter: 0
   numClusters: 10
   numSystemsAvg: 15
   numSystemsVar: 5
-  sizePlanetsAvg: 200
+  sizePlanetsAvg: 20
   sizePlanetsVar: 100
   sector: {fileID: 0}
   nameSeed: 0
+  homeSystem: {fileID: 0}

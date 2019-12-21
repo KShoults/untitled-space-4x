@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TransitionSpeed: 25
-  viewType: 0
+  view: 0
 --- !u!114 &388720050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -899,6 +899,11 @@ PrefabInstance:
       propertyPath: TurnCounterText
       value: 
       objectReference: {fileID: 1680495017}
+    - target: {fileID: 7977364891536752231, guid: 9b579bf4d30ea422c9290e84e328651f,
+        type: 3}
+      propertyPath: sizePlanetsAvg
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 847975173183008193, guid: 9b579bf4d30ea422c9290e84e328651f,
         type: 3}
       propertyPath: m_LocalPosition.x
