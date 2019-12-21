@@ -84,9 +84,9 @@ public class ViewController : MonoBehaviour
 
             case View.Region:   // The Region View
                 objectPosition = o.transform.position;
-                newPosition.x = objectPosition.x;
+                newPosition.x = objectPosition.x - .04f;
                 newPosition.y = objectPosition.y;
-                newSize = .1f;
+                newSize = .02f;
                 newLayerMask = 1 << 11;
                 break;
         }
@@ -137,9 +137,9 @@ public class ViewController : MonoBehaviour
 
             case View.Region:   // The Region View
                 objectPosition = o.transform.position;
-                targetPosition.x = objectPosition.x;
+                targetPosition.x = objectPosition.x - .04f;
                 targetPosition.y = objectPosition.y;
-                targetSize = .1f;
+                targetSize = .02f;
                 targetLayerMask = 1 << 11;
                 break;
         }
