@@ -55,7 +55,6 @@ public class InputManager : MonoBehaviour
                     }
                     break;
                 case View.Region:
-                case View.Planet:
                     if (viewObject != null)
                     {
                         viewController.SetCameraTargetSmooth(View.System, viewObject.GetComponentInParent<StarSystem>());
@@ -134,12 +133,6 @@ public class InputManager : MonoBehaviour
                 Region region = o as Region;
                 //LabelViewText.text = region.regionName;
                 LabelViewText.gameObject.SetActive(false);
-                break;
-            
-            case View.Planet:
-                Planet planet = o as Planet;
-                LabelViewText.text = planet.planetName;
-                LabelViewText.gameObject.SetActive(true);
                 break;
         }
         viewObject = o;

@@ -9,7 +9,7 @@ public class PlanetOverlayObject : OverlayObject
     // Start is called before the first frame update
     void Start()
     {
-        RegisterOverlayObject(View.Planet, Overlay.Development);
+        RegisterOverlayObject(View.Region, Overlay.Development);
     }
 
     protected override bool ShouldBeActive(MonoBehaviour viewObject)

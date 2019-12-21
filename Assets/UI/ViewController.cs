@@ -7,8 +7,7 @@ public enum View
     Sector,
     Cluster,
     System,
-    Region,
-    Planet
+    Region
 }
 
 public class ViewController : MonoBehaviour
@@ -90,14 +89,6 @@ public class ViewController : MonoBehaviour
                 newSize = .1f;
                 newLayerMask = 1 << 11;
                 break;
-
-            case View.Planet:   // The Planet View
-                objectPosition = o.transform.position;
-                newPosition.x = objectPosition.x;
-                newPosition.y = objectPosition.y;
-                newSize = .1f;
-                newLayerMask = 1 << 12;
-                break;
         }
         mainCamera.cullingMask = newLayerMask;
         transform.position = newPosition;
@@ -150,14 +141,6 @@ public class ViewController : MonoBehaviour
                 targetPosition.y = objectPosition.y;
                 targetSize = .1f;
                 targetLayerMask = 1 << 11;
-                break;
-
-            case View.Planet:   // The Planet View
-                objectPosition = o.transform.position;
-                targetPosition.x = objectPosition.x;
-                targetPosition.y = objectPosition.y;
-                targetSize = .1f;
-                targetLayerMask = 1 << 12;
                 break;
         }
 
