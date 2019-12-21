@@ -115,101 +115,34 @@ public class StarSystem : MonoBehaviour
                 }
             }
 
+            Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
+
             // Generate the planet's size
             int planetSize = (int)Mathf.Floor(UnityEngine.Random.value * 99 + 1);
-
-            Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
-            newPlanet.transform.parent = targetRegion.transform;
-            newPlanet.planetName = GeneratePlanetName();
             newPlanet.planetSize = planetSize;
+
+            // Place the planet in its region
+            newPlanet.transform.parent = targetRegion.transform;
             newPlanet.parentRegion = targetRegion;
 
             Vector3 planetPosition = targetRegion.transform.position;
             planetPosition.z = 1;
 
             newPlanet.transform.position = planetPosition;
+            newPlanet.planetName = GeneratePlanetName();
             planets.Add(newPlanet);
 
-            // Generate planet resources
-            Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
-            // Generate a random value for each resource
-            for (int i = 0; i < 4; i++)
-            {
-                planetResources[(Resource)i] = UnityEngine.Random.value;
-            }
-            
-            // Modify each resource by the star class
-            Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
-            foreach (KeyValuePair<Resource, int> kvp in classResources)
-            {
-                planetResources[kvp.Key] *= kvp.Value;
-            }
-            // Increase the mineral amounts to bring it to the same level as the rest
-            planetResources[Resource.Minerals] *= 10;
-
-            // Zero out any resources that are below a certain threshold
-            for (int i = 0; i < 4; i++)
-            {
-                if (planetResources[(Resource)i] < 2.5f)
-                {
-                    planetResources[(Resource)i] = 0;
-                }
-            }
-
-            // Calculate the highest maximum possible size multiplier between all resources
-            float maxMultiplier = planetSize / 8f;
-            foreach (KeyValuePair<Resource, float> kvp in planetResources)
-            {
-                if (planetSize / kvp.Value < maxMultiplier)
-                {
-                    maxMultiplier = planetSize / kvp.Value;
-                }
-            }
-
-            // Adjust resources for planet size
-            for (int i = 0; i < 4; i++)
-            {
-                planetResources[(Resource)i] *= maxMultiplier;
-                // Floor any values that are less than 1
-                if (planetResources[(Resource)i] < 1)
-                {
-                    planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
-                } 
-            }
-
-            newPlanet.resources = planetResources;
+            // Generate Planet Resources
+            newPlanet.resources = GeneratePlanetResources(planetSize);
 
             // Generate mineral quality
-            if (planetResources[Resource.Minerals] > 0)
+            if (newPlanet.resources[Resource.Minerals] > 0)
             {
-                float mineralQuality = UnityEngine.Random.value;
-                if (mineralQuality >= .5f)
-                {
-                    newPlanet.mineralQuality = 2;
-                }
-                else if (mineralQuality >= .15f)
-                {
-                    newPlanet.mineralQuality = 1;
-                }
+                newPlanet.mineralQuality = GenerateMineralQuality();
             }
 
             // Generate planet habitability
-            float habitability = UnityEngine.Random.value;
-
-            // Adjust for star class
-            habitability *= StarClassUtil.StarHabitability[star.starClass];
-
-            // Place this habitability on a curve that makes high habitability rare
-            // The curve is the function (1.25x)^4 / 100
-            habitability = Mathf.Pow(1.25f * habitability, 4) / 100f;
-
-            // Minimum habitability should be 1
-            if (habitability < 1)
-            {
-                habitability = 1;
-            }
-
-            newPlanet.habitability = (int)Mathf.Round(habitability);
+            newPlanet.habitability = GenerateHabitability();
 
             currentSystemSize += planetSize;
         }
@@ -394,5 +327,89 @@ public class StarSystem : MonoBehaviour
         }
         
         return regionMesh;
+    }
+
+    private Dictionary<Resource, float> GeneratePlanetResources(int planetSize)
+    {
+        Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
+        // Generate a random value for each resource
+        for (int i = 0; i < 4; i++)
+        {
+            planetResources[(Resource)i] = UnityEngine.Random.value;
+        }
+        
+        // Modify each resource by the star class
+        Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
+        foreach (KeyValuePair<Resource, int> kvp in classResources)
+        {
+            planetResources[kvp.Key] *= kvp.Value;
+        }
+        // Increase the mineral amounts to bring it to the same level as the rest
+        planetResources[Resource.Minerals] *= 10;
+
+        // Zero out any resources that are below a certain threshold
+        for (int i = 0; i < 4; i++)
+        {
+            if (planetResources[(Resource)i] < 2.5f)
+            {
+                planetResources[(Resource)i] = 0;
+            }
+        }
+
+        // Calculate the highest maximum possible size multiplier between all resources
+        float maxMultiplier = planetSize / 8f;
+        foreach (KeyValuePair<Resource, float> kvp in planetResources)
+        {
+            if (planetSize / kvp.Value < maxMultiplier)
+            {
+                maxMultiplier = planetSize / kvp.Value;
+            }
+        }
+
+        // Adjust resources for planet size
+        for (int i = 0; i < 4; i++)
+        {
+            planetResources[(Resource)i] *= maxMultiplier;
+            // Floor any values that are less than 1
+            if (planetResources[(Resource)i] < 1)
+            {
+                planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
+            } 
+        }
+        return planetResources;
+    }
+    
+    private int GenerateMineralQuality()
+    {
+        float mineralQuality = UnityEngine.Random.value;
+        if (mineralQuality <= .15f)
+        {
+            return 2;
+        }
+        else if (mineralQuality <= .5f)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    private int GenerateHabitability()
+    {
+        float habitability = UnityEngine.Random.value;
+
+        // Adjust for star class
+        habitability *= StarClassUtil.StarHabitability[star.starClass];
+
+        // Place this habitability on a curve that makes high habitability rare
+        // The curve is the function (1.25x)^4 / 100
+        habitability = Mathf.Pow(1.25f * habitability, 4) / 100f;
+
+        // Minimum habitability should be 1
+        if (habitability < 1)
+        {
+            habitability = 1;
+        }
+        
+        return (int)Mathf.Round(habitability);
     }
 }
