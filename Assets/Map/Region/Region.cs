@@ -5,16 +5,5 @@ using UnityEngine;
 public class Region : MonoBehaviour
 {
     public MonoBehaviour orbitalObject;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public int q, r, s;
 }
