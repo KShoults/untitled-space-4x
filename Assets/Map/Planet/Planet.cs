@@ -5,8 +5,8 @@ using UnityEngine;
 public class Planet : MonoBehaviour
 {
     public string planetName;
-    // orbital distance is measured in light minutes
-    public float orbitalDistance;
+    // The region that contains this planet
+    public Region parentRegion;
     // Planet size is an integer from 1 - 100;
     public int planetSize;
     // The units for resources are the same as planet size.
@@ -15,18 +15,6 @@ public class Planet : MonoBehaviour
     public int mineralQuality;
     // The habitability is from 1 - 100
     public int habitability;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     // Alert the InputManager when this is hovered over
     void OnMouseEnter()

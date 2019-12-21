@@ -63,7 +63,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 newPosition.x = objectPosition.x;
                 newPosition.y = objectPosition.y;
-                newSize = 1;
+                newSize = .75f;
                 newLayerMask = 1 << 10;
                 break;
         }
@@ -107,7 +107,7 @@ public class CameraController : MonoBehaviour
                 objectPosition = o.transform.position;
                 targetPosition.x = objectPosition.x;
                 targetPosition.y = objectPosition.y;
-                targetSize = 1;
+                targetSize = .75f;
                 targetLayerMask = 1 << 10;
                 break;
         }
@@ -130,7 +130,7 @@ public class CameraController : MonoBehaviour
         mainCamera.orthographicSize = newSize;
         
         // When zooming out the mask should be applied when finished.
-        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .25f * targetSize)
+        if (Mathf.Abs(targetSize - mainCamera.orthographicSize) < .1f * targetSize)
         {
             mainCamera.cullingMask = targetLayerMask;
         }

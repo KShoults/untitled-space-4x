@@ -2,19 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 
 public class StarSystem : MonoBehaviour
 {
     // The position of this StarSystem relative to its parent cluster
     public Vector2 position;
     public string starSystemName;
-    public GameObject StarPrefab, PlanetPrefab, OrbitalRegionPrefab, PlanetaryRegionPrefab;
+    public GameObject StarPrefab, PlanetPrefab, RegionPrefab;
     public Star star;
     public List<Planet> planets;
-    // The list contains a sequence of orbital regions
-    public List<OrbitalRegion[]> orbitalRegions;
-    public List<PlanetaryRegion> planetaryRegions;
+    // The region map in axial coordinates (q, r)
+    public Region[,] regions;
     private List<string> planetNames;
+    // A buffered region mesh to prevent generating the mesh extra times
+    private static Mesh regionMesh;
+    // Useful constants for axial coordinate conversion
+    private Vector2 qVector = new Vector2(Mathf.Sqrt(3), 0);
+    private Vector2 rVector = new Vector2(Mathf.Sqrt(3)/2f, 3f/2f);
+    // Axial coordinate directions
+    private Tuple<int,int>[] axialDirections = new Tuple<int, int>[6] {Tuple.Create(1, 0), Tuple.Create(1, -1), Tuple.Create(0, -1),
+                                                Tuple.Create(-1, 0), Tuple.Create(-1, 1), Tuple.Create(0, 1)};
 
     // Start is called before the first frame update
     void Start()
@@ -40,198 +48,101 @@ public class StarSystem : MonoBehaviour
         GetComponent<SpriteRenderer>().color = StarClassUtil.StarColor[star.starClass];
 
         // Determine the total size of planets to add to the system
-        int systemSize = sizePlanetsAvg + (int) Mathf.Round((Random.value * sizePlanetsVar * 2) - sizePlanetsVar);
+        int systemSize = sizePlanetsAvg + (int) Mathf.Round((UnityEngine.Random.value * sizePlanetsVar * 2) - sizePlanetsVar);
 
         // Create and add the planets
         planets = new List<Planet>();
         int currentSystemSize = 0;
 
-        // Create the innermost orbital region sequence
-        orbitalRegions = new List<OrbitalRegion[]>();
-        AddOrbitalSequence(ref orbitalRegions);
-        planetaryRegions = new List<PlanetaryRegion>();
+        GenerateRegionMap();
 
-        // Planets are created from the inner orbit out until the systemSize is reached
+        // Generate a noise map with zero weights where we don't have regions
+        int mapWidth = regions.GetLength(0);
+        float[,] weightMap = new float[mapWidth, mapWidth];
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapWidth; j++)
+            {
+                if (regions[i,j] == null)
+                {
+                    weightMap[i,j] = 0;
+                }
+                else
+                {
+                    weightMap[i,j] = 1f;
+                }
+            }
+        }
+        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(weightMap, 1);
+
+        // Planets are created until the systemSize is reached
         while (currentSystemSize < systemSize)
         {
-            // Generate the planet's size
-            int planetSize = (int)Mathf.Floor(Random.value * 99 + 1);
-
-            // Figure orbital distance in light minutes
-            float orbitalDistance = 2 + (Random.value * 2);
-            // Adjust outward for existing planets
-            if (planets.Count > 0)
+            // Find the largest point in the noise map to place a planet
+            float bestValue = 0;
+            int bestX = 0, bestY = 0;
+            for (int i = 0; i < mapWidth; i++)
             {
-                orbitalDistance += planets[planets.Count - 1].orbitalDistance;
+                for (int j = 0; j < mapWidth; j++)
+                {
+                    if (noiseMap[i,j] > bestValue)
+                    {
+                        bestX = i;
+                        bestY = j;
+                        bestValue = noiseMap[i,j];
+                    }
+                }
+            }
+
+            // Find the associated region
+            Region targetRegion = regions[bestX, bestY];
+
+            // Clear the target position and adjacent positions in the noise map
+            noiseMap[bestX, bestY] = 0;
+            for (int i = 0; i < axialDirections.Length; i++)
+            {
+                // Find the neighbor in region coordinates
+                int qToClear = targetRegion.q + axialDirections[i].Item1;
+                int rToClear = targetRegion.r + axialDirections[i].Item2;
+                // Convert to noisemap coordinates
+                int xToClear = qToClear + (mapWidth-1) / 2;
+                int yToClear = rToClear + (mapWidth-1) / 2;
+
+                if (xToClear >= 0 && xToClear < mapWidth &&
+                    yToClear >= 0 && yToClear < mapWidth)
+                {
+                    noiseMap[xToClear, yToClear] = 0;
+                }
             }
 
             Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
-            newPlanet.transform.parent = transform;
-            newPlanet.orbitalDistance = orbitalDistance;
-            newPlanet.planetName = GeneratePlanetName();
+
+            // Generate the planet's size
+            int planetSize = (int)Mathf.Floor(UnityEngine.Random.value * 99 + 1);
             newPlanet.planetSize = planetSize;
 
-            // Create planetary region
-            PlanetaryRegion planetaryRegion = Instantiate(PlanetaryRegionPrefab).GetComponent<PlanetaryRegion>();
-            planetaryRegion.transform.parent = transform.Find("RegionMap");
-            // Determine which orbital region to start looking in to place the planetary region
-            int desiredOrbitalSequence = (int)Mathf.Floor(orbitalDistance / 6);
-            // Create the orbital sequence if necessary
-            while (orbitalRegions.Count <= desiredOrbitalSequence)
-            {
-                AddOrbitalSequence(ref orbitalRegions);
-            }
-            // Generate the number of orbital regions to skip from 0 to the number of regions in that sequence
-            int regionsToSkip = (int)Mathf.Floor(orbitalRegions[desiredOrbitalSequence].Length * Random.value);
+            // Place the planet in its region
+            newPlanet.transform.parent = targetRegion.transform;
+            newPlanet.parentRegion = targetRegion;
 
-            // Find an orbital region in which to place the planetary region
-            int skippedRegions = 0;
-            bool regionFound = false;
-            int foundRegion = 0;
-            do
-            {
-                for (int i = 0; i < orbitalRegions[desiredOrbitalSequence].Length; i++)
-                {
-                    if (orbitalRegions[desiredOrbitalSequence][i].planetaryRegion == null)
-                    {
-                        if (skippedRegions == regionsToSkip)
-                        {
-                            orbitalRegions[desiredOrbitalSequence][i].planetaryRegion = planetaryRegion;
-                            regionFound = true;
-                            foundRegion = i;
-                            break;
-                        }
-                        else
-                        {
-                            skippedRegions++;
-                        }
-                    }
-                }
-            } while (skippedRegions != 0 && regionFound == false);
-
-            // Create a new sequence if the desired one was full
-            if (regionFound == false)
-            {
-                AddOrbitalSequence(ref orbitalRegions);
-
-                desiredOrbitalSequence++;
-                for (int i = 0; i < orbitalRegions[desiredOrbitalSequence].Length; i++)
-                {
-                    if (orbitalRegions[desiredOrbitalSequence][i].planetaryRegion == null)
-                    {
-                        if (skippedRegions == regionsToSkip)
-                        {
-                            orbitalRegions[desiredOrbitalSequence][i].planetaryRegion = planetaryRegion;
-                        }
-                        else
-                        {
-                            skippedRegions++;
-                        }
-                    }
-                }
-            }
-
-            // Generate the planetary region's mesh
-            Mesh planetaryRegionMesh = GeneratePlanetaryRegionMesh();
-            planetaryRegion.GetComponent<MeshFilter>().mesh = planetaryRegionMesh;
-            planetaryRegion.GetComponent<MeshCollider>().sharedMesh = planetaryRegionMesh;
-
-            // Set the region's position
-            Vector3 regionPosition = transform.Find("RegionMap").position;
-            float regionAngle = 360f * foundRegion / (float)orbitalRegions[desiredOrbitalSequence].Length;
-            float r = (desiredOrbitalSequence * .2f) + .1f;
-            regionPosition += Quaternion.AngleAxis(regionAngle, Vector3.back) * Vector3.up * r;
-            regionPosition.z = 2;
-            planetaryRegion.transform.position = regionPosition;
-
-            planetaryRegions.Add(planetaryRegion);
-
-            // Place the planet in its planetary region
-            Vector3 planetPosition = regionPosition;
+            Vector3 planetPosition = targetRegion.transform.position;
             planetPosition.z = 1;
+
             newPlanet.transform.position = planetPosition;
+            newPlanet.planetName = GeneratePlanetName();
             planets.Add(newPlanet);
 
-            // Generate planet resources
-            Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
-            // Generate a random value for each resource
-            for (int i = 0; i < 4; i++)
-            {
-                planetResources[(Resource)i] = Random.value;
-            }
-            
-            // Modify each resource by the star class
-            Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
-            foreach (KeyValuePair<Resource, int> kvp in classResources)
-            {
-                planetResources[kvp.Key] *= kvp.Value;
-            }
-            // Increase the mineral amounts to bring it to the same level as the rest
-            planetResources[Resource.Minerals] *= 10;
-
-            // Zero out any resources that are below a certain threshold
-            for (int i = 0; i < 4; i++)
-            {
-                if (planetResources[(Resource)i] < 2.5f)
-                {
-                    planetResources[(Resource)i] = 0;
-                }
-            }
-
-            // Calculate the highest maximum possible size multiplier between all resources
-            float maxMultiplier = planetSize / 8f;
-            foreach (KeyValuePair<Resource, float> kvp in planetResources)
-            {
-                if (planetSize / kvp.Value < maxMultiplier)
-                {
-                    maxMultiplier = planetSize / kvp.Value;
-                }
-            }
-
-            // Adjust resources for planet size
-            for (int i = 0; i < 4; i++)
-            {
-                planetResources[(Resource)i] *= maxMultiplier;
-                // Floor any values that are less than 1
-                if (planetResources[(Resource)i] < 1)
-                {
-                    planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
-                } 
-            }
-
-            newPlanet.resources = planetResources;
+            // Generate Planet Resources
+            newPlanet.resources = GeneratePlanetResources(planetSize);
 
             // Generate mineral quality
-            if (planetResources[Resource.Minerals] > 0)
+            if (newPlanet.resources[Resource.Minerals] > 0)
             {
-                float mineralQuality = Random.value;
-                if (mineralQuality >= .5f)
-                {
-                    newPlanet.mineralQuality = 2;
-                }
-                else if (mineralQuality >= .15f)
-                {
-                    newPlanet.mineralQuality = 1;
-                }
+                newPlanet.mineralQuality = GenerateMineralQuality();
             }
 
             // Generate planet habitability
-            float habitability = Random.value;
-
-            // Adjust for star class
-            habitability *= StarClassUtil.StarHabitability[star.starClass];
-
-            // Place this habitability on a curve that makes high habitability rare
-            // The curve is the function (1.25x)^4 / 100
-            habitability = Mathf.Pow(1.25f * habitability, 4) / 100f;
-
-            // Minimum habitability should be 1
-            if (habitability < 1)
-            {
-                habitability = 1;
-            }
-
-            newPlanet.habitability = (int)Mathf.Round(habitability);
+            newPlanet.habitability = GenerateHabitability();
 
             currentSystemSize += planetSize;
         }
@@ -256,9 +167,11 @@ public class StarSystem : MonoBehaviour
         }
     }
 
+
+
     private StarClass GenerateStarClass()
     {
-        float r = Random.value * 7;
+        float r = UnityEngine.Random.value * 7;
         if (r < 1)
         {
             return StarClass.O;
@@ -316,100 +229,187 @@ public class StarSystem : MonoBehaviour
         return newNameList;
     }
 
-    private void AddOrbitalSequence(ref List<OrbitalRegion[]> regions)
+    // Generate the hexagonal region map
+    private void GenerateRegionMap()
     {
-        int numRegions = (int)Mathf.Pow(2, regions.Count+1);
-        OrbitalRegion[] newSequence = new OrbitalRegion[numRegions];
-        Transform regionMap = transform.Find("RegionMap");
-        float sequenceAngleOffset = 360f / numRegions / 2f;
-        for (int i = 0; i < numRegions; i++)
+        // The radius of the map in hexagonal tiles
+        int mapSize = 7;
+        regions = new Region[mapSize * 2 + 1, mapSize * 2 + 1];
+
+        // We'll want to skip some regions to make the map the right shape
+        List<Tuple<int, int>> regionsToSkip = new List<Tuple<int, int>>();
+
+        // Leave the center region and every region adjacent null to give the star some room
+        regionsToSkip.Add(Tuple.Create(0, 0));
+        for (int i = 0; i < axialDirections.Length; i++)
         {
-            OrbitalRegion newRegion = Instantiate(OrbitalRegionPrefab).GetComponent<OrbitalRegion>();
-            newRegion.transform.parent = regionMap;
-            Vector3 regionPosition = transform.position;
-            regionPosition.z = 3 + regions.Count;
-            newRegion.transform.position = regionPosition;
-            float regionAngle = 360f / numRegions;
-            Quaternion regionRotation = Quaternion.AngleAxis(regionAngle * i + sequenceAngleOffset, Vector3.back);
-            newRegion.transform.rotation = regionRotation;
-            Mesh regionMesh = GenerateOrbitalRegionMesh(regions.Count+1);
-            newRegion.GetComponent<MeshFilter>().mesh = regionMesh;
-            newRegion.GetComponent<MeshCollider>().sharedMesh = regionMesh;
-            newSequence[i] = newRegion;
+            regionsToSkip.Add(axialDirections[i]);
         }
-        regions.Add(newSequence);
+
+        // Generate the map in axial coordinates
+        for(int q = -mapSize; q <= mapSize; q++)
+        {
+            for (int r = -mapSize; r <= mapSize; r++)
+            {
+                if (!regionsToSkip.Contains(Tuple.Create(q, r)) &&
+                    Mathf.Abs(q + r) <= mapSize) // Cut off the corners to make the map hexagonal
+                {
+                    Region newRegion = Instantiate(RegionPrefab).GetComponent<Region>();
+                    newRegion.q = q;
+                    newRegion.r = r;
+                    newRegion.s = -q - r;
+
+                    // Set the region's world position
+                    newRegion.transform.parent = transform;
+                    Vector3 regionPosition = transform.position;
+                    regionPosition += (Vector3) (q * qVector) * .05f;
+                    regionPosition += (Vector3) (r * rVector) * .05f;
+                    regionPosition.z = 2;
+                    newRegion.transform.position = regionPosition;
+
+                    // Get the region's mesh
+                    Mesh regionMesh = GenerateRegionMesh();
+                    newRegion.GetComponent<MeshFilter>().mesh = regionMesh;
+                    newRegion.GetComponent<MeshCollider>().sharedMesh = regionMesh;
+
+                    regions[q + mapSize, r + mapSize] = newRegion;
+                }
+            }
+        }
     }
 
-    // Returns the region mesh for a region in the specified orbital sequence
-    private Mesh GenerateOrbitalRegionMesh(int orbitalSequence)
+    // Generate a hexagonal region mesh
+    private Mesh GenerateRegionMesh()
     {
-        float r = 2 * orbitalSequence; // The outer curve radius
-        int curveVertices = 20; // The number of vertices in the outer curve
-        Mesh newMesh = new Mesh();
-        Vector3[] newVertices = new Vector3[curveVertices + 2];
-        Vector2[] newUV = new Vector2[curveVertices + 2];
-        int[] newTriangles = new int[(curveVertices - 1) * 3];
-        float angle = 360f / (float)(curveVertices - 1) / Mathf.Pow(2, orbitalSequence);
-
-        // Create the outer curve
-        for (int i = 0; i < curveVertices; i++)
+        // Check to see if the mesh has already been generated
+        if (regionMesh == null)
         {
-            newVertices[i] = Quaternion.AngleAxis(angle * i, Vector3.back) * Vector3.up * r;
-            newUV[i] = new Vector2(i / (float)(curveVertices - 1), 1);
+            Mesh newMesh = new Mesh();
+            Vector3[] newVertices = new Vector3[7];
+            Vector2[] newUV = new Vector2[7];
+            int[] newTriangles = new int[6*3];
+
+            float size = .5f;  // Half the width
+
+            // Create the center vertex
+            newVertices[0] = Vector3.zero;
+            newUV[0] = new Vector2(.5f, .5f);
+
+            // Create the hexagon
+            for (int i = 0; i < 6; i++)
+            {
+                // Generate the vertex
+                float angleDeg = 60 * i - 30;
+                float angleRad = Mathf.PI / 180f * angleDeg;
+                float xPos = size * Mathf.Cos(angleRad);
+                float yPos = size * Mathf.Sin(angleRad);
+                newVertices[i+1] = new Vector3(xPos, yPos, 0);
+
+                // Generate the UV
+                float uPos = .5f * Mathf.Cos(angleRad) + .5f;
+                float vPos = .5f * Mathf.Sin(angleRad) + .5f;
+
+                newUV[i+1] = new Vector2(uPos, vPos);
+            }
+
+            // Create the triangles
+            for (int i = 0; i < 6; i++)
+            {
+                newTriangles[3 * i] = 0;
+                newTriangles[3 * i + 1] = i + 2 < 7 ? i + 2 : 1; // Loop back around to 1
+                newTriangles[3 * i + 2] = i + 1;
+            }
+
+            newMesh.vertices = newVertices;
+            newMesh.uv = newUV;
+            newMesh.triangles = newTriangles;
+            regionMesh = newMesh;
         }
-
-        // Create the bottom vertex
-        newVertices[curveVertices] = Vector3.zero;
-        newUV[curveVertices] = new Vector2(.5f, 0);
-
-        // Create the triangles
-        for (int i = 0; i < curveVertices - 1; i++)
-        {
-            newTriangles[3 * i] = curveVertices; // The bottom vertex
-            newTriangles[3 * i + 1] = i;
-            newTriangles[3 * i + 2] = i + 1;
-        }
-
-        newMesh.vertices = newVertices;
-        newMesh.uv = newUV;
-        newMesh.triangles = newTriangles;
-        return newMesh;
+        
+        return regionMesh;
     }
 
-    private Mesh GeneratePlanetaryRegionMesh()
+    private Dictionary<Resource, float> GeneratePlanetResources(int planetSize)
     {
-        int curveVertices = 20;
-        Mesh newMesh = new Mesh();
-        Vector3[] newVertices = new Vector3[curveVertices + 1];
-        Vector2[] newUV = new Vector2[curveVertices + 1];
-        int[] newTriangles = new int[3 * curveVertices];
-        float angle = 360f / (float)(curveVertices - 1);
-        float r = .1f;
-
-        // Create a circular mesh
-        for (int i = 0; i < curveVertices; i++)
+        Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
+        // Generate a random value for each resource
+        for (int i = 0; i < 4; i++)
         {
-            Vector3 vertex = Quaternion.AngleAxis(angle * i, Vector3.back) * Vector3.up;
-            newVertices[i] = vertex * r;
+            planetResources[(Resource)i] = UnityEngine.Random.value;
+        }
+        
+        // Modify each resource by the star class
+        Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
+        foreach (KeyValuePair<Resource, int> kvp in classResources)
+        {
+            planetResources[kvp.Key] *= kvp.Value;
+        }
+        // Increase the mineral amounts to bring it to the same level as the rest
+        planetResources[Resource.Minerals] *= 10;
 
-            newUV[i] = new Vector2((vertex.x + 1 ) / 2f, (vertex.y + 1 ) / 2f);
+        // Zero out any resources that are below a certain threshold
+        for (int i = 0; i < 4; i++)
+        {
+            if (planetResources[(Resource)i] < 2.5f)
+            {
+                planetResources[(Resource)i] = 0;
+            }
         }
 
-        // Create the center vertex
-        newVertices[curveVertices] = Vector3.zero;
-        newUV[curveVertices] = new Vector2(.5f, .5f);
-
-        // Create the triangles
-        for (int i = 0; i < curveVertices - 1; i++)
+        // Calculate the highest maximum possible size multiplier between all resources
+        float maxMultiplier = planetSize / 8f;
+        foreach (KeyValuePair<Resource, float> kvp in planetResources)
         {
-            newTriangles[3 * i] = curveVertices; // The center vertex
-            newTriangles[3 * i + 1] = i;
-            newTriangles[3 * i + 2] = i + 1;
+            if (planetSize / kvp.Value < maxMultiplier)
+            {
+                maxMultiplier = planetSize / kvp.Value;
+            }
         }
 
-        newMesh.vertices = newVertices;
-        newMesh.uv = newUV;
-        newMesh.triangles = newTriangles;
-        return newMesh;
+        // Adjust resources for planet size
+        for (int i = 0; i < 4; i++)
+        {
+            planetResources[(Resource)i] *= maxMultiplier;
+            // Floor any values that are less than 1
+            if (planetResources[(Resource)i] < 1)
+            {
+                planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
+            } 
+        }
+        return planetResources;
+    }
+    
+    private int GenerateMineralQuality()
+    {
+        float mineralQuality = UnityEngine.Random.value;
+        if (mineralQuality <= .15f)
+        {
+            return 2;
+        }
+        else if (mineralQuality <= .5f)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    private int GenerateHabitability()
+    {
+        float habitability = UnityEngine.Random.value;
+
+        // Adjust for star class
+        habitability *= StarClassUtil.StarHabitability[star.starClass];
+
+        // Place this habitability on a curve that makes high habitability rare
+        // The curve is the function (1.25x)^4 / 100
+        habitability = Mathf.Pow(1.25f * habitability, 4) / 100f;
+
+        // Minimum habitability should be 1
+        if (habitability < 1)
+        {
+            habitability = 1;
+        }
+        
+        return (int)Mathf.Round(habitability);
     }
 }
