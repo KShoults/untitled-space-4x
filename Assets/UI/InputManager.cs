@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText;
-    public PlanetPanel planetPanel;
     public Dictionary<View, Dictionary<Overlay, List<OverlayObject>>> overlayLists;
     private Overlay activeOverlay;
     private View activeView;
@@ -120,7 +119,6 @@ public class InputManager : MonoBehaviour
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
-                //planetPanel.gameObject.SetActive(false);
                 break;
 
             case View.System:
@@ -137,13 +135,6 @@ public class InputManager : MonoBehaviour
         }
         viewObject = o;
         SetOverlay(newView, activeOverlay);
-    }
-
-    // Triggers the UI changes that should occur when a planet is selected
-    public void SelectPlanet(Planet planet)
-    {
-        //planetPanel.gameObject.SetActive(true);
-        //planetPanel.SelectPlanet(planet);
     }
 
     private void InitializeOverlayLists()
