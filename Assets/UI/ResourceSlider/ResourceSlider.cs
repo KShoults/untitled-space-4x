@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class ResourceSlider : MonoBehaviour
 {
-    public PlanetPanel planetPanel;
     public Slider Slider;
     public RectTransform FillArea, HandleArea;
     // The resource this slider is tracking
@@ -42,7 +41,7 @@ public class ResourceSlider : MonoBehaviour
         if (value != targetSize)
         {
             targetSize = value;
-            planetPanel.SetIndustryTarget(resource, value);
+            //planetPanel.SetIndustryTarget(resource, value);
         }
     }
 

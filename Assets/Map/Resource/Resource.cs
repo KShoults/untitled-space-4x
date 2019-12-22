@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum Resource
 {
+    None,
     Energy,
     Water,
     Food,

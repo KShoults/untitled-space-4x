@@ -34,22 +34,78 @@ public static class StarClassUtil
         }
     }
 
-    private static readonly Dictionary<StarClass, Dictionary<Resource, int>> _starResources = new Dictionary<StarClass, Dictionary<Resource, int>>
+    // Determines the possible resources for a specific yield on a planet around a star of a specified class
+    private static readonly Dictionary<StarClass, Dictionary<Yield, Resource[]>> _starTiles = new Dictionary<StarClass, Dictionary<Yield, Resource[]>>
     {
-        {StarClass.O, new Dictionary<Resource, int> {{Resource.Energy, 10}, {Resource.Water, 0}, {Resource.Food, 4}}},
-        {StarClass.B, new Dictionary<Resource, int> {{Resource.Energy, 8}, {Resource.Water, 1}, {Resource.Food, 6}}},
-        {StarClass.A, new Dictionary<Resource, int> {{Resource.Energy, 6}, {Resource.Water, 2}, {Resource.Food, 8}}},
-        {StarClass.F, new Dictionary<Resource, int> {{Resource.Energy, 4}, {Resource.Water, 4}, {Resource.Food, 6}}},
-        {StarClass.G, new Dictionary<Resource, int> {{Resource.Energy, 2}, {Resource.Water, 6}, {Resource.Food, 4}}},
-        {StarClass.K, new Dictionary<Resource, int> {{Resource.Energy, 1}, {Resource.Water, 8}, {Resource.Food, 2}}},
-        {StarClass.M, new Dictionary<Resource, int> {{Resource.Energy, 0}, {Resource.Water, 10}, {Resource.Food, 1}}}
+        {StarClass.O, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[2] {Resource.Minerals, Resource.Energy}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Energy}},
+            {Yield.Uncommon, new Resource[2] {Resource.Minerals, Resource.Energy}},
+            {Yield.Rare, new Resource[2] {Resource.Minerals, Resource.Energy}}
+        }},
+
+        {StarClass.B, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[3] {Resource.Minerals, Resource.Energy, Resource.Food}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Energy}},
+            {Yield.Uncommon, new Resource[1] {Resource.Minerals}},
+            {Yield.Rare, new Resource[1] {Resource.Minerals}}
+        }},
+
+        {StarClass.A, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[3] {Resource.Minerals, Resource.Energy, Resource.Food}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Food}},
+            {Yield.Uncommon, new Resource[1] {Resource.Minerals}},
+            {Yield.Rare, new Resource[1] {Resource.Minerals}}
+        }},
+
+        {StarClass.F, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[2] {Resource.Minerals, Resource.Food}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Food}},
+            {Yield.Uncommon, new Resource[2] {Resource.Minerals, Resource.Food}},
+            {Yield.Rare, new Resource[2] {Resource.Minerals, Resource.Food}}
+        }},
+
+        {StarClass.G, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[3] {Resource.Minerals, Resource.Food, Resource.Water}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Food}},
+            {Yield.Uncommon, new Resource[1] {Resource.Minerals}},
+            {Yield.Rare, new Resource[1] {Resource.Minerals}}
+        }},
+
+        {StarClass.K, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[3] {Resource.Minerals, Resource.Food, Resource.Water}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Water}},
+            {Yield.Uncommon, new Resource[1] {Resource.Minerals}},
+            {Yield.Rare, new Resource[1] {Resource.Minerals}}
+        }},
+
+        {StarClass.M, new Dictionary<Yield, Resource[]>
+        {
+            {Yield.Low, new Resource[4] {Resource.Minerals, Resource.Energy, Resource.Water, Resource.Food}},
+            {Yield.Medium, new Resource[2] {Resource.Minerals, Resource.Water}},
+            {Yield.High, new Resource[2] {Resource.Minerals, Resource.Water}},
+            {Yield.Uncommon, new Resource[2] {Resource.Minerals, Resource.Water}},
+            {Yield.Rare, new Resource[2] {Resource.Minerals, Resource.Water}}
+        }}
     };
 
-    public static Dictionary<StarClass, Dictionary<Resource, int>> StarResources
+    public static Dictionary<StarClass, Dictionary<Yield, Resource[]>> StarTiles
     {
         get
         {
-            return _starResources;
+            return _starTiles;
         }
     }
 

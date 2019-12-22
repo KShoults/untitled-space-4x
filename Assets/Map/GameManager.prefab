@@ -49,7 +49,7 @@ MonoBehaviour:
   numSystemsAvg: 15
   numSystemsVar: 5
   sizePlanetsAvg: 20
-  sizePlanetsVar: 100
+  sizePlanetsVar: 10
   sector: {fileID: 0}
   nameSeed: 0
   homeSystem: {fileID: 0}

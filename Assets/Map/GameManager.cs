@@ -59,17 +59,18 @@ public class GameManager : MonoBehaviour
         Planet homeworld = homeSystem.planets[(int)Mathf.Floor(Random.value * homeSystem.planets.Count)];
 
         // Overwrite its size, habitability, and resources
-        homeworld.planetSize = 50;
+        homeworld.planetSize = 5;
         homeworld.habitability = 90;
 
-        Dictionary<Resource, float> resources = new Dictionary<Resource, float>();
-        resources.Add(Resource.Energy, 10f);
-        resources.Add(Resource.Water, 20f);
-        resources.Add(Resource.Food, 20f);
-        resources.Add(Resource.Minerals, 20f);
+        // Set the homeworld's tiles
+        Tile[] tiles = new Tile[5];
+        tiles[0] = new Tile(Resource.Minerals, Yield.Medium, Resource.Energy, Yield.Medium);
+        tiles[1] = new Tile(Resource.Food, Yield.Medium, Resource.Water, Yield.Medium);
+        tiles[2] = new Tile();
+        tiles[3] = new Tile();
+        tiles[4] = new Tile();
 
-        homeworld.resources = resources;
-        homeworld.mineralQuality = 0;
+        homeworld.tiles = tiles;
 
         // Center the view on the home system
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
