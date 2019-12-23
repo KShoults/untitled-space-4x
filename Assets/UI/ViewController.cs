@@ -137,9 +137,9 @@ public class ViewController : MonoBehaviour
 
             case View.Region:   // The Region View
                 objectPosition = o.transform.position;
-                targetPosition.x = objectPosition.x - .04f;
+                targetPosition.x = objectPosition.x - .05f;
                 targetPosition.y = objectPosition.y;
-                targetSize = .02f;
+                targetSize = .05f / mainCamera.aspect;
                 targetLayerMask = 1 << 11;
                 break;
         }
@@ -163,7 +163,8 @@ public class ViewController : MonoBehaviour
         mainCamera.orthographicSize = newSize;
         
         // When zooming out the mask should be applied when finished.
-        if (targetSize - mainCamera.orthographicSize > 0 &&
+        if (mainCamera.cullingMask != targetLayerMask &&
+            targetSize - mainCamera.orthographicSize > 0 &&
             targetSize - mainCamera.orthographicSize < .1f * targetSize)
         {
             mainCamera.cullingMask = targetLayerMask;
