@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
-    public Text SelectedObjectNameText, LabelViewText;
+    public Text SelectedObjectNameText, LabelViewText, LabelViewSubText;
     public Dictionary<View, Dictionary<Overlay, List<OverlayObject>>> overlayLists;
     private Overlay activeOverlay;
     private View activeView;
@@ -38,7 +38,6 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-
             switch (activeView)
             {
                 default:
@@ -111,26 +110,37 @@ public class InputManager : MonoBehaviour
         {
             default:
             case View.Sector:
-                LabelViewText.text = "";
                 LabelViewText.gameObject.SetActive(false);
+                LabelViewSubText.gameObject.SetActive(false);
                 break;
 
             case View.Cluster:
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
+                LabelViewSubText.gameObject.SetActive(false);
                 break;
 
             case View.System:
                 StarSystem starSystem = o as StarSystem;
                 LabelViewText.text = starSystem.starSystemName;
                 LabelViewText.gameObject.SetActive(true);
+                LabelViewSubText.gameObject.SetActive(false);
                 break;
 
             case View.Region:
                 Region region = o as Region;
-                //LabelViewText.text = region.regionName;
-                LabelViewText.gameObject.SetActive(false);
+                if (region.orbitalObject != null)
+                {
+                    LabelViewText.text = ((Planet)region.orbitalObject).planetName;
+                }
+                else
+                {
+                    LabelViewText.text = region.GetComponentInParent<StarSystem>().starSystemName;
+                }
+                LabelViewText.gameObject.SetActive(true);
+                LabelViewSubText.text = "(" + region.q + ", " + region.r + ", " + region.s + ")";
+                LabelViewSubText.gameObject.SetActive(true);
                 break;
         }
         viewObject = o;
