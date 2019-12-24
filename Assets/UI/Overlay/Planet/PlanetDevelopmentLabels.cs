@@ -13,30 +13,29 @@ public class PlanetDevelopmentLabels : OverlayObject
     // Quick lookup for the industry development texts
     public Dictionary<Resource, TextMeshProUGUI> developmentTexts;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        InitializeDevelopmentTexts();
-        RegisterOverlayObject(View.Region, Overlay.Development);
-    }
-
     void OnEnable()
     {
-        // This skips if the planet hasn't been loaded
-        if (planet.tiles == null)
+        // This skips if the planet hasn't been selected
+        if (planet == null)
         {
             return;
+        }
+        
+        // The first time this runs we need to initialize some dictionaries
+        if (developmentTexts == null)
+        {
+            InitializeDevelopmentTexts();
         }
         UpdateLabels();
     }
 
-    protected override bool ShouldBeActive(MonoBehaviour viewObject)
+    public override void Initialize(MonoBehaviour viewObject)
     {
-        if (viewObject is Region && viewObject == planet.parentRegion)
+        if (viewObject is Region)
         {
-            return true;
+            planet = (Planet)((Region)viewObject).orbitalObject;
+            base.Initialize(viewObject);
         }
-        return false;
     }
 
     public void UpdateLabels()

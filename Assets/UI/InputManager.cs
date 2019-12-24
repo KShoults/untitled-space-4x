@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class InputManager : MonoBehaviour
 {
     public Text SelectedObjectNameText, LabelViewText, LabelViewSubText;
+    public List<OverlayObject> SectorDevelopmentOverlays, ClusterDevelopmentOverlays, SystemDevelopmentOverlays, RegionDevelopmentOverlays;
+    // Dictionary for quick lookup of overlay objects
     public Dictionary<View, Dictionary<Overlay, List<OverlayObject>>> overlayLists;
     private Overlay activeOverlay;
     private View activeView;
@@ -149,15 +151,25 @@ public class InputManager : MonoBehaviour
 
     private void InitializeOverlayLists()
     {
-        overlayLists = new Dictionary<View, Dictionary<Overlay, List<OverlayObject>>>();
-        foreach(View view in Enum.GetValues(typeof(View)))
+        overlayLists = new Dictionary<View, Dictionary<Overlay, List<OverlayObject>>>()
         {
-            overlayLists.Add(view, new Dictionary<Overlay, List<OverlayObject>>());
-            foreach(Overlay overlay in Enum.GetValues(typeof(Overlay)))
+            {View.Sector, new Dictionary<Overlay, List<OverlayObject>>()
             {
-                overlayLists[view].Add(overlay, new List<OverlayObject>());
-            }
-        }
+                {Overlay.Development, SectorDevelopmentOverlays}
+            }},
+            {View.Cluster, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, ClusterDevelopmentOverlays}
+            }},
+            {View.System, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, SystemDevelopmentOverlays}
+            }},
+            {View.Region, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, RegionDevelopmentOverlays}
+            }},
+        };
     }
     
     private void SetOverlay(View view, Overlay overlay)
@@ -177,6 +189,11 @@ public class InputManager : MonoBehaviour
             foreach(OverlayObject o in overlayLists[view][overlay])
             {
                 o.Initialize(viewObject);
+            }
+            if (overlayLists[view][overlay].Count > 0)
+            {
+                // Move the overlay container to the viewObject
+                overlayLists[view][overlay][0].transform.parent.position = viewObject.transform.position + new Vector3(0,0,-1);
             }
         }
 

@@ -19,21 +19,19 @@ public class PlanetDevelopmentControls : OverlayObject
     // Dictionary containing the images for all 5 buttons for each tile
     private Dictionary<TileControl, Image[]> tileButtons;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        InitializeYieldTexts();
-        GetTileButtons();
-
-        RegisterOverlayObject(View.Region, Overlay.Development);
-    }
-
     void OnEnable()
     {
-        // This skips if the planet hasn't been loaded
-        if (planet.tiles == null)
+        // This skips if the planet hasn't been selected
+        if (planet == null)
         {
             return;
+        }
+
+        // The first time this runs we need to initialize some dictionaries
+        if (tileButtons == null)
+        {
+            InitializeYieldTexts();
+            GetTileButtons();
         }
 
         // Enable and update the tile controls we need
@@ -68,13 +66,13 @@ public class PlanetDevelopmentControls : OverlayObject
         }
     }
 
-    protected override bool ShouldBeActive(MonoBehaviour viewObject)
+    public override void Initialize(MonoBehaviour viewObject)
     {
-        if (viewObject is Region && viewObject == planet.parentRegion)
+        if (viewObject is Region)
         {
-            return true;
+            planet = (Planet)((Region)viewObject).orbitalObject;
+            base.Initialize(viewObject);
         }
-        return false;
     }
 
     public void OnYieldButtonClick(TileControl tile, int yieldButton)

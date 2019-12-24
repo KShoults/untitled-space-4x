@@ -5,21 +5,13 @@ using UnityEngine;
 public abstract class OverlayObject : MonoBehaviour
 {
     // Activate this object if it passes a check based on the current view object.
-    public void Initialize(MonoBehaviour viewObject)
+    public virtual void Initialize(MonoBehaviour viewObject)
     {
-        if (ShouldBeActive(viewObject))
+        Canvas canvas = GetComponent<Canvas>();
+        if (canvas.worldCamera == null)
         {
-            gameObject.SetActive(true);
+            canvas.worldCamera = Camera.main;
         }
+        gameObject.SetActive(true);
     }
-
-    // Registers this overlay object and then disables it so that it is ready to be called by input manager.
-    protected void RegisterOverlayObject(View view, Overlay overlay)
-    {
-        GetComponent<Canvas>().worldCamera = Camera.main;
-        Camera.main.GetComponent<InputManager>().overlayLists[view][overlay].Add(this);
-        gameObject.SetActive(false);
-    }
-
-    protected abstract bool ShouldBeActive(MonoBehaviour viewObject);
 }
