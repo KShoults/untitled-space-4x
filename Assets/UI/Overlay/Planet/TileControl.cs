@@ -23,11 +23,22 @@ public class TileControl : MonoBehaviour
 
     public void OnAdvancedIndustriesButtonClick()
     {
-        foreach (Image i in advancedIndustryButtons)
+        // If they're already active deactivate them
+        if (advancedIndustryButtons[0].gameObject.activeSelf)
         {
-            i.gameObject.SetActive(true);
+            foreach (Image i in advancedIndustryButtons)
+            {
+                i.gameObject.SetActive(false);
+            }
         }
-        planetDevelopmentControls.OnAdvancedIndustriesButtonClick(this);
+        else
+        {
+            foreach (Image i in advancedIndustryButtons)
+            {
+                i.gameObject.SetActive(true);
+            }
+            planetDevelopmentControls.OnAdvancedIndustriesButtonClick(this);
+        }
     }
 
     public void OnCivilianIndustryButtonClick()
