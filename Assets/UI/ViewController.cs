@@ -84,9 +84,9 @@ public class ViewController : MonoBehaviour
 
             case View.Region:   // The Region View
                 objectPosition = o.transform.position;
-                newPosition.x = objectPosition.x - .04f;
+                newPosition.x = objectPosition.x - .05f;
                 newPosition.y = objectPosition.y;
-                newSize = .02f;
+                newSize = .05f / mainCamera.aspect;
                 newLayerMask = 1 << 11;
                 break;
         }
