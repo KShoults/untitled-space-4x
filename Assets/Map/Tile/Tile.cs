@@ -13,7 +13,7 @@ public enum Yield
 
 public class Tile
 {
-    Dictionary<Resource, Yield> resources;
+    public Dictionary<Resource, Yield> resources;
 
     public Tile()
     {
