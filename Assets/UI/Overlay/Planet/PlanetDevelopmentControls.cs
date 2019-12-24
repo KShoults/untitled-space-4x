@@ -66,6 +66,14 @@ public class PlanetDevelopmentControls : OverlayObject
         }
     }
 
+    void OnDisable()
+    {
+        foreach(TileControl t in TileControls)
+        {
+            t.ClosePopups();
+        }
+    }
+
     public override void Initialize(MonoBehaviour viewObject)
     {
         if (viewObject is Region)
@@ -83,33 +91,10 @@ public class PlanetDevelopmentControls : OverlayObject
         planetTile.resources.Keys.CopyTo(tileResources, 0);
         // The resource that was clicked on
         Resource clickedResource = tileResources[yieldButton];
-        // The industry to allocate the tile to
-        if (!planet.industries.ContainsKey(clickedResource))
-        {
-            planet.industries.Add(clickedResource, new Industry(clickedResource));
-        }
-        Industry selectedIndustry = planet.industries[clickedResource];
-        if (planetTile.industry != null)
-        {
-            if (planetTile.industry != selectedIndustry)
-            {
-                planetTile.industry.tiles.Remove(planetTile);
-                selectedIndustry.tiles.Add(planetTile);
-                planetTile.industry = selectedIndustry;
+        AllocateTile(planetTile, clickedResource);
                 
-                // Update the planet labels
-                planetDevelopmentLabels.UpdateLabels();
-            }
-            // Else tile is already assigned to this industry so do nothing
-        }
-        else
-        {
-            selectedIndustry.tiles.Add(planetTile);
-            planetTile.industry = selectedIndustry;
-                
-                // Update the planet labels
-            planetDevelopmentLabels.UpdateLabels();
-        }
+        // Update the planet labels
+        planetDevelopmentLabels.UpdateLabels();
     }
 
     public void OnCancelButtonClick(TileControl tile)
@@ -124,6 +109,50 @@ public class PlanetDevelopmentControls : OverlayObject
                 
             // Update the planet labels
             planetDevelopmentLabels.UpdateLabels();
+        }
+    }
+
+    public void OnCivilianIndustryButtonClick(TileControl tile)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+
+        AllocateTile(planetTile, Resource.CivilianGoods);
+                
+        // Update the planet labels
+        planetDevelopmentLabels.UpdateLabels();
+    }
+
+    public void OnMilitaryIndustryButtonClick(TileControl tile)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+
+        AllocateTile(planetTile, Resource.MilitaryGoods);
+                
+        // Update the planet labels
+        planetDevelopmentLabels.UpdateLabels();
+    }
+
+    public void OnShipyardIndustryButtonClick(TileControl tile)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+
+        AllocateTile(planetTile, Resource.ShipParts);
+                
+        // Update the planet labels
+        planetDevelopmentLabels.UpdateLabels();
+    }
+
+    public void OnAdvancedIndustriesButtonClick(TileControl tile)
+    {
+        foreach(TileControl t in TileControls)
+        {
+            if (t != tile)
+            {
+                t.ClosePopups();
+            }
         }
     }
 
@@ -176,6 +205,33 @@ public class PlanetDevelopmentControls : OverlayObject
         {
             Image[] buttons = t.buttons;
             tileButtons.Add(t, buttons);
+        }
+    }
+
+    private void AllocateTile(Tile tile, Resource resource)
+    {
+        // The planet might not have this industry yet
+        if (!planet.industries.ContainsKey(resource))
+        {
+            planet.industries.Add(resource, new Industry(resource));
+        }
+
+        // The industry to allocate the tile to
+        Industry selectedIndustry = planet.industries[resource];
+        if (tile.industry != null)
+        {
+            if (tile.industry != selectedIndustry)
+            {
+                tile.industry.tiles.Remove(tile);
+                selectedIndustry.tiles.Add(tile);
+                tile.industry = selectedIndustry;
+            }
+            // Else tile is already assigned to this industry so do nothing
+        }
+        else
+        {
+            selectedIndustry.tiles.Add(tile);
+            tile.industry = selectedIndustry;
         }
     }
 }

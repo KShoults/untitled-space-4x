@@ -8,7 +8,7 @@ public class TileControl : MonoBehaviour
     // The buttons on this TileControl.
     // 0: Yield Button 1, 1: Yield Button 2, 2: Clear Development Button,
     // 3: Advanced Industry Button, 4: Other Development Button
-    public Image[] buttons;
+    public Image[] buttons, advancedIndustryButtons;
     public PlanetDevelopmentControls planetDevelopmentControls;
 
     public void OnYieldButtonClick(int yieldButton)
@@ -19,5 +19,40 @@ public class TileControl : MonoBehaviour
     public void OnCancelButtonClick()
     {
         planetDevelopmentControls.OnCancelButtonClick(this);
+    }
+
+    public void OnAdvancedIndustriesButtonClick()
+    {
+        foreach (Image i in advancedIndustryButtons)
+        {
+            i.gameObject.SetActive(true);
+        }
+        planetDevelopmentControls.OnAdvancedIndustriesButtonClick(this);
+    }
+
+    public void OnCivilianIndustryButtonClick()
+    {
+        planetDevelopmentControls.OnCivilianIndustryButtonClick(this);
+        ClosePopups();
+    }
+
+    public void OnMilitaryIndustryButtonClick()
+    {
+        planetDevelopmentControls.OnMilitaryIndustryButtonClick(this);
+        ClosePopups();
+    }
+
+    public void OnShipyardIndustryButtonClick()
+    {
+        planetDevelopmentControls.OnShipyardIndustryButtonClick(this);
+        ClosePopups();
+    }
+
+    public void ClosePopups()
+    {
+        foreach (Image i in advancedIndustryButtons)
+        {
+            i.gameObject.SetActive(false);
+        }
     }
 }

@@ -54,7 +54,16 @@ public class PlanetDevelopmentLabels : OverlayObject
                 int development = 0;
                 foreach(Tile t in planet.industries[kvp.Key].tiles)
                 {
-                    development += (int)t.resources[kvp.Key];
+                    // Is this a basic industry
+                    if (kvp.Key == Resource.Energy || kvp.Key == Resource.Water ||
+                        kvp.Key == Resource.Food || kvp.Key == Resource.Minerals)
+                    {
+                        development += (int)t.resources[kvp.Key];
+                    }
+                    else
+                    {
+                        development += 10;
+                    }
                 }
                 // Write the label
                 kvp.Value.text = kvp.Key + ": " + development;
