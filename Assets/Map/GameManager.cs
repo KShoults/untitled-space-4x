@@ -59,18 +59,46 @@ public class GameManager : MonoBehaviour
         Planet homeworld = homeSystem.planets[(int)Mathf.Floor(Random.value * homeSystem.planets.Count)];
 
         // Overwrite its size, habitability, and resources
-        homeworld.planetSize = 5;
+        homeworld.planetSize = 7;
         homeworld.habitability = 90;
 
         // Set the homeworld's tiles
-        Tile[] tiles = new Tile[5];
-        tiles[0] = new Tile(Resource.Minerals, Yield.Medium, Resource.Energy, Yield.Medium);
-        tiles[1] = new Tile(Resource.Food, Yield.Medium, Resource.Water, Yield.Medium);
-        tiles[2] = new Tile(Resource.Energy, Yield.Low);
-        tiles[3] = new Tile(Resource.Water, Yield.Low);
-        tiles[4] = new Tile(Resource.Food, Yield.Low);
+        Tile[] tiles = new Tile[7];
+        tiles[0] = new Tile(Resource.Energy, Yield.Medium);
+        tiles[1] = new Tile(Resource.Water, Yield.Medium);
+        tiles[2] = new Tile(Resource.Food, Yield.Medium);
+        tiles[3] = new Tile(Resource.Minerals, Yield.Medium);
+        tiles[4] = new Tile(Resource.Energy, Yield.Low);
+        tiles[5] = new Tile(Resource.Water, Yield.Low);
+        tiles[6] = new Tile(Resource.Food, Yield.Low);
 
         homeworld.tiles = tiles;
+
+        // Assign those tiles to industries
+        homeworld.industries.Add(Resource.Energy, new Industry(Resource.Energy));
+        Industry energyIndustry = homeworld.industries[Resource.Energy];
+        energyIndustry.tiles.Add(tiles[0]);
+        tiles[0].industry = energyIndustry;
+
+        homeworld.industries.Add(Resource.Water, new Industry(Resource.Water));
+        Industry waterIndustry = homeworld.industries[Resource.Water];
+        waterIndustry.tiles.Add(tiles[1]);
+        tiles[1].industry = waterIndustry;
+
+        homeworld.industries.Add(Resource.Food, new Industry(Resource.Food));
+        Industry foodIndustry = homeworld.industries[Resource.Food];
+        foodIndustry.tiles.Add(tiles[2]);
+        tiles[2].industry = foodIndustry;
+
+        homeworld.industries.Add(Resource.Minerals, new Industry(Resource.Minerals));
+        Industry mineralsIndustry = homeworld.industries[Resource.Minerals];
+        mineralsIndustry.tiles.Add(tiles[3]);
+        tiles[3].industry = mineralsIndustry;
+
+        homeworld.industries.Add(Resource.CivilianGoods, new Industry(Resource.CivilianGoods));
+        Industry civilianIndustry = homeworld.industries[Resource.CivilianGoods];
+        civilianIndustry.tiles.Add(tiles[4]);
+        tiles[4].industry = civilianIndustry;
 
         // Center the view on the home system
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
