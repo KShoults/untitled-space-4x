@@ -66,9 +66,9 @@ public class GameManager : MonoBehaviour
         Tile[] tiles = new Tile[5];
         tiles[0] = new Tile(Resource.Minerals, Yield.Medium, Resource.Energy, Yield.Medium);
         tiles[1] = new Tile(Resource.Food, Yield.Medium, Resource.Water, Yield.Medium);
-        tiles[2] = new Tile();
-        tiles[3] = new Tile();
-        tiles[4] = new Tile();
+        tiles[2] = new Tile(Resource.Energy, Yield.Low);
+        tiles[3] = new Tile(Resource.Water, Yield.Low);
+        tiles[4] = new Tile(Resource.Food, Yield.Low);
 
         homeworld.tiles = tiles;
 
