@@ -34,4 +34,23 @@ public static class ResourceUtil
             return _resourceString;
         }
     }
+
+    private static readonly Dictionary<Resource, Color> _resourceColors = new Dictionary<Resource, Color>
+    {
+        {Resource.Energy, Color.yellow},
+        {Resource.Water, Color.blue},
+        {Resource.Food, Color.green},
+        {Resource.Minerals, Color.red},
+        {Resource.CivilianGoods, new Color(.55f, .27f, .07f)},
+        {Resource.MilitaryGoods, new Color(1, .65f, 0)},
+        {Resource.ShipParts, new Color(.5f, 0, .5f)}
+    };
+
+    public static Dictionary<Resource, Color> ResourceColors
+    {
+        get
+        {
+            return _resourceColors;
+        }
+    }
 }
