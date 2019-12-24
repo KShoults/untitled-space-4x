@@ -96,6 +96,9 @@ public class PlanetDevelopmentControls : OverlayObject
                 planetTile.industry.tiles.Remove(planetTile);
                 selectedIndustry.tiles.Add(planetTile);
                 planetTile.industry = selectedIndustry;
+                
+                // Update the planet labels
+                planetDevelopmentLabels.UpdateLabels();
             }
             // Else tile is already assigned to this industry so do nothing
         }
@@ -103,9 +106,25 @@ public class PlanetDevelopmentControls : OverlayObject
         {
             selectedIndustry.tiles.Add(planetTile);
             planetTile.industry = selectedIndustry;
+                
+                // Update the planet labels
+            planetDevelopmentLabels.UpdateLabels();
         }
-        
-        planetDevelopmentLabels.UpdateLabels();
+    }
+
+    public void OnCancelButtonClick(TileControl tile)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+
+        if (planetTile.industry != null)
+        {
+            planetTile.industry.tiles.Remove(planetTile);
+            planetTile.industry = null;
+                
+            // Update the planet labels
+            planetDevelopmentLabels.UpdateLabels();
+        }
     }
 
 

@@ -230,6 +230,7 @@ MonoBehaviour:
     type: 3}
   MineralsRareYieldSprite: {fileID: 21300000, guid: 80697a4e5adc7ca1c913993871b69e9d,
     type: 3}
+  CancelSprite: {fileID: 21300000, guid: 7bb83dd45ce1617dcbefc6176f050776, type: 3}
 --- !u!1 &6557336290175251669
 GameObject:
   m_ObjectHideFlags: 0
