@@ -118,6 +118,7 @@ public class StarSystem : MonoBehaviour
             // Place the planet in its region
             newPlanet.transform.parent = targetRegion.transform;
             newPlanet.parentRegion = targetRegion;
+            targetRegion.orbitalObject = newPlanet;
 
             Vector3 planetPosition = targetRegion.transform.position;
             planetPosition.z = 1;
