@@ -13,7 +13,10 @@ public enum Yield
 
 public class Tile
 {
+    // The resource yields on this tile
     public Dictionary<Resource, Yield> resources;
+    // The industry that this tile is allocated to
+    public Industry industry;
 
     public Tile()
     {

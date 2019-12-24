@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 public class PlanetDevelopmentControls : OverlayObject
 {
     public Planet planet;
+    public PlanetDevelopmentLabels planetDevelopmentLabels;
     public TileControl[] TileControls;
     // Yield Sprites
     public Sprite EnergyLowYieldSprite, EnergyMediumYieldSprite, EnergyHighYieldSprite, EnergyUncommonYieldSprite, EnergyRareYieldSprite,
@@ -73,6 +75,39 @@ public class PlanetDevelopmentControls : OverlayObject
             return true;
         }
         return false;
+    }
+
+    public void OnYieldButtonClick(TileControl tile, int yieldButton)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+        Resource[] tileResources = new Resource[planetTile.resources.Count];
+        planetTile.resources.Keys.CopyTo(tileResources, 0);
+        // The resource that was clicked on
+        Resource clickedResource = tileResources[yieldButton];
+        // The industry to allocate the tile to
+        if (!planet.industries.ContainsKey(clickedResource))
+        {
+            planet.industries.Add(clickedResource, new Industry(clickedResource));
+        }
+        Industry selectedIndustry = planet.industries[clickedResource];
+        if (planetTile.industry != null)
+        {
+            if (planetTile.industry != selectedIndustry)
+            {
+                planetTile.industry.tiles.Remove(planetTile);
+                selectedIndustry.tiles.Add(planetTile);
+                planetTile.industry = selectedIndustry;
+            }
+            // Else tile is already assigned to this industry so do nothing
+        }
+        else
+        {
+            selectedIndustry.tiles.Add(planetTile);
+            planetTile.industry = selectedIndustry;
+        }
+        
+        planetDevelopmentLabels.UpdateLabels();
     }
 
 

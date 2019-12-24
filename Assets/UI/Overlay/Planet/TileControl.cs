@@ -9,4 +9,10 @@ public class TileControl : MonoBehaviour
     // 0: Yield Button 1, 1: Yield Button 2, 2: Advanced Industry Button,
     // 3: Other Development Button, 4: Clear Development Button
     public Image[] buttons;
+    public PlanetDevelopmentControls planetDevelopmentControls;
+
+    public void OnYieldButtonClick(int yieldButton)
+    {
+        planetDevelopmentControls.OnYieldButtonClick(this, yieldButton);
+    }
 }

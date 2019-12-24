@@ -27,7 +27,20 @@ public class PlanetDevelopmentLabels : OverlayObject
         {
             return;
         }
+        UpdateLabels();
+    }
 
+    protected override bool ShouldBeActive(MonoBehaviour viewObject)
+    {
+        if (viewObject is Region && viewObject == planet.parentRegion)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void UpdateLabels()
+    {
         SizeText.text = "Size: " + planet.planetSize;
         HabitabilityText.text = "Habitability: " + planet.habitability;
         
@@ -55,15 +68,6 @@ public class PlanetDevelopmentLabels : OverlayObject
         }
 
         TotalDevelopmentText.text = "Total: " + totalDevelopment;
-    }
-
-    protected override bool ShouldBeActive(MonoBehaviour viewObject)
-    {
-        if (viewObject is Region && viewObject == planet.parentRegion)
-        {
-            return true;
-        }
-        return false;
     }
 
 

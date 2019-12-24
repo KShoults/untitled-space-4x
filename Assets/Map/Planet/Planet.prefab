@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planet: {fileID: 1739958908949571776}
+  planetDevelopmentLabels: {fileID: 7855402545745575842}
   TileControls:
   - {fileID: 6228045676813136316}
   - {fileID: 170537416064193719}
@@ -2410,6 +2411,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!114 &170537416064193719 stripped
@@ -2577,6 +2583,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!114 &378005488970029990 stripped
@@ -2749,6 +2760,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!114 &3620309587131619751 stripped
@@ -2916,6 +2932,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &5692097846080765588 stripped
@@ -3083,6 +3104,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &6607002834115395243 stripped
@@ -3265,6 +3291,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &5896614818791291178 stripped
@@ -3432,6 +3463,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &7367872633825391679 stripped
@@ -3599,6 +3635,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &6986329566181030599 stripped
@@ -3766,6 +3807,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &8432190278393882768 stripped
@@ -3888,6 +3934,21 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 545792600735741056, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 545792600735741056, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 545792600735741056, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8805602109198367449, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -3908,6 +3969,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 230515736193783166, guid: 43a7d1cf138d728d5b61ae5d83bb55a0,
+        type: 3}
+      propertyPath: planetDevelopmentControls
+      value: 
+      objectReference: {fileID: 2171868965147381185}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a7d1cf138d728d5b61ae5d83bb55a0, type: 3}
 --- !u!224 &8328956777965918164 stripped

@@ -14,7 +14,12 @@ public class Industry
         tiles = new List<Tile>();
     }
 
-    public Industry(List<Tile> tiles) : this()
+    public Industry(Resource resource) : this()
+    {
+        this.resource = resource;
+    }
+
+    public Industry(List<Tile> tiles)
     {
         this.tiles = tiles;
     }
