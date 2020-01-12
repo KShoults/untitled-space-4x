@@ -8,6 +8,7 @@ public class SystemPlanetDevelopmentOverlay : MonoBehaviour
 {
     public Planet planet;
     public SystemTile[] SystemTiles;
+    public TextMeshProUGUI PlanetNameText;
 
     void OnEnable()
     {
@@ -15,6 +16,16 @@ public class SystemPlanetDevelopmentOverlay : MonoBehaviour
         {
             gameObject.SetActive(false);
             return;
+        }
+
+        PlanetNameText.text = planet.planetShortName;
+        if (planet.industries.Count > 0)
+        {
+            PlanetNameText.color = Color.red;
+        }
+        else
+        {
+            PlanetNameText.color = Color.white;
         }
 
         for (int i = 0; i < SystemTiles.Length; i++)
