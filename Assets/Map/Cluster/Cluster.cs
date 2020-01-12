@@ -16,18 +16,6 @@ public class Cluster : MonoBehaviour
     // Ordered list of names used for additional starSystems
     private List<string> starSystemNames;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void GenerateCluster(int numSystemsAvg, float numSystemsVar, int sizePlanetsAvg, int sizePlanetsVar)
     {
         // Determine the number of systems in this cluster
@@ -82,7 +70,9 @@ public class Cluster : MonoBehaviour
             newSystem.transform.parent = transform;
             newSystem.transform.position = new Vector3(unityXPosition, unityYPosition, 0);
             newSystem.position = new Vector2(xPosition, yPosition);
-            newSystem.starSystemName = GenerateSystemName();
+            string systemName = GenerateSystemName();
+            newSystem.starSystemShortName = systemName;
+            newSystem.starSystemName = systemName + " " + clusterName;
             newSystem.GenerateStarSystem(sizePlanetsAvg, sizePlanetsVar);
             starSystems.Add(newSystem);
 
@@ -140,7 +130,7 @@ public class Cluster : MonoBehaviour
             starSystemNames = GenerateNameList();
         }
 
-        string name = starSystemNames[0] + " " + clusterName;
+        string name = starSystemNames[0];
         starSystemNames.RemoveAt(0);
         return name;
     }

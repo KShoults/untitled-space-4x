@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
             gameManager = this;
             if (nameSeed == 0f)
             {
-                float nameSeed = Random.value;
+                nameSeed = Random.value;
             }
             nameManager = new NameManager(nameSeed);
         }
