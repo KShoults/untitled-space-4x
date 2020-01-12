@@ -185,7 +185,7 @@ public class InputManager : MonoBehaviour
 
         if (overlay != Overlay.None)
         {
-            if (overlayLists[view][overlay].Count > 0)
+            if (overlayLists[view][overlay].Count > 0 && viewObject != null)
             {
                 // Move the overlay container to the viewObject
                 overlayLists[view][overlay][0].transform.parent.position = viewObject.transform.position + new Vector3(0,0,-1);
