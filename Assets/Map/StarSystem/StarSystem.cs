@@ -25,18 +25,6 @@ public class StarSystem : MonoBehaviour
     private Tuple<int,int>[] axialDirections = new Tuple<int, int>[6] {Tuple.Create(1, 0), Tuple.Create(1, -1), Tuple.Create(0, -1),
                                                 Tuple.Create(-1, 0), Tuple.Create(-1, 1), Tuple.Create(0, 1)};
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void GenerateStarSystem(int sizePlanetsAvg, int sizePlanetsVar)
     {
         // Create the star
@@ -125,12 +113,13 @@ public class StarSystem : MonoBehaviour
             Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
 
             // Generate the planet's size
-            int planetSize = (int)Mathf.Floor(UnityEngine.Random.value * 99 + 1);
+            int planetSize = (int)Mathf.Floor(UnityEngine.Random.value * 9 + 1);
             newPlanet.planetSize = planetSize;
 
             // Place the planet in its region
             newPlanet.transform.parent = targetRegion.transform;
             newPlanet.parentRegion = targetRegion;
+            targetRegion.orbitalObject = newPlanet;
 
             Vector3 planetPosition = targetRegion.transform.position;
             planetPosition.z = 1;
@@ -141,14 +130,8 @@ public class StarSystem : MonoBehaviour
             newPlanet.planetName = starSystemName + " " + planetName;
             planets.Add(newPlanet);
 
-            // Generate Planet Resources
-            newPlanet.resources = GeneratePlanetResources(planetSize);
-
-            // Generate mineral quality
-            if (newPlanet.resources[Resource.Minerals] > 0)
-            {
-                newPlanet.mineralQuality = GenerateMineralQuality();
-            }
+            // Generate Planet Tiles
+            newPlanet.tiles = GeneratePlanetTiles(planetSize);
 
             // Generate planet habitability
             newPlanet.habitability = GenerateHabitability();
@@ -157,22 +140,11 @@ public class StarSystem : MonoBehaviour
         }
     }
 
-    // Alert the InputManager when this is hovered over
-    void OnMouseEnter()
-    {
-        Camera.main.GetComponent<InputManager>().HoverEnter(this);
-    }
-
-    void OnMouseExit()
-    {
-        Camera.main.GetComponent<InputManager>().HoverExit(this);
-    }
-
     void OnMouseDown()
     {
         if (Input.GetMouseButton(0))
         {
-            Camera.main.GetComponent<CameraController>().SetCameraTargetSmooth(2, this);
+            Camera.main.GetComponent<ViewController>().SetCameraTargetSmooth(View.System, this);
         }
     }
 
@@ -338,68 +310,89 @@ public class StarSystem : MonoBehaviour
         return regionMesh;
     }
 
-    private Dictionary<Resource, float> GeneratePlanetResources(int planetSize)
+    private Tile[] GeneratePlanetTiles(int planetSize)
     {
-        Dictionary<Resource, float> planetResources = new Dictionary<Resource, float>();
-        // Generate a random value for each resource
-        for (int i = 0; i < 4; i++)
-        {
-            planetResources[(Resource)i] = UnityEngine.Random.value;
-        }
-        
-        // Modify each resource by the star class
-        Dictionary<Resource, int> classResources = StarClassUtil.StarResources[star.starClass];
-        foreach (KeyValuePair<Resource, int> kvp in classResources)
-        {
-            planetResources[kvp.Key] *= kvp.Value;
-        }
-        // Increase the mineral amounts to bring it to the same level as the rest
-        planetResources[Resource.Minerals] *= 10;
+        Tile[] planetTiles = new Tile[planetSize];
 
-        // Zero out any resources that are below a certain threshold
-        for (int i = 0; i < 4; i++)
+        // Generate the tiles
+        for (int i = 0; i < planetSize; i++)
         {
-            if (planetResources[(Resource)i] < 2.5f)
+            // Generate a random yield for the tile
+            Yield primaryYield = GenerateYield();
+            
+            // Select a resource for this yield
+            Resource primaryResource = GenerateResource(primaryYield);
+
+            // Check for a secondary yield
+            if (primaryYield != Yield.Uncommon && primaryYield != Yield.Rare &&
+                UnityEngine.Random.value > .5f)
             {
-                planetResources[(Resource)i] = 0;
+                // Generate a random yield for the tile
+                Yield secondaryYield = GenerateYield(primaryYield);
+                
+                // Select a resource for this yield
+                Resource secondaryResource = GenerateResource(secondaryYield, primaryResource);
+
+                // Create the tile
+                planetTiles[i] = new Tile(primaryResource, primaryYield, secondaryResource, secondaryYield);
+            }
+            else
+            {
+                // Create the tile
+                planetTiles[i] = new Tile(primaryResource, primaryYield);
             }
         }
 
-        // Calculate the highest maximum possible size multiplier between all resources
-        float maxMultiplier = planetSize / 8f;
-        foreach (KeyValuePair<Resource, float> kvp in planetResources)
-        {
-            if (planetSize / kvp.Value < maxMultiplier)
-            {
-                maxMultiplier = planetSize / kvp.Value;
-            }
-        }
-
-        // Adjust resources for planet size
-        for (int i = 0; i < 4; i++)
-        {
-            planetResources[(Resource)i] *= maxMultiplier;
-            // Floor any values that are less than 1
-            if (planetResources[(Resource)i] < 1)
-            {
-                planetResources[(Resource)i] = Mathf.Floor(planetResources[(Resource)i]);
-            } 
-        }
-        return planetResources;
+        return planetTiles;
     }
-    
-    private int GenerateMineralQuality()
+
+    // Generate a random yield with an optional max yield
+    private Yield GenerateYield(Yield maxYield = Yield.Rare)
     {
-        float mineralQuality = UnityEngine.Random.value;
-        if (mineralQuality <= .15f)
+        float yieldRandom = UnityEngine.Random.value * 3.1f;
+        if (yieldRandom < 1 || maxYield == Yield.Low)
         {
-            return 2;
+            return Yield.Low;
         }
-        else if (mineralQuality <= .5f)
+        else if (yieldRandom < 2 || maxYield == Yield.Medium)
         {
-            return 1;
+            return Yield.Medium;
         }
-        return 0;
+        else if (yieldRandom < 3 || maxYield == Yield.High)
+        {
+            return Yield.High;
+        }
+        else if (yieldRandom < 3.075f || maxYield == Yield.Uncommon)
+        {
+            return Yield.Uncommon;
+        }
+        else
+        {
+            return Yield.Rare;
+        }
+    }
+
+    // Selects a random resource based on the given yield and the class of star in this system
+    // Can pass a resource that shouldn't be selected
+    private Resource GenerateResource(Yield yield, Resource resourceToExclude = Resource.None)
+    {
+        // Get the array of resources for this yield and starclass
+        Resource[] possibleResources = StarClassUtil.StarTiles[star.starClass][yield];
+
+        Resource resource;
+        int failCount = 0;
+        do
+        {
+            if (failCount > 10)
+            {
+                return Resource.None;
+            }
+            int resourceRandom = (int)Mathf.Floor(UnityEngine.Random.value * possibleResources.Length);
+            resource = possibleResources[resourceRandom < possibleResources.Length ? resourceRandom : possibleResources.Length - 1];
+            failCount++;
+        } while (resource == resourceToExclude);
+        // Select a random resource from this array
+        return resource;
     }
 
     private int GenerateHabitability()

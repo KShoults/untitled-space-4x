@@ -1,24 +1,38 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
-    public Text SelectedObjectNameText, LabelViewText;
-    public PlanetPanel planetPanel;
-    private CameraController cameraController;
+    public Text SelectedObjectNameText, LabelViewText, LabelViewSubText;
+    public List<OverlayObject> SectorDevelopmentOverlays, ClusterDevelopmentOverlays, SystemDevelopmentOverlays, RegionDevelopmentOverlays;
+    // Dictionary for quick lookup of overlay objects
+    public Dictionary<View, Dictionary<Overlay, List<OverlayObject>>> overlayLists;
+    private Overlay activeOverlay;
+    private View activeView;
+    private ViewController viewController;
     private MonoBehaviour viewObject;
+
+    void Awake()
+    {
+        InitializeOverlayLists();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        cameraController = GetComponent<CameraController>();
+        viewController = GetComponent<ViewController>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (activeOverlay == Overlay.None)
+        {
+            SetOverlay(activeView, Overlay.Development);
+        }
         HandleMouseButtons();
     }
 
@@ -26,19 +40,24 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-
-            switch (cameraController.viewType)
+            switch (activeView)
             {
                 default:
-                case 0:
+                case View.Sector:
                     break;
-                case 1:
-                    GetComponent<CameraController>().SetCameraTargetSmooth(0, null);
+                case View.Cluster:
+                    viewController.SetCameraTargetSmooth(View.Sector, null);
                     break;
-                case 2:
+                case View.System:
                     if (viewObject != null)
                     {
-                        GetComponent<CameraController>().SetCameraTargetSmooth(1, viewObject.GetComponentInParent<Cluster>());
+                        viewController.SetCameraTargetSmooth(View.Cluster, viewObject.GetComponentInParent<Cluster>());
+                    }
+                    break;
+                case View.Region:
+                    if (viewObject != null)
+                    {
+                        viewController.SetCameraTargetSmooth(View.System, viewObject.GetComponentInParent<StarSystem>());
                     }
                     break;
             }
@@ -87,36 +106,98 @@ public class InputManager : MonoBehaviour
     // Triggers all of the UI changes that should occur when the view changes
     // viewType refers to Sector/Cluster/System view.
     // o is the cluster or system we are viewing or null for sector view.
-    public void ChangeView(int viewType, MonoBehaviour o)
+    public void ChangeView(View newView, MonoBehaviour o)
     {
-        switch (viewType)
+        switch (newView)
         {
             default:
-            case 0:
-                LabelViewText.text = "";
+            case View.Sector:
                 LabelViewText.gameObject.SetActive(false);
+                LabelViewSubText.gameObject.SetActive(false);
                 break;
 
-            case 1:
+            case View.Cluster:
                 Cluster cluster = o as Cluster;
                 LabelViewText.text = cluster.clusterName;
                 LabelViewText.gameObject.SetActive(true);
-                planetPanel.gameObject.SetActive(false);
+                LabelViewSubText.gameObject.SetActive(false);
                 break;
 
-            case 2:
+            case View.System:
                 StarSystem starSystem = o as StarSystem;
                 LabelViewText.text = starSystem.starSystemName;
                 LabelViewText.gameObject.SetActive(true);
+                LabelViewSubText.gameObject.SetActive(false);
+                break;
+
+            case View.Region:
+                Region region = o as Region;
+                if (region.orbitalObject != null)
+                {
+                    LabelViewText.text = ((Planet)region.orbitalObject).planetName;
+                }
+                else
+                {
+                    LabelViewText.text = region.GetComponentInParent<StarSystem>().starSystemName;
+                }
+                LabelViewText.gameObject.SetActive(true);
+                LabelViewSubText.text = "(" + region.q + ", " + region.r + ", " + region.s + ")";
+                LabelViewSubText.gameObject.SetActive(true);
                 break;
         }
         viewObject = o;
+        SetOverlay(newView, activeOverlay);
     }
 
-    // Triggers the UI changes that should occur when a planet is selected
-    public void SelectPlanet(Planet planet)
+    private void InitializeOverlayLists()
     {
-        planetPanel.gameObject.SetActive(true);
-        planetPanel.SelectPlanet(planet);
+        overlayLists = new Dictionary<View, Dictionary<Overlay, List<OverlayObject>>>()
+        {
+            {View.Sector, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, SectorDevelopmentOverlays}
+            }},
+            {View.Cluster, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, ClusterDevelopmentOverlays}
+            }},
+            {View.System, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, SystemDevelopmentOverlays}
+            }},
+            {View.Region, new Dictionary<Overlay, List<OverlayObject>>()
+            {
+                {Overlay.Development, RegionDevelopmentOverlays}
+            }},
+        };
+    }
+    
+    private void SetOverlay(View view, Overlay overlay)
+    {
+        if (activeOverlay != Overlay.None)
+        {
+            // Deactivate any OverlayObjects in the old overlay
+            foreach(OverlayObject o in overlayLists[activeView][activeOverlay])
+            {
+                o.gameObject.SetActive(false);
+            }
+        }
+
+        if (overlay != Overlay.None)
+        {
+            if (overlayLists[view][overlay].Count > 0 && viewObject != null)
+            {
+                // Move the overlay container to the viewObject
+                overlayLists[view][overlay][0].transform.parent.position = viewObject.transform.position + new Vector3(0,0,-1);
+            }
+            // Activate any OverlayObjects in the new overlay
+            foreach(OverlayObject o in overlayLists[view][overlay])
+            {
+                o.Initialize(viewObject);
+            }
+        }
+
+        activeOverlay = overlay;
+        activeView = view;
     }
 }

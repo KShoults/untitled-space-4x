@@ -5,14 +5,22 @@ using UnityEngine;
 public class Industry
 {
     public Resource resource;
-    public float development, targetDevelopment;
+    // The tiles that are allocated to this industry
+    public List<Tile> tiles;
 
 
     public Industry()
-    { }
-
-    public Industry(float targetDevelopment) : this()
     {
-        this.targetDevelopment = targetDevelopment;
+        tiles = new List<Tile>();
+    }
+
+    public Industry(Resource resource) : this()
+    {
+        this.resource = resource;
+    }
+
+    public Industry(List<Tile> tiles)
+    {
+        this.tiles = tiles;
     }
 }
