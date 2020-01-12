@@ -185,15 +185,15 @@ public class InputManager : MonoBehaviour
 
         if (overlay != Overlay.None)
         {
-            // Activate any OverlayObjects in the new overlay
-            foreach(OverlayObject o in overlayLists[view][overlay])
-            {
-                o.Initialize(viewObject);
-            }
             if (overlayLists[view][overlay].Count > 0)
             {
                 // Move the overlay container to the viewObject
                 overlayLists[view][overlay][0].transform.parent.position = viewObject.transform.position + new Vector3(0,0,-1);
+            }
+            // Activate any OverlayObjects in the new overlay
+            foreach(OverlayObject o in overlayLists[view][overlay])
+            {
+                o.Initialize(viewObject);
             }
         }
 
