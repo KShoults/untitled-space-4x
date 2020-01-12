@@ -140,17 +140,6 @@ public class StarSystem : MonoBehaviour
         }
     }
 
-    // Alert the InputManager when this is hovered over
-    void OnMouseEnter()
-    {
-        Camera.main.GetComponent<InputManager>().HoverEnter(this);
-    }
-
-    void OnMouseExit()
-    {
-        Camera.main.GetComponent<InputManager>().HoverExit(this);
-    }
-
     void OnMouseDown()
     {
         if (Input.GetMouseButton(0))
