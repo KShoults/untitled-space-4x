@@ -5,6 +5,7 @@ using UnityEngine;
 public class Planet : MonoBehaviour
 {
     public string planetName;
+    public string planetShortName;
     // The region that contains this planet
     public Region parentRegion;
     // Planet size is an integer from 1 - 100;

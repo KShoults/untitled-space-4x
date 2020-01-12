@@ -9,6 +9,7 @@ public class StarSystem : MonoBehaviour
     // The position of this StarSystem relative to its parent cluster
     public Vector2 position;
     public string starSystemName;
+    public string starSystemShortName;
     public GameObject StarPrefab, PlanetPrefab, RegionPrefab;
     public Star star;
     public List<Planet> planets;
@@ -135,7 +136,9 @@ public class StarSystem : MonoBehaviour
             planetPosition.z = 1;
 
             newPlanet.transform.position = planetPosition;
-            newPlanet.planetName = GeneratePlanetName();
+            string planetName = GeneratePlanetName();
+            newPlanet.planetShortName = planetName;
+            newPlanet.planetName = starSystemName + " " + planetName;
             planets.Add(newPlanet);
 
             // Generate Planet Resources
@@ -216,7 +219,7 @@ public class StarSystem : MonoBehaviour
             planetNames = GenerateNameList();
         }
 
-        string name = starSystemName + " " + planetNames[0];
+        string name = planetNames[0];
         planetNames.RemoveAt(0);
         return name;
     }
