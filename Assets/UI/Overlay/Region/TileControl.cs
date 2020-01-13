@@ -10,6 +10,8 @@ public class TileControl : MonoBehaviour
     // 3: Advanced Industry Button, 4: Other Development Button
     public Image[] buttons, advancedIndustryButtons;
     public PlanetDevelopmentControls planetDevelopmentControls;
+    public Image TileOutline;
+    public RectTransform BackgroundMask;
 
     public void OnYieldButtonClick(int yieldButton)
     {

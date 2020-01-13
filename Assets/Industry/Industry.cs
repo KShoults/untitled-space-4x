@@ -11,7 +11,7 @@ public class Industry
     public List<Tile> tiles;
     // Population employed by the industry
     public ulong population;
-    Dictionary<Tile, float> tileDevelopments;
+    public Dictionary<Tile, float> tileDevelopments;
 
 
     public Industry()

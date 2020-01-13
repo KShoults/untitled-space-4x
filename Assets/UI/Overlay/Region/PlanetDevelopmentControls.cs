@@ -56,14 +56,24 @@ public class PlanetDevelopmentControls : OverlayObject
                 tileButtons[TileControls[i]][1].gameObject.SetActive(false);
             }
 
-            // Update the tile control's color
+            // Update the tile control's color and update the background mask to show development
             if (tile.industry != null)
             {
-                TileControls[i].GetComponent<Image>().color = ResourceUtil.ResourceColors[tile.industry.resource];
+                TileControls[i].TileOutline.color = ResourceUtil.ResourceColors[tile.industry.resource];
+                if (tile.industry.tileDevelopments.ContainsKey(tile))
+                {
+                    float development = tile.industry.tileDevelopments[tile];
+                    TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, development / 100f * .15f);
+                }
+                else
+                {
+                    TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+                }
             }
             else
             {
-                TileControls[i].GetComponent<Image>().color = Color.white;
+                TileControls[i].TileOutline.color = Color.white;
+                TileControls[i].BackgroundMask.sizeDelta = new Vector2(.15f, 0);
             }
 
             TileControls[i].gameObject.SetActive(true);
@@ -105,7 +115,7 @@ public class PlanetDevelopmentControls : OverlayObject
         AllocateTile(planetTile, clickedResource);
 
         // Update the tile control's color
-        tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[clickedResource];
+        tile.TileOutline.color = ResourceUtil.ResourceColors[clickedResource];
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -125,7 +135,7 @@ public class PlanetDevelopmentControls : OverlayObject
             planetDevelopmentLabels.UpdateLabels();
 
             // Update the tile control's color
-            tile.GetComponent<Image>().color = Color.white;
+            tile.TileOutline.color = Color.white;
         }
     }
 
@@ -137,7 +147,7 @@ public class PlanetDevelopmentControls : OverlayObject
         AllocateTile(planetTile, Resource.CivilianGoods);
 
         // Update the tile control's color
-        tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.CivilianGoods];
+        tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.CivilianGoods];
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -151,7 +161,7 @@ public class PlanetDevelopmentControls : OverlayObject
         AllocateTile(planetTile, Resource.MilitaryGoods);
 
         // Update the tile control's color
-        tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.MilitaryGoods];
+        tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.MilitaryGoods];
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -165,7 +175,7 @@ public class PlanetDevelopmentControls : OverlayObject
         AllocateTile(planetTile, Resource.ShipParts);
 
         // Update the tile control's color
-        tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.ShipParts];
+        tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.ShipParts];
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
