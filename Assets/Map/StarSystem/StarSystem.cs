@@ -113,7 +113,7 @@ public class StarSystem : MonoBehaviour
             Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
 
             // Generate the planet's size
-            int planetSize = (int)Mathf.Floor(UnityEngine.Random.value * 9 + 1);
+            int planetSize = (int)Mathf.Floor((float)(new System.Random()).NextDouble() * 10 + 1);
             newPlanet.planetSize = planetSize;
 
             // Place the planet in its region
