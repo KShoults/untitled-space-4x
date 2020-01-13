@@ -45,31 +45,11 @@ public class PlanetDevelopmentControls : OverlayObject
             // Set the first yield icon
             tileButtons[TileControls[i]][0].sprite = yieldSprites[tileResources[0]][tile.resources[tileResources[0]]];
 
-            // Set the yield icon's shading
-            if (tile.industry != null && tile.industry.resource == tileResources[0])
-            {
-                TileControls[i].buttons[0].color = Color.white;
-            }
-            else
-            {
-                TileControls[i].buttons[0].color = Color.HSVToRGB(0, .5f, 1);
-            }
-
             if (tileResources.Length > 1)
             {
                 // Set the second yield icon
                 tileButtons[TileControls[i]][1].sprite = yieldSprites[tileResources[1]][tile.resources[tileResources[1]]];
                 tileButtons[TileControls[i]][1].gameObject.SetActive(true);
-
-                // Set the yield icon's shading
-                if (tile.industry != null && tile.industry.resource == tileResources[1])
-                {
-                    TileControls[i].buttons[1].color = Color.white;
-                }
-                else
-                {
-                    TileControls[i].buttons[1].color = Color.HSVToRGB(0, .5f, 1);
-                }
             }
             else
             {
@@ -126,12 +106,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[clickedResource];
-
-        // Update the yield button's shading
-        tile.buttons[yieldButton].color = Color.white;
-
-        // Update the other yield button's shading
-        tile.buttons[1 - yieldButton].color = Color.HSVToRGB(0, .5f, 1);
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -150,12 +124,6 @@ public class PlanetDevelopmentControls : OverlayObject
             // Update the planet labels
             planetDevelopmentLabels.UpdateLabels();
 
-            // Update the yield button's shading
-            tile.buttons[0].color = Color.HSVToRGB(0, .5f, 1);
-
-            // Update the other yield button's shading
-            tile.buttons[1].color = Color.HSVToRGB(0, .5f, 1);
-
             // Update the tile control's color
             tile.GetComponent<Image>().color = Color.white;
         }
@@ -170,12 +138,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.CivilianGoods];
-
-        // Update the yield button's shading
-        tile.buttons[0].color = Color.HSVToRGB(0, .5f, 1);
-
-        // Update the other yield button's shading
-        tile.buttons[1].color = Color.HSVToRGB(0, .5f, 1);
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -190,12 +152,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.MilitaryGoods];
-
-        // Update the yield button's shading
-        tile.buttons[0].color = Color.HSVToRGB(0, .5f, 1);
-
-        // Update the other yield button's shading
-        tile.buttons[1].color = Color.HSVToRGB(0, .5f, 1);
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
@@ -210,12 +166,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.GetComponent<Image>().color = ResourceUtil.ResourceColors[Resource.ShipParts];
-
-        // Update the yield button's shading
-        tile.buttons[0].color = Color.HSVToRGB(0, .5f, 1);
-
-        // Update the other yield button's shading
-        tile.buttons[1].color = Color.HSVToRGB(0, .5f, 1);
                 
         // Update the planet labels
         planetDevelopmentLabels.UpdateLabels();
