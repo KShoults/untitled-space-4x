@@ -149,6 +149,19 @@ public class InputManager : MonoBehaviour
         SetOverlay(newView, activeOverlay);
     }
 
+    public void UpdateOverlay()
+    {
+        if (activeOverlay != Overlay.None)
+        {
+            // Activate any OverlayObjects in the new overlay
+            foreach(OverlayObject o in overlayLists[activeView][activeOverlay])
+            {
+                o.gameObject.SetActive(false);
+                o.Initialize(viewObject);
+            }
+        }
+    }
+
     private void InitializeOverlayLists()
     {
         overlayLists = new Dictionary<View, Dictionary<Overlay, List<OverlayObject>>>()

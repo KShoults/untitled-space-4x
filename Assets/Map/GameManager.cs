@@ -41,16 +41,14 @@ public class GameManager : MonoBehaviour
         TurnCounterText.text = "Turn: " + turnCounter;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void EndTurn()
     {
+        GrowIndustries();
+
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;
+
+        Camera.main.GetComponent<InputManager>().UpdateOverlay();
     }
 
     private void CreateHomeworld()
@@ -102,5 +100,22 @@ public class GameManager : MonoBehaviour
 
         // Center the view on the home system
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
+    }
+
+    private void GrowIndustries()
+    {
+        foreach (Cluster c in sector.clusters)
+        {
+            foreach (StarSystem s in c.starSystems)
+            {
+                foreach (Planet p in s.planets)
+                {
+                    foreach (KeyValuePair<Resource, Industry> kvp in p.industries)
+                    {
+                        kvp.Value.Grow();
+                    }
+                }
+            }
+        }
     }
 }
