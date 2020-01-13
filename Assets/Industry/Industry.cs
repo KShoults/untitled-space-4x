@@ -42,7 +42,7 @@ public class Industry
         
         // Calculate the maximum population we can add to this industry
         // Later on we will base this on transport costs
-        int populationToAdd = 1000;
+        int populationToAdd = 10000;
 
         // Limit by the maximum population for this industry
         ulong maxPop = (ulong)tiles.Count * 100 * POPTODEVRATIO;
