@@ -73,7 +73,7 @@ public class PlanetDevelopmentControls : OverlayObject
             else
             {
                 TileControls[i].TileOutline.color = Color.white;
-                TileControls[i].BackgroundMask.sizeDelta = new Vector2(.15f, 0);
+                    TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
             }
 
             TileControls[i].gameObject.SetActive(true);

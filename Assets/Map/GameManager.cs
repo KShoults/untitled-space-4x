@@ -47,6 +47,8 @@ public class GameManager : MonoBehaviour
 
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;
+
+        Camera.main.GetComponent<InputManager>().UpdateOverlay();
     }
 
     private void CreateHomeworld()
