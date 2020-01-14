@@ -98,6 +98,9 @@ public class GameManager : MonoBehaviour
         civilianIndustry.tiles.Add(tiles[4]);
         tiles[4].industry = civilianIndustry;
 
+        // Add a palace for dev purposes
+        homeworld.palace = new Palace();
+
         // Center the view on the home system
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
     }
