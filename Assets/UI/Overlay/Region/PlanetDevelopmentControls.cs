@@ -14,6 +14,8 @@ public class PlanetDevelopmentControls : OverlayObject
                     WaterLowYieldSprite, WaterMediumYieldSprite, WaterHighYieldSprite, WaterUncommonYieldSprite, WaterRareYieldSprite,
                     FoodLowYieldSprite, FoodMediumYieldSprite, FoodHighYieldSprite, FoodUncommonYieldSprite, FoodRareYieldSprite,
                     MineralsLowYieldSprite, MineralsMediumYieldSprite, MineralsHighYieldSprite, MineralsUncommonYieldSprite, MineralsRareYieldSprite;
+    public Button palaceButton;
+    public PalacePanel palacePanel;
     // Dictionary for quick lookup of yield sprites
     private Dictionary<Resource, Dictionary<Yield, Sprite>> yieldSprites;
     // Dictionary containing the images for all 5 buttons for each tile
@@ -73,7 +75,7 @@ public class PlanetDevelopmentControls : OverlayObject
             else
             {
                 TileControls[i].TileOutline.color = Color.white;
-                    TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+                TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
             }
 
             TileControls[i].gameObject.SetActive(true);
@@ -85,6 +87,16 @@ public class PlanetDevelopmentControls : OverlayObject
         {
             TileControls[i].gameObject.SetActive(false);
         }
+
+        // Activate the palace button if needed
+        if (planet.palace != null)
+        {
+            palaceButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            palaceButton.gameObject.SetActive(false);
+        }
     }
 
     void OnDisable()
@@ -93,6 +105,8 @@ public class PlanetDevelopmentControls : OverlayObject
         {
             t.ClosePopups();
         }
+
+        palacePanel.gameObject.SetActive(false);
     }
 
     public override void Initialize(MonoBehaviour viewObject)
@@ -148,9 +162,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.CivilianGoods];
-                
-        // Update the planet labels
-        planetDevelopmentLabels.UpdateLabels();
     }
 
     public void OnMilitaryIndustryButtonClick(TileControl tile)
@@ -162,9 +173,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.MilitaryGoods];
-                
-        // Update the planet labels
-        planetDevelopmentLabels.UpdateLabels();
     }
 
     public void OnShipyardIndustryButtonClick(TileControl tile)
@@ -176,9 +184,6 @@ public class PlanetDevelopmentControls : OverlayObject
 
         // Update the tile control's color
         tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.ShipParts];
-                
-        // Update the planet labels
-        planetDevelopmentLabels.UpdateLabels();
     }
 
     public void OnAdvancedIndustriesButtonClick(TileControl tile)
@@ -189,6 +194,27 @@ public class PlanetDevelopmentControls : OverlayObject
             {
                 t.ClosePopups();
             }
+        }
+
+        palacePanel.gameObject.SetActive(false);
+    }
+
+    public void OnPalaceButtonClick()
+    {
+        // Close it if it's already open
+        if (palacePanel.gameObject.activeSelf)
+        {
+            palacePanel.gameObject.SetActive(false);
+        }
+        else
+        {
+            palacePanel.palace = planet.palace;
+            palacePanel.gameObject.SetActive(true);
+        }
+        // Close the other popups
+        foreach(TileControl t in TileControls)
+        {
+            t.ClosePopups();
         }
     }
 

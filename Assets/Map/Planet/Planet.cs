@@ -15,6 +15,7 @@ public class Planet : MonoBehaviour
     // The habitability is from 1 - 100
     public int habitability;
     public Dictionary<Resource, Industry> industries;
+    public Palace palace;
 
     void Awake()
     {
