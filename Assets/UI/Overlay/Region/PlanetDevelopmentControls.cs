@@ -186,7 +186,18 @@ public class PlanetDevelopmentControls : OverlayObject
         tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.ShipParts];
     }
 
-    public void OnAdvancedIndustriesButtonClick(TileControl tile)
+    public void OnTransportHubButtonClick(TileControl tile)
+    {
+        // The tile in question
+        Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
+
+        AllocateTile(planetTile, Resource.TransportCapacity);
+
+        // Update the tile control's color
+        tile.TileOutline.color = ResourceUtil.ResourceColors[Resource.TransportCapacity];
+    }
+
+    public void OnPopupButtonClick(TileControl tile)
     {
         foreach(TileControl t in TileControls)
         {
@@ -279,6 +290,10 @@ public class PlanetDevelopmentControls : OverlayObject
             if ((int)resource < 8)
             {
                 planet.developments.Add(resource, new Industry(resource));
+            }
+            if (resource == Resource.TransportCapacity)
+            {
+                planet.developments.Add(resource, new TransportHub(resource));
             }
         }
 

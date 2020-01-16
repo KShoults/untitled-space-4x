@@ -9,7 +9,7 @@ public class PlanetDevelopmentLabels : OverlayObject
     public Planet planet;
     public TextMeshProUGUI SizeText, HabitabilityText,
         TotalDevelopmentText, EnergyDevelopmentText, WaterDevelopmentText, FoodDevelopmentText, MineralDevelopmentText,
-        CivilianDevelopmentText, MilitaryDevelopmentText, ShipyardDevelopmentText;
+        CivilianDevelopmentText, MilitaryDevelopmentText, ShipyardDevelopmentText, TransportDevelopmentText;
     // Quick lookup for the industry development texts
     public Dictionary<Resource, TextMeshProUGUI> developmentTexts;
 
@@ -87,5 +87,7 @@ public class PlanetDevelopmentLabels : OverlayObject
         developmentTexts.Add(Resource.CivilianGoods, CivilianDevelopmentText);
         developmentTexts.Add(Resource.MilitaryGoods, MilitaryDevelopmentText);
         developmentTexts.Add(Resource.ShipParts, ShipyardDevelopmentText);
+        // Non-Industries
+        developmentTexts.Add(Resource.TransportCapacity, TransportDevelopmentText);
     }
 }
