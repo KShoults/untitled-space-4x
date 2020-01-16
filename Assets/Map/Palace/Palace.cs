@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Palace
+public class Palace : IContractEndpoint
 {
     // The artificial demand for goods at this palace
     public int civilianDemand, militaryDemand, shipDemand,
@@ -12,4 +12,15 @@ public class Palace
         civilianTurnReceived, militaryTurnReceived, shipTurnReceived,
         // The population sent to developments
         popTotalSent, popTurnSent;
+    public ContractTerminal contractTerminal;
+
+    public Palace()
+    {
+        contractTerminal = new ContractTerminal(Resource.Economy, this);
+    }
+
+    public void Grow()
+    {
+        // Do nothing
+    }
 }

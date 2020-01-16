@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
     public NameManager nameManager;
+    public ContractSystem contractSystem;
     public Text TurnCounterText;
     public int turnCounter;
     // Galaxy generation default settings
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
                 nameSeed = Random.value;
             }
             nameManager = new NameManager(nameSeed);
+            contractSystem = new ContractSystem();
         }
     }
 
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        GrowDevelopments();
+        contractSystem.EvaluateContracts();
 
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;
@@ -114,22 +116,5 @@ public class GameManager : MonoBehaviour
 
         // Center the view on the home system
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
-    }
-
-    private void GrowDevelopments()
-    {
-        foreach (Cluster c in sector.clusters)
-        {
-            foreach (StarSystem s in c.starSystems)
-            {
-                foreach (Planet p in s.planets)
-                {
-                    foreach (KeyValuePair<Resource, Development> kvp in p.developments)
-                    {
-                        kvp.Value.Grow();
-                    }
-                }
-            }
-        }
     }
 }

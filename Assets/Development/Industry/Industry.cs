@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Industry : Development
+public class Industry : Development, IContractEndpoint
 {
+    public ContractTerminal contractTerminal;
     public Industry(Resource resource) : base()
     {
         this.resource = resource;
+        contractTerminal = new ContractTerminal(resource, this);
     }
 
     public override void Grow()
