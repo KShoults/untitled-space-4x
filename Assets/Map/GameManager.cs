@@ -57,11 +57,11 @@ public class GameManager : MonoBehaviour
         Planet homeworld = homeSystem.planets[(int)Mathf.Floor(Random.value * homeSystem.planets.Count)];
 
         // Overwrite its size, habitability, and resources
-        homeworld.planetSize = 7;
+        homeworld.planetSize = 8;
         homeworld.habitability = 90;
 
         // Set the homeworld's tiles
-        Tile[] tiles = new Tile[7];
+        Tile[] tiles = new Tile[8];
         tiles[0] = new Tile(Resource.Energy, Yield.Medium);
         tiles[1] = new Tile(Resource.Water, Yield.Medium);
         tiles[2] = new Tile(Resource.Food, Yield.Medium);
@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
         tiles[4] = new Tile(Resource.Energy, Yield.Low);
         tiles[5] = new Tile(Resource.Water, Yield.Low);
         tiles[6] = new Tile(Resource.Food, Yield.Low);
+        tiles[7] = new Tile(Resource.Minerals, Yield.Low);
 
         homeworld.tiles = tiles;
 
@@ -97,6 +98,11 @@ public class GameManager : MonoBehaviour
         Industry civilianIndustry = homeworld.industries[Resource.CivilianGoods];
         civilianIndustry.tiles.Add(tiles[4]);
         tiles[4].industry = civilianIndustry;
+
+        homeworld.industries.Add(Resource.ShipParts, new Industry(Resource.ShipParts));
+        Industry shipyard = homeworld.industries[Resource.ShipParts];
+        shipyard.tiles.Add(tiles[5]);
+        tiles[5].industry = shipyard;
 
         // Add a palace for dev purposes
         homeworld.palace = new Palace();
