@@ -11,7 +11,10 @@ public enum Resource
     Minerals,
     CivilianGoods,
     MilitaryGoods,
-    ShipParts
+    ShipParts,
+    Economy,
+    MilitaryCapacity,
+    TransportCapacity
 }
 
 public static class ResourceUtil
@@ -24,7 +27,10 @@ public static class ResourceUtil
         {Resource.Minerals, "Minerals"},
         {Resource.CivilianGoods, "Civilian Industry"},
         {Resource.MilitaryGoods, "Military Industry"},
-        {Resource.ShipParts, "Shipyards"}
+        {Resource.ShipParts, "Shipyards"},
+        {Resource.Economy, "Economy"},
+        {Resource.MilitaryCapacity, "HQ"},
+        {Resource.TransportCapacity, "TransportHub"}
     };
 
     public static Dictionary<Resource, string> ResourceString
@@ -43,7 +49,10 @@ public static class ResourceUtil
         {Resource.Minerals, Color.red},
         {Resource.CivilianGoods, new Color(.55f, .27f, .07f)},
         {Resource.MilitaryGoods, new Color(1, .65f, 0)},
-        {Resource.ShipParts, new Color(.5f, 0, .5f)}
+        {Resource.ShipParts, new Color(.5f, 0, .5f)},
+        {Resource.Economy, new Color(1, .85f, 0)},
+        {Resource.MilitaryCapacity, Color.black},
+        {Resource.TransportCapacity, new Color(.5f, .5f, .5f)}
     };
 
     public static Dictionary<Resource, Color> ResourceColors

@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        GrowIndustries();
+        GrowDevelopments();
 
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;
@@ -73,36 +73,36 @@ public class GameManager : MonoBehaviour
 
         homeworld.tiles = tiles;
 
-        // Assign those tiles to industries
-        homeworld.industries.Add(Resource.Energy, new Industry(Resource.Energy));
-        Industry energyIndustry = homeworld.industries[Resource.Energy];
+        // Assign those tiles to developments
+        Industry energyIndustry = new Industry(Resource.Energy);
+        homeworld.developments.Add(Resource.Energy, energyIndustry);
         energyIndustry.tiles.Add(tiles[0]);
-        tiles[0].industry = energyIndustry;
+        tiles[0].development = energyIndustry;
 
-        homeworld.industries.Add(Resource.Water, new Industry(Resource.Water));
-        Industry waterIndustry = homeworld.industries[Resource.Water];
+        Industry waterIndustry = new Industry(Resource.Water);
+        homeworld.developments.Add(Resource.Water, waterIndustry);
         waterIndustry.tiles.Add(tiles[1]);
-        tiles[1].industry = waterIndustry;
+        tiles[1].development = waterIndustry;
 
-        homeworld.industries.Add(Resource.Food, new Industry(Resource.Food));
-        Industry foodIndustry = homeworld.industries[Resource.Food];
+        Industry foodIndustry = new Industry(Resource.Food);
+        homeworld.developments.Add(Resource.Food, foodIndustry);
         foodIndustry.tiles.Add(tiles[2]);
-        tiles[2].industry = foodIndustry;
+        tiles[2].development = foodIndustry;
 
-        homeworld.industries.Add(Resource.Minerals, new Industry(Resource.Minerals));
-        Industry mineralsIndustry = homeworld.industries[Resource.Minerals];
+        Industry mineralsIndustry = new Industry(Resource.Minerals);
+        homeworld.developments.Add(Resource.Minerals, mineralsIndustry);
         mineralsIndustry.tiles.Add(tiles[3]);
-        tiles[3].industry = mineralsIndustry;
+        tiles[3].development = mineralsIndustry;
 
-        homeworld.industries.Add(Resource.CivilianGoods, new Industry(Resource.CivilianGoods));
-        Industry civilianIndustry = homeworld.industries[Resource.CivilianGoods];
+        Industry civilianIndustry = new Industry(Resource.CivilianGoods);
+        homeworld.developments.Add(Resource.CivilianGoods, civilianIndustry);
         civilianIndustry.tiles.Add(tiles[4]);
-        tiles[4].industry = civilianIndustry;
+        tiles[4].development = civilianIndustry;
 
-        homeworld.industries.Add(Resource.ShipParts, new Industry(Resource.ShipParts));
-        Industry shipyard = homeworld.industries[Resource.ShipParts];
+        Industry shipyard = new Industry(Resource.ShipParts);
+        homeworld.developments.Add(Resource.ShipParts, shipyard);
         shipyard.tiles.Add(tiles[5]);
-        tiles[5].industry = shipyard;
+        tiles[5].development = shipyard;
 
         // Add a palace for dev purposes
         homeworld.palace = new Palace();
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
         Camera.main.GetComponent<ViewController>().SetCameraTarget(View.System, homeSystem);
     }
 
-    private void GrowIndustries()
+    private void GrowDevelopments()
     {
         foreach (Cluster c in sector.clusters)
         {
@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
             {
                 foreach (Planet p in s.planets)
                 {
-                    foreach (KeyValuePair<Resource, Industry> kvp in p.industries)
+                    foreach (KeyValuePair<Resource, Development> kvp in p.developments)
                     {
                         kvp.Value.Grow();
                     }

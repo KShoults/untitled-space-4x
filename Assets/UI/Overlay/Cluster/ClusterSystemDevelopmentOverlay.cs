@@ -22,7 +22,7 @@ public class ClusterSystemDevelopmentOverlay : MonoBehaviour
         // Check for player allocation in this system
         foreach (Planet p in starSystem.planets)
         {
-            if (p.industries.Count > 0)
+            if (p.developments.Count > 0)
             {
                 isDeveloped = true;
                 break;

@@ -48,16 +48,16 @@ public class PlanetDevelopmentLabels : OverlayObject
         foreach (KeyValuePair<Resource, TextMeshProUGUI> kvp in developmentTexts)
         {
             // If the planet has this industry
-            if (planet.industries.ContainsKey(kvp.Key))
+            if (planet.developments.ContainsKey(kvp.Key))
             {
                 // Loop through the industry's tiles to add up development
                 int development = 0;
-                foreach(Tile t in planet.industries[kvp.Key].tiles)
+                foreach(Tile t in planet.developments[kvp.Key].tiles)
                 {
                     // Is this tile developed yet
-                    if (t.industry.tileDevelopments.ContainsKey(t))
+                    if (t.development.tileDevelopments.ContainsKey(t))
                     {
-                        development += (int)Mathf.Round(t.industry.tileDevelopments[t]);
+                        development += (int)Mathf.Round(t.development.tileDevelopments[t]);
                     }
                 }
                 // Write the label

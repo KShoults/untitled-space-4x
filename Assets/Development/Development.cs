@@ -2,49 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Industry
+public abstract class Development
 {
+    // The resource produced by this development
+    public Resource resource;
     // The ratio of population to a point of development
     public const int POPTODEVRATIO = 1000;
-    public Resource resource;
-    // The tiles that are allocated to this industry
+    // The tiles that are allocated to this development
     public List<Tile> tiles;
-    // Population employed by the industry
-    public ulong population;
+    // The development per tile
     public Dictionary<Tile, float> tileDevelopments;
+    // Population employed by the development
+    public ulong population;
 
-
-    public Industry()
+    public Development()
     {
         tiles = new List<Tile>();
         tileDevelopments = new Dictionary<Tile, float>();
     }
-
-    public Industry(Resource resource) : this()
+    public Development(Resource resource) : this()
     {
         this.resource = resource;
     }
 
-    public void Grow()
+    public virtual void Grow()
     {
-        // Sort the tiles by the order they should be developed
-        // We only need to sort for basic industries
-        if (resource == Resource.Energy ||
-            resource == Resource.Water ||
-            resource == Resource.Food ||
-            resource == Resource.Minerals)
-        {
-            SortTiles();
-        }
         
         // Identify the population source
         // For now we create it from nothing
         
-        // Calculate the maximum population we can add to this industry
+        // Calculate the maximum population we can add to this development
         // Later on we will base this on transport costs
         int populationToAdd = 10000;
 
-        // Limit by the maximum population for this industry
+        // Limit by the maximum population for this development
         ulong maxPop = (ulong)tiles.Count * 100 * POPTODEVRATIO;
         populationToAdd = (int)(maxPop - population) >= populationToAdd ? populationToAdd : (int)(maxPop - population);
 
@@ -77,20 +68,5 @@ public class Industry
                 break;
             }
         }
-    }
-
-    private void SortTiles()
-    {
-        tiles.Sort(delegate(Tile x, Tile y)
-        {
-            if ((int)x.resources[resource] > (int)y.resources[resource])
-            {
-                return -1;
-            }
-            else
-            {
-                return 1;
-            }
-        });
     }
 }

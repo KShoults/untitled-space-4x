@@ -10,6 +10,6 @@ public class Palace
         civilianTotalReceived, militaryTotalReceived, shipTotalReceived,
         // The goods received last turn
         civilianTurnReceived, militaryTurnReceived, shipTurnReceived,
-        // The population sent to industries
+        // The population sent to developments
         popTotalSent, popTurnSent;
 }

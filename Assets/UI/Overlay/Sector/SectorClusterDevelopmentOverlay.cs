@@ -25,7 +25,7 @@ public class SectorClusterDevelopmentOverlay : MonoBehaviour
         {
             foreach (Planet p in s.planets)
             {
-                if (p.industries.Count > 0)
+                if (p.developments.Count > 0)
                 {
                     isDeveloped = true;
                     break;

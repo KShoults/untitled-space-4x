@@ -59,12 +59,12 @@ public class PlanetDevelopmentControls : OverlayObject
             }
 
             // Update the tile control's color and update the background mask to show development
-            if (tile.industry != null)
+            if (tile.development != null)
             {
-                TileControls[i].TileOutline.color = ResourceUtil.ResourceColors[tile.industry.resource];
-                if (tile.industry.tileDevelopments.ContainsKey(tile))
+                TileControls[i].TileOutline.color = ResourceUtil.ResourceColors[tile.development.resource];
+                if (tile.development.tileDevelopments.ContainsKey(tile))
                 {
-                    float development = tile.industry.tileDevelopments[tile];
+                    float development = tile.development.tileDevelopments[tile];
                     TileControls[i].BackgroundMask.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, development / 100f * .15f);
                 }
                 else
@@ -140,10 +140,10 @@ public class PlanetDevelopmentControls : OverlayObject
         // The tile in question
         Tile planetTile = planet.tiles[Array.IndexOf(TileControls, tile)];
 
-        if (planetTile.industry != null)
+        if (planetTile.development != null)
         {
-            planetTile.industry.tiles.Remove(planetTile);
-            planetTile.industry = null;
+            planetTile.development.tiles.Remove(planetTile);
+            planetTile.development = null;
                 
             // Update the planet labels
             planetDevelopmentLabels.UpdateLabels();
@@ -272,28 +272,32 @@ public class PlanetDevelopmentControls : OverlayObject
 
     private void AllocateTile(Tile tile, Resource resource)
     {
-        // The planet might not have this industry yet
-        if (!planet.industries.ContainsKey(resource))
+        // The planet might not have this development yet
+        if (!planet.developments.ContainsKey(resource))
         {
-            planet.industries.Add(resource, new Industry(resource));
+            // If it's an industry
+            if ((int)resource < 8)
+            {
+                planet.developments.Add(resource, new Industry(resource));
+            }
         }
 
-        // The industry to allocate the tile to
-        Industry selectedIndustry = planet.industries[resource];
-        if (tile.industry != null)
+        // The development to allocate the tile to
+        Development selectedDevelopment = planet.developments[resource];
+        if (tile.development != null)
         {
-            if (tile.industry != selectedIndustry)
+            if (tile.development != selectedDevelopment)
             {
-                tile.industry.tiles.Remove(tile);
-                selectedIndustry.tiles.Add(tile);
-                tile.industry = selectedIndustry;
+                tile.development.tiles.Remove(tile);
+                selectedDevelopment.tiles.Add(tile);
+                tile.development = selectedDevelopment;
             }
-            // Else tile is already assigned to this industry so do nothing
+            // Else tile is already assigned to this development so do nothing
         }
         else
         {
-            selectedIndustry.tiles.Add(tile);
-            tile.industry = selectedIndustry;
+            selectedDevelopment.tiles.Add(tile);
+            tile.development = selectedDevelopment;
         }
     }
 }

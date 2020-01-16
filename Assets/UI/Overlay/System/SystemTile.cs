@@ -18,13 +18,13 @@ public class SystemTile : MonoBehaviour
             return;
         }
 
-        if (tile.industry == null)
+        if (tile.development == null)
         {
             GetComponent<Image>().color = Color.white;
         }
         else
         {
-            GetComponent<Image>().color = ResourceUtil.ResourceColors[tile.industry.resource];
+            GetComponent<Image>().color = ResourceUtil.ResourceColors[tile.development.resource];
         }
     }
 }

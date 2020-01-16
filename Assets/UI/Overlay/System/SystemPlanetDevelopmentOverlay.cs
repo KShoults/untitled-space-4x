@@ -19,7 +19,7 @@ public class SystemPlanetDevelopmentOverlay : MonoBehaviour
         }
 
         PlanetNameText.text = planet.planetShortName;
-        if (planet.industries.Count > 0)
+        if (planet.developments.Count > 0)
         {
             PlanetNameText.color = Color.red;
         }

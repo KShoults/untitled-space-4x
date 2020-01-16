@@ -15,8 +15,8 @@ public class Tile
 {
     // The resource yields on this tile
     public Dictionary<Resource, Yield> resources;
-    // The industry that this tile is allocated to
-    public Industry industry;
+    // The development that this tile is allocated to
+    public Development development;
 
     public Tile()
     {
