@@ -4,17 +4,20 @@ using UnityEngine;
 
 public enum Resource
 {
-    None,
-    Energy,
-    Water,
-    Food,
-    Minerals,
-    CivilianGoods,
-    MilitaryGoods,
-    ShipParts,
-    Economy,
-    MilitaryCapacity,
-    TransportCapacity
+    None = 0,
+    // Basic Resources
+    Energy = 1,
+    Water = 2,
+    Food = 3,
+    Minerals = 4,
+    // Advanced Resources
+    CivilianGoods = 100,
+    MilitaryGoods = 101,
+    ShipParts = 102,
+    // Non-Tangible Resources
+    Economy = 200,
+    MilitaryCapacity = 201,
+    TransportCapacity = 202
 }
 
 public static class ResourceUtil
