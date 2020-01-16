@@ -69,6 +69,7 @@ public class StarSystem : MonoBehaviour
             }
         }
         float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(weightMap, 1);
+        System.Random random = new System.Random();
 
         // Planets are created until the systemSize is reached
         while (currentSystemSize < systemSize)
@@ -113,7 +114,7 @@ public class StarSystem : MonoBehaviour
             Planet newPlanet = Instantiate(PlanetPrefab).GetComponent<Planet>();
 
             // Generate the planet's size
-            int planetSize = (int)Mathf.Floor((float)(new System.Random()).NextDouble() * 10 + 1);
+            int planetSize = (int)Mathf.Floor((float)(random).NextDouble() * 10 + 1);
             newPlanet.planetSize = planetSize;
 
             // Place the planet in its region
