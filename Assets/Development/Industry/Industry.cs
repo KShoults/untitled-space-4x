@@ -1,35 +1,85 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Industry : Development, IContractEndpoint
 {
     public ContractTerminal contractTerminal;
     // The ratio of resources produced per point of tile development
     // Recalculated during capacity calculation
-    private float resourcesPerDevelopment;
+    private float outputPerDevelopment;
 
     public Industry(Resource resource) : base()
     {
         this.resource = resource;
-        contractTerminal = new ContractTerminal(resource, this);
+        contractTerminal = new ContractTerminal(this, resource, GetImportResources());
     }
 
     /**************************************************************
         IContractEndpoint Member Implementations
     **************************************************************/
 
-    public float CalculateCapacity()
+    public Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        // Get the maximum development capacity
-        float developmentCapacity = CalculateDevelopmentCapacity();
+        // Get the development capacity
+        float developmentCapacity = CalculateDevelopmentCapacity(suppliers);
 
-        // Search for transport hubs to supply this new capacity
-        // For now we don't need supplies
+        // If we're an advanced industry
+        if ((int)resource >= 100)
+        {
+            // Search for a supplier of minerals for this new capacity
+            float mineralShortage = developmentCapacity;
+            foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
+            {
+                mineralShortage -= s.Item2;
+                if (mineralShortage < 0)
+                {
+                    // We've found enough energy for our new development
+                    mineralShortage = 0;
+                    break;
+                }
+            }
+            developmentCapacity -= mineralShortage;
+        }
 
         // Convert from development to resource output
-        UpdateResourcesPerDevelopment();
-        return developmentCapacity * resourcesPerDevelopment;
+        UpdateOutputPerDevelopment();
+        return new Dictionary<Resource, float> {{resource, developmentCapacity * outputPerDevelopment}};
+    }
+
+    public Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    {
+        float newDevelopment = contractTerminal.capacity[resource] / outputPerDevelopment;
+        // Start with development costs
+        float cost = CalculateDevelopmentCosts(suppliers, contractTerminal, newDevelopment);
+
+        // Add other import costs
+        // If we're an advanced industry
+        if ((int)resource >= 100)
+        {
+            // Add mineral costs
+            foreach (Contract c in contractTerminal.importContracts[Resource.Minerals])
+            {
+                cost += c.cost * c.amount;
+            }
+            // The input capacity for advanced industries is 10 times their output capacity
+            float inputCapacity = newDevelopment;
+            // Add future mineral costs
+            foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
+            {
+                float capacityToUse = s.Item2 < inputCapacity ? s.Item2 : inputCapacity;
+                cost += s.Item3 * capacityToUse;
+                inputCapacity -= capacityToUse;
+            }
+        }
+
+        // Divide by total output
+        if (totalDevelopment > 0 && outputPerDevelopment > 0)
+        {
+            cost = cost / (totalDevelopment * outputPerDevelopment);  
+        }
+
+        return new Dictionary<Resource, float> {{resource, cost}};
     }
 
     public override void Grow()
@@ -51,7 +101,22 @@ public class Industry : Development, IContractEndpoint
         Personal Members
     **************************************************************/
 
-    private void UpdateResourcesPerDevelopment()
+    protected override List<Resource> GetImportResources()
+    {
+        List<Resource> importResources = base.GetImportResources();
+        if (importResources.Contains(resource))
+        {
+            importResources.Remove(resource);
+        }
+        // If this is an advanced resource
+        if ((int)resource  >= 100)
+        {
+            importResources.Add(Resource.Minerals);
+        }
+        return importResources;
+    }
+
+    private void UpdateOutputPerDevelopment()
     {
         // If we produce a basic resource
         if ((int)resource < 100)
@@ -68,16 +133,16 @@ public class Industry : Development, IContractEndpoint
             }
             if (totalDevelopment > 0)
             {
-                resourcesPerDevelopment = totalResources / totalDevelopment;
+                outputPerDevelopment = totalResources / totalDevelopment;
             }
             else
             {
-                resourcesPerDevelopment = 0;
+                outputPerDevelopment = 0;
             }
         }
         else
         {
-            resourcesPerDevelopment = 1;
+            outputPerDevelopment = 1;
         }
     }
 

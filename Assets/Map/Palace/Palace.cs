@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Palace : IContractEndpoint
 {
@@ -16,20 +16,39 @@ public class Palace : IContractEndpoint
 
     public Palace()
     {
-        contractTerminal = new ContractTerminal(Resource.Economy, this);
+        contractTerminal = new ContractTerminal(this, Resource.Economy, GetImportResources());
     }
 
     /**************************************************************
         IContractEndpoint Member Implementations
     **************************************************************/
 
-    public float CalculateCapacity()
+    public Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        return 0;
+        return new Dictionary<Resource, float>();
+    }
+
+    public Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    {
+        return new Dictionary<Resource, float>();
     }
 
     public void Grow()
     {
         // Do nothing
+    }
+
+    /**************************************************************
+        Personal Members
+    **************************************************************/
+
+    protected List<Resource> GetImportResources()
+    {
+        return new List<Resource>
+        {
+            Resource.CivilianGoods,
+            Resource.MilitaryGoods,
+            Resource.ShipParts
+        };
     }
 }
