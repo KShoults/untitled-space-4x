@@ -19,6 +19,15 @@ public class Palace : IContractEndpoint
         contractTerminal = new ContractTerminal(Resource.Economy, this);
     }
 
+    /**************************************************************
+        IContractEndpoint Member Implementations
+    **************************************************************/
+
+    public float CalculateCapacity()
+    {
+        return 0;
+    }
+
     public void Grow()
     {
         // Do nothing

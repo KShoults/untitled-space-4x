@@ -8,6 +8,8 @@ public abstract class Development
     public Resource resource;
     // The ratio of population to a point of development
     public const int POPTODEVRATIO = 1000;
+    // This is the max population that can be moved into this development in a turn
+    public const int MAXPOPTOMOVE = 10000;
     // The tiles that are allocated to this development
     public List<Tile> tiles;
     // The development per tile
@@ -25,6 +27,32 @@ public abstract class Development
         this.resource = resource;
     }
 
+    // Calculate the amount of available room for this development
+    public float CalculateDevelopmentCapacity()
+    {
+        float developmentCapacity = 0;
+
+        foreach (Tile t in tiles)
+        {
+            if (tileDevelopments.ContainsKey(t))
+            {
+                // Add however much room there is in this tile
+                developmentCapacity += 100 - tileDevelopments[t];
+            }
+            else
+            {
+                // If it isn't developed we just add an empty tile's worth
+                developmentCapacity += 100;
+            }
+        }
+
+        // Limit by the amount of population that can be moved
+        // It will eventually be based on transport costs
+        developmentCapacity = developmentCapacity <= MAXPOPTOMOVE ? developmentCapacity : MAXPOPTOMOVE;
+
+        return developmentCapacity;
+    }
+
     public virtual void Grow()
     {
         
@@ -33,7 +61,7 @@ public abstract class Development
         
         // Calculate the maximum population we can add to this development
         // Later on we will base this on transport costs
-        int populationToAdd = 10000;
+        int populationToAdd = MAXPOPTOMOVE;
 
         // Limit by the maximum population for this development
         ulong maxPop = (ulong)tiles.Count * 100 * POPTODEVRATIO;

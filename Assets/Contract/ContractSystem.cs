@@ -22,6 +22,7 @@ public class ContractSystem
     // Called at the beginning of the end turn calculations to run the entire contract system
     public void EvaluateContracts()
     {
+        CalculateCapacities();
         GrowDevelopments();
     }
 
@@ -40,6 +41,17 @@ public class ContractSystem
             {Resource.MilitaryCapacity, new List<ContractTerminal>()},
             {Resource.TransportCapacity, new List<ContractTerminal>()}
         };
+    }
+
+    private void CalculateCapacities()
+    {
+        foreach (KeyValuePair<Resource, List<ContractTerminal>> kvp in contractTerminalLists)
+        {
+            foreach (ContractTerminal c in kvp.Value)
+            {
+                c.CalculateCapacity();
+            }
+        }
     }
 
     private void GrowDevelopments()
