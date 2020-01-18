@@ -10,5 +10,8 @@ public interface IContractEndpoint
     // Calculate the cost per unit of buying the resources that this IContractEndpoint produces
     // This method is called just after CalculateCapacity
     Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
+    // Calculates the need for each resource to determine contract reevaluation
+    // This method is called after every contract terminal has calculated their capacity and cost
+    Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
     void Grow();
 }

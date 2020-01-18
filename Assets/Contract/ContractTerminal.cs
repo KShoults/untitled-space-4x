@@ -22,7 +22,7 @@ public class ContractTerminal
     // Item1 is the supplier, Item 2 is capacity, Item 3 is cost
     // This dictionary is recalculated at the same time as capacity
     public Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers;
-    // 
+    // The amount of capacity that has been contracted by others this turn
     public Dictionary<Resource, float> boughtCapacity;
     // This ContractTerminals import contracts
     public Dictionary<Resource, List<Contract>> importContracts;
@@ -30,7 +30,7 @@ public class ContractTerminal
     public Dictionary<Resource, List<Contract>> exportContracts;
     
     // The contract system we are a part of
-    private ContractSystem contractSystem;
+    protected ContractSystem contractSystem;
 
     public ContractTerminal(IContractEndpoint owner, Resource resource, List<Resource> importResources)
     {
@@ -40,6 +40,7 @@ public class ContractTerminal
         suppliers = new Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>>();
         capacity = new Dictionary<Resource, float> {{resource, 0}};
         cost = new Dictionary<Resource, float> {{resource, 0}};
+        boughtCapacity = new Dictionary<Resource, float>();
         InitializeImportContracts();
         InitializeExportContracts();
         contractSystem = GameManager.gameManager.contractSystem;
@@ -48,6 +49,8 @@ public class ContractTerminal
 
     public virtual void CalculateCapacity()
     {
+        boughtCapacity.Clear();
+        boughtCapacity.Add(resource, 0);
         // Find our suppliers
         suppliers.Clear();
         foreach (Resource r in importResources)
@@ -56,6 +59,51 @@ public class ContractTerminal
         }
         capacity = owner.CalculateCapacity(suppliers);
         cost = owner.CalculateCost(suppliers);
+    }
+
+    // Reevaluates the 10% (min 5) most expensive current import contracts
+    // and evaluates an equal number of new, least expensive import contracts
+    public virtual void EvaluateContracts()
+    {
+        // Select the most expensive contracts to reevaluate
+        // This will be done as part of a later issue
+
+        // Get the import demand from the owner
+        Dictionary<Resource, float> importDemand = owner.CalculateImportDemand(suppliers);
+        
+        foreach (Resource r in importResources)
+        {
+            float resourcesAdded = 0;
+            foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
+            {
+                float amount = c.Item2 < importDemand[r] - resourcesAdded ? c.Item2 : importDemand[r] - resourcesAdded;
+                // Create a contract
+                Contract newContract = c.Item1.RequestContract(r, amount, this);
+                
+                if (newContract.amount > 0)
+                {
+                    importContracts[r].Add(newContract);
+                    resourcesAdded += amount;
+                    if (resourcesAdded > importDemand[r])
+                    {
+                        // We've added enough import contracts
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public virtual Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
+    {
+        amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
+        Contract newContract = new Contract(resource, amount, cost[resource], this, importer);
+        if (amount > 0)
+        {
+            exportContracts[resource].Add(newContract);
+            boughtCapacity[resource] += amount;
+        }
+        return newContract;
     }
 
     public void Grow()

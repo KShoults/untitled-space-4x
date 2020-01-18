@@ -82,6 +82,19 @@ public class Industry : Development, IContractEndpoint
         return new Dictionary<Resource, float> {{resource, cost}};
     }
 
+    public Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    {
+        Dictionary<Resource, float> importDemand = CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource]);
+
+        // If we are an advanced industry
+        if ((int)resource >= 100)
+        {
+            importDemand.Add(Resource.Minerals, totalDevelopment + contractTerminal.boughtCapacity[resource]);
+        }
+
+        return importDemand;
+    }
+
     public override void Grow()
     {
         // Sort the tiles by the order they should be developed

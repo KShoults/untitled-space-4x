@@ -23,6 +23,17 @@ public class ContractSystem
     public void EvaluateContracts()
     {
         CalculateCapacities();
+        //EvaluateContracts(Resource.MilitaryCapacity);
+        EvaluateContracts(Resource.Economy);
+        EvaluateContracts(Resource.TransportCapacity);
+        EvaluateContracts(Resource.MilitaryGoods);
+        EvaluateContracts(Resource.ShipParts);
+        EvaluateContracts(Resource.CivilianGoods);
+        EvaluateContracts(Resource.TransportCapacity);
+        EvaluateContracts(Resource.Minerals);
+        EvaluateContracts(Resource.Food);
+        EvaluateContracts(Resource.Water);
+        EvaluateContracts(Resource.Energy);
         GrowDevelopments();
     }
 
@@ -78,6 +89,15 @@ public class ContractSystem
             {
                 c.CalculateCapacity();
             }
+        }
+    }
+
+    // Tells all of the registered ContractTerminals for a specific resource to reevaluate their contracts
+    private void EvaluateContracts(Resource resource)
+    {
+        foreach (ContractTerminal c in contractTerminalLists[resource])
+        {
+            c.EvaluateContracts();
         }
     }
 

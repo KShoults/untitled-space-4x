@@ -199,6 +199,32 @@ public abstract class Development
         return cost;
     }
 
+    // Calculates the import demand of this development
+    public Dictionary<Resource, float> CalculateDevelopmentDemand(float boughtCapacity)
+    {
+        Dictionary<Resource, float> developmentDemand = new Dictionary<Resource, float>();
+
+        if (resource != Resource.Energy)
+        {
+            float energyNeed = (totalDevelopment + boughtCapacity) * ENERGYTODEVRATIO;
+            developmentDemand.Add(Resource.Energy, energyNeed);
+        }
+
+        if (resource != Resource.Water)
+        {
+            float waterNeed = (totalDevelopment + boughtCapacity) * WATERTOPOPRATIO * POPTODEVRATIO;
+            developmentDemand.Add(Resource.Water, waterNeed);
+        }
+
+        if (resource != Resource.Food)
+        {
+            float foodNeed = (totalDevelopment + boughtCapacity) * FOODTOPOPRATIO * POPTODEVRATIO;
+            developmentDemand.Add(Resource.Food, foodNeed);
+        }
+
+        return developmentDemand;
+    }
+
     public virtual void Grow()
     {
         

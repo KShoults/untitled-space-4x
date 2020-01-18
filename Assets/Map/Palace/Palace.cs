@@ -33,6 +33,17 @@ public class Palace : IContractEndpoint
         return new Dictionary<Resource, float>();
     }
 
+    public Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    {
+        Dictionary<Resource, float> importDemand = new Dictionary<Resource, float>();
+
+        importDemand.Add(Resource.CivilianGoods, civilianDemand);
+        importDemand.Add(Resource.MilitaryGoods, militaryDemand);
+        importDemand.Add(Resource.ShipParts, shipDemand);
+
+        return importDemand;
+    }
+
     public void Grow()
     {
         // Do nothing
