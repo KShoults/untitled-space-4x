@@ -14,6 +14,9 @@ public interface IContractEndpoint
     // This method is called after every contract terminal has calculated their capacity and cost
     Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
     // Grows into its bought capacity and return how much resources it generated this turn
-    // This method is called at the end of the contract system evaluation
+    // This method is called at the end of the contract system evaluation during contract fulfillment
     float GenerateOutput();
+    // Determines the final sale price of this IContractEndpoint's exports
+    // This method is called just after GenerateOutput
+    Dictionary<Resource, float> CalculatePrice();
 }

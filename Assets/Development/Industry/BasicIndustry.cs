@@ -48,6 +48,20 @@ public class BasicIndustry : Industry
         return newDevelopment * CalculateOutputPerDevelopment(0);
     }
 
+    public override Dictionary<Resource, float> CalculatePrice()
+    {
+        float cost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+
+        if (totalDevelopment > 0)
+        {
+            return new Dictionary<Resource, float>() {{resource, cost / (totalDevelopment * CalculateOutputPerDevelopment(0))}};
+        }
+        else
+        {
+            return new Dictionary<Resource, float>() {{resource, cost}};
+        }
+    }
+
     protected void SortTiles()
     {
         tiles.Sort(delegate(Tile x, Tile y)

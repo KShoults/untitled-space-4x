@@ -93,6 +93,26 @@ public class AdvancedIndustry : Industry
         return totalDevelopment * OUTPUTTODEVRATIO;
     }
 
+    public override Dictionary<Resource, float> CalculatePrice()
+    {
+        float cost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+
+        // Add mineral costs
+        foreach (Contract c in contractTerminal.importContracts[Resource.Minerals])
+        {
+            cost += c.cost * c.amount;
+        }
+
+        if (totalDevelopment > 0)
+        {
+            return new Dictionary<Resource, float>() {{resource, cost / (totalDevelopment * OUTPUTTODEVRATIO)}};
+        }
+        else
+        {
+            return new Dictionary<Resource, float>() {{resource, cost}};
+        }
+    }
+
     protected override List<Resource> GetImportResources()
     {
         List<Resource> importResources = base.GetImportResources();

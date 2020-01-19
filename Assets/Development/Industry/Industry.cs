@@ -27,6 +27,8 @@ public abstract class Industry : Development, IContractEndpoint
 
     public abstract float GenerateOutput();
 
+    public abstract Dictionary<Resource, float> CalculatePrice();
+
     /**************************************************************
         Personal Members
     **************************************************************/

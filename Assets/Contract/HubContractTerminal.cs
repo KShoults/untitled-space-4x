@@ -70,6 +70,8 @@ public class HubContractTerminal : ContractTerminal
         {
             // Grows into its bought capacity and returns how much transport capacity it has this turn.
             float output = owner.GenerateOutput();
+            // Determines the final price per unit of its exports
+            Dictionary<Resource, float> price = owner.CalculatePrice();
 
             // Add all of the contracts to a sorted set to sort by age and resource
             SortedSet<Contract> sortedOutputContracts = new SortedSet<Contract>(new ByAgeThenResource()); 
@@ -85,6 +87,7 @@ public class HubContractTerminal : ContractTerminal
             // Limit the amount of any contracts that we can't fulfill
             foreach (Contract c in sortedOutputContracts)
             {
+                c.cost = price[c.resource];
                 if (output < c.amount)
                 {
                     c.amount = output;

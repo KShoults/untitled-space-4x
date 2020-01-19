@@ -181,6 +181,48 @@ public class TransportHub : Development, IContractEndpoint
         return totalDevelopment * TRANSPORTTODEVRATIO;
     }
 
+    public Dictionary<Resource, float> CalculatePrice()
+    {
+        float developmentCost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+        // The exports of each resource
+        Dictionary<Resource, float> totalExports = new Dictionary<Resource, float>();
+        // The exports of all resources
+        float totalOutput = 0;
+        // The price per unit of this hub's exports
+        Dictionary<Resource, float> prices = new Dictionary<Resource, float>();
+
+        foreach (Resource r in contractTerminal.importResources)
+        {
+            // The total cost of this resource's inputs
+            float resourceCost = 0;
+            // The total amount of this resource's inputs
+            float resourceAmount = 0;
+            foreach (Contract c in contractTerminal.importContracts[r])
+            {
+                resourceCost += c.cost * c.amount;
+                resourceAmount += c.amount;
+            }
+            prices.Add(r, resourceCost / resourceAmount);
+            float resourceExports = 0;
+            foreach (Contract c in contractTerminal.exportContracts[r])
+            {
+                resourceExports += c.amount;
+            }
+            totalExports.Add(r, resourceExports);
+            totalOutput += resourceExports;
+        }
+
+        foreach (Resource r in contractTerminal.importResources)
+        {
+            if (totalOutput > 0)
+            {
+                prices[r] += developmentCost * totalExports[r] / totalOutput;
+            }
+        }
+
+        return prices;
+    }
+
     /**************************************************************
         Personal Members
     **************************************************************/

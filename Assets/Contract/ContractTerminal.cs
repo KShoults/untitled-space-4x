@@ -132,6 +132,8 @@ public class ContractTerminal
     {
         // Grows into its bought capacity and returns how many resources it generated this turn
         float output = owner.GenerateOutput();
+        // Determines the final price per unit of its exports
+        Dictionary<Resource, float> price = owner.CalculatePrice();
 
         // Reverse the exportContracts' order so that the oldest contracts get fulfilled first
         Contract[] reversedExportContracts = new Contract[exportContracts[resource].Count];
@@ -141,6 +143,7 @@ public class ContractTerminal
         // Limit the amount of any contracts that we can't fulfill
         foreach (Contract c in reversedExportContracts)
         {
+            c.cost = price[c.resource];
             if (output < c.amount)
             {
                 c.amount = output;

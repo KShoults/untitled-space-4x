@@ -69,6 +69,12 @@ public class Palace : IContractEndpoint
         return 0;
     }
 
+    public Dictionary<Resource, float> CalculatePrice()
+    {
+        // We don't export
+        return new Dictionary<Resource, float>();
+    }
+
     /**************************************************************
         Personal Members
     **************************************************************/
