@@ -230,6 +230,10 @@ public class TransportHub : Development, IContractEndpoint
 
     private void CalculateStockpileRatios()
     {
+        // The minimum amount of exports that the stockpile should be prepared for regardless of its current exports
+        float minimumExportLevel = totalDevelopment * TRANSPORTTODEVRATIO * .01f;
+        minimumExportLevel = minimumExportLevel > .01f ? minimumExportLevel : .01f;
+        // Add up the imports and exports
         foreach (Resource r in contractTerminal.importResources)
         {
             totalExports[r] = 0;
@@ -242,7 +246,10 @@ public class TransportHub : Development, IContractEndpoint
             {
                 totalImports[r] += c.amount;
             }
-            stockpileRatio[r] = totalExports[r] > 0 ? stockpile[r] / totalExports[r] : 5;
+
+            float effectiveExportLevel = totalExports[r] > minimumExportLevel ? totalExports[r] : minimumExportLevel;
+            stockpileRatio[r] = stockpile[r] / effectiveExportLevel;
+
             stockpileTrend[r] = totalExports[r] > 0 ? (totalImports[r] - totalExports[r]) / totalExports[r] : 0;
         }
     }
