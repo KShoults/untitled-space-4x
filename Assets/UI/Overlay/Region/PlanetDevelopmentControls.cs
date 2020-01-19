@@ -291,12 +291,12 @@ public class PlanetDevelopmentControls : OverlayObject
             {
                 planet.developments.Add(resource, new BasicIndustry(resource));
             }
-            // If it's a basic or advanced industry
-            if ((int)resource < 200)
+            // If it's an advanced industry
+            else if ((int)resource < 200)
             {
                 planet.developments.Add(resource, new AdvancedIndustry(resource));
             }
-            if (resource == Resource.TransportCapacity)
+            else if (resource == Resource.TransportCapacity)
             {
                 planet.developments.Add(resource, new TransportHub());
             }
