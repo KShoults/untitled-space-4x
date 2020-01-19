@@ -27,6 +27,7 @@ public class HubContractTerminal : ContractTerminal
             suppliers.Add(r, contractSystem.FindSuppliers(r));
             boughtCapacity.Add(r, 0);
         }
+        boughtCapacity.Add(Resource.TransportCapacity, 0);
         capacity = hubOwner.CalculateCapacity(suppliers);
         cost = hubOwner.CalculateCost(suppliers);
     }
@@ -38,8 +39,10 @@ public class HubContractTerminal : ContractTerminal
     }
 
     // In this override we just want to additionally increase every resource's boughtCapacity by the same amount
+    // This simulates the reduced transport capacity due to each contract
     public override Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
     {
+        // Limit by the amount of capacity left for that resource
         amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
         Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
         if (amount > 0)
@@ -49,6 +52,7 @@ public class HubContractTerminal : ContractTerminal
             {
                 boughtCapacity[r] += amount;
             }
+            boughtCapacity[Resource.TransportCapacity] += amount;
         }
         return newContract;
     }

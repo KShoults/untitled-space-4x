@@ -25,10 +25,9 @@ public class TransportHub : Development, IContractEndpoint
     // The ratio of transportation capacity to development
     public const float TRANSPORTTODEVRATIO = 10;
 
-    public TransportHub(Resource resource) : base()
+    public TransportHub() : base(Resource.TransportCapacity)
     {
-        this.resource = resource;
-        contractTerminal = new HubContractTerminal(this, resource, GetImportResources());
+        contractTerminal = new HubContractTerminal(this, Resource.TransportCapacity, GetImportResources());
         InitializeStockpile();
     }
 
@@ -69,7 +68,7 @@ public class TransportHub : Development, IContractEndpoint
                 capacity.Add(r, developmentCapacity);
             }
         }
-        capacity.Add(resource, developmentCapacity);
+        capacity.Add(Resource.TransportCapacity, developmentCapacity);
 
         return capacity;
     }
@@ -160,9 +159,10 @@ public class TransportHub : Development, IContractEndpoint
         return importDemand;
     }
 
+    // Grows the development and returns the new transport capacity
     public float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[Resource.Minerals];
+        float newDevelopment = contractTerminal.boughtCapacity[Resource.TransportCapacity];
 
         Grow(newDevelopment, contractTerminal);
 

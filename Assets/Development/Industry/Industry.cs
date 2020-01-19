@@ -7,9 +7,8 @@ public abstract class Industry : Development, IContractEndpoint
 {
     public ContractTerminal contractTerminal;
 
-    public Industry(Resource resource) : base()
+    public Industry(Resource resource) : base(resource)
     {
-        this.resource = resource;
         contractTerminal = new ContractTerminal(this, resource, GetImportResources());
     }
 

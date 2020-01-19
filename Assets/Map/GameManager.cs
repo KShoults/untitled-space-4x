@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
         shipyard.tiles.Add(tiles[5]);
         tiles[5].development = shipyard;
 
-        TransportHub transportHub = new TransportHub(Resource.TransportCapacity);
+        TransportHub transportHub = new TransportHub();
         homeworld.developments.Add(Resource.TransportCapacity, transportHub);
         transportHub.tiles.Add(tiles[6]);
         tiles[6].development = transportHub;

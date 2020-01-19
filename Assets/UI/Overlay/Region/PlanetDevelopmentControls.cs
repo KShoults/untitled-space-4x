@@ -298,7 +298,7 @@ public class PlanetDevelopmentControls : OverlayObject
             }
             if (resource == Resource.TransportCapacity)
             {
-                planet.developments.Add(resource, new TransportHub(resource));
+                planet.developments.Add(resource, new TransportHub());
             }
         }
 
