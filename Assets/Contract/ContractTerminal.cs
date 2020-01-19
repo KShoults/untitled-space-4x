@@ -73,29 +73,35 @@ public class ContractTerminal
         
         foreach (Resource r in importResources)
         {
-            float resourcesAdded = 0;
-            foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
+            if (importDemand[r] > 0)
             {
-                float amount = c.Item2 < importDemand[r] - resourcesAdded ? c.Item2 : importDemand[r] - resourcesAdded;
-                // Create a contract
-                Contract newContract = c.Item1.RequestContract(r, amount, this);
-                
-                if (newContract.amount > 0)
+                float resourcesAdded = 0;
+                foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
                 {
-                    // See if there already exists a contract with this terminal
-                    Contract existingContract = importContracts[r].Find(x => x.exporter == newContract.exporter);
-
-                    if (existingContract == null)
+                    float amount = c.Item2 < importDemand[r] - resourcesAdded ? c.Item2 : importDemand[r] - resourcesAdded;
+                    if (amount > 0)
                     {
-                        importContracts[r].Add(newContract);
-                    }
-                    // We don't need an else because the exporter already took care of updating the existing contract
+                        // Create a contract
+                        Contract newContract = c.Item1.RequestContract(r, amount, this);
+                        
+                        if (newContract.amount > 0)
+                        {
+                            // See if there already exists a contract with this terminal
+                            Contract existingContract = importContracts[r].Find(x => x.exporter == newContract.exporter);
 
-                    resourcesAdded += newContract.amount;
-                    if (resourcesAdded > importDemand[r])
-                    {
-                        // We've added enough import contracts
-                        break;
+                            if (existingContract == null)
+                            {
+                                importContracts[r].Add(newContract);
+                            }
+                            // We don't need an else because the exporter already took care of updating the existing contract
+
+                            resourcesAdded += newContract.amount;
+                            if (resourcesAdded > importDemand[r])
+                            {
+                                // We've added enough import contracts
+                                break;
+                            }
+                        }
                     }
                 }
             }
