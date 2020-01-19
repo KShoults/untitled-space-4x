@@ -111,6 +111,14 @@ public class GameManager : MonoBehaviour
         transportHub.tiles.Add(tiles[6]);
         tiles[6].development = transportHub;
 
+        // Add starting stockpiles to the transport hub
+        transportHub.stockpile[Resource.Energy] = 1;
+        transportHub.stockpile[Resource.Water] = 1;
+        transportHub.stockpile[Resource.Food] = 1;
+        transportHub.stockpile[Resource.Minerals] = 1;
+        transportHub.stockpile[Resource.CivilianGoods] = .1f;
+        transportHub.stockpile[Resource.ShipParts] = .1f;
+
         // Add a palace for dev purposes
         homeworld.palace = new Palace();
 
