@@ -91,19 +91,27 @@ public class TransportHub : Development, IContractEndpoint
         // Add the import costs for each resource
         foreach (Resource r in contractTerminal.importResources)
         {
-            float cost = 0;
-            foreach (Contract c in contractTerminal.importContracts[r])
+            if (contractTerminal.importContracts.Count > 0)
             {
-                cost += c.cost * c.amount;
+                float cost = 0;
+                foreach (Contract c in contractTerminal.importContracts[r])
+                {
+                    cost += c.cost * c.amount;
+                }
+                costs.Add(r, cost);
+                float resourceOutput = 0;
+                foreach (Contract c in contractTerminal.exportContracts[r])
+                {
+                    resourceOutput += c.amount;
+                }
+                resourceOutputs.Add(r, resourceOutput);
+                totalOutput += resourceOutput;
             }
-            costs.Add(r, cost);
-            float resourceOutput = 0;
-            foreach (Contract c in contractTerminal.exportContracts[r])
+            else
             {
-                resourceOutput += c.amount;
+                resourceOutputs.Add(r, 0);
+                costs.Add(r, suppliers[r].Min.Item3);
             }
-            resourceOutputs.Add(r, resourceOutput);
-            totalOutput += resourceOutput;
         }
 
         // Add the base cost to each resource proportionally by output
@@ -193,23 +201,31 @@ public class TransportHub : Development, IContractEndpoint
 
         foreach (Resource r in contractTerminal.importResources)
         {
-            // The total cost of this resource's inputs
-            float resourceCost = 0;
-            // The total amount of this resource's inputs
-            float resourceAmount = 0;
-            foreach (Contract c in contractTerminal.importContracts[r])
+            if (contractTerminal.importContracts.Count > 0)
             {
-                resourceCost += c.cost * c.amount;
-                resourceAmount += c.amount;
+                // The total cost of this resource's inputs
+                float resourceCost = 0;
+                // The total amount of this resource's inputs
+                float resourceAmount = 0;
+                foreach (Contract c in contractTerminal.importContracts[r])
+                {
+                    resourceCost += c.cost * c.amount;
+                    resourceAmount += c.amount;
+                }
+                prices.Add(r, resourceCost / resourceAmount);
+                float resourceExports = 0;
+                foreach (Contract c in contractTerminal.exportContracts[r])
+                {
+                    resourceExports += c.amount;
+                }
+                totalExports.Add(r, resourceExports);
+                totalOutput += resourceExports;
             }
-            prices.Add(r, resourceCost / resourceAmount);
-            float resourceExports = 0;
-            foreach (Contract c in contractTerminal.exportContracts[r])
+            else
             {
-                resourceExports += c.amount;
+                totalExports.Add(r, 0);
+                prices.Add(r, contractTerminal.suppliers[r].Min.Item3);
             }
-            totalExports.Add(r, resourceExports);
-            totalOutput += resourceExports;
         }
 
         foreach (Resource r in contractTerminal.importResources)
