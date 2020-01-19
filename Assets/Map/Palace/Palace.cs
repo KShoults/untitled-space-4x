@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Palace : IContractEndpoint
 {
     // The artificial demand for goods at this palace
-    public int civilianDemand, militaryDemand, shipDemand,
+    public float civilianDemand, militaryDemand, shipDemand,
         // The total goods received
         civilianTotalReceived, militaryTotalReceived, shipTotalReceived,
         // The goods received last turn
@@ -44,9 +44,29 @@ public class Palace : IContractEndpoint
         return importDemand;
     }
 
-    public void Grow()
+    public float GenerateOutput()
     {
-        // Do nothing
+        // Update our resources received values
+        militaryTurnReceived = 0;
+        foreach (Contract c in contractTerminal.importContracts[Resource.MilitaryGoods])
+        {
+            militaryTurnReceived += c.amount;
+        }
+        militaryTotalReceived += militaryTurnReceived;
+        civilianTurnReceived = 0;
+        foreach (Contract c in contractTerminal.importContracts[Resource.MilitaryGoods])
+        {
+            civilianTurnReceived += c.amount;
+        }
+        civilianTotalReceived += civilianTurnReceived;
+        shipTurnReceived = 0;
+        foreach (Contract c in contractTerminal.importContracts[Resource.MilitaryGoods])
+        {
+            shipTurnReceived += c.amount;
+        }
+        shipTotalReceived += shipTurnReceived;
+        // We don't export
+        return 0;
     }
 
     /**************************************************************

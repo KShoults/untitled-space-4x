@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        contractSystem.EvaluateContracts();
+        contractSystem.EvaluateContractSystem();
 
         turnCounter++;
         TurnCounterText.text = "Turn: " + turnCounter;

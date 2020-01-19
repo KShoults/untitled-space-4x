@@ -13,5 +13,7 @@ public interface IContractEndpoint
     // Calculates the need for each resource to determine contract reevaluation
     // This method is called after every contract terminal has calculated their capacity and cost
     Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
-    void Grow();
+    // Grows into its bought capacity and return how much resources it generated this turn
+    // This method is called at the end of the contract system evaluation
+    float GenerateOutput();
 }

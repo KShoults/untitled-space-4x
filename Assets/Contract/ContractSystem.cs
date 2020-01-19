@@ -20,28 +20,18 @@ public class ContractSystem
     }
 
     // Called at the beginning of the end turn calculations to run the entire contract system
-    public void EvaluateContracts()
+    public void EvaluateContractSystem()
     {
         CalculateCapacities();
-        //EvaluateContracts(Resource.MilitaryCapacity);
-        EvaluateContracts(Resource.Economy);
-        EvaluateContracts(Resource.TransportCapacity);
-        EvaluateContracts(Resource.MilitaryGoods);
-        EvaluateContracts(Resource.ShipParts);
-        EvaluateContracts(Resource.CivilianGoods);
-        EvaluateContracts(Resource.TransportCapacity);
-        EvaluateContracts(Resource.Minerals);
-        EvaluateContracts(Resource.Food);
-        EvaluateContracts(Resource.Water);
-        EvaluateContracts(Resource.Energy);
-        GrowDevelopments();
+        EvaluateContracts();
+        FulfillContracts();
     }
 
     // Returns a sorted set of industry suppliers for a given resource
     // Item1 is the ContractTerminal, Item2 is the available capacity, Item3 is the cost per unit
     public SortedSet<Tuple<ContractTerminal, float, float>> FindSuppliers(Resource resource)
     {
-        SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>();
+        SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>(new ByUnitCost());
         foreach(ContractTerminal c in contractTerminalLists[resource])
         {
             suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.capacity[resource], c.cost[resource]));
@@ -53,7 +43,7 @@ public class ContractSystem
     // Item1 is the ContractTerminal, Item2 is the available capacity, Item3 is the cost per unit
     public SortedSet<Tuple<ContractTerminal, float, float>> FindHubSuppliers(Resource resource)
     {
-        SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>();
+        SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>(new ByUnitCost());
         foreach(ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
         {
             suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.capacity[resource], c.cost[resource]));
@@ -93,22 +83,96 @@ public class ContractSystem
     }
 
     // Tells all of the registered ContractTerminals for a specific resource to reevaluate their contracts
-    private void EvaluateContracts(Resource resource)
+    private void EvaluateContracts()
     {
-        foreach (ContractTerminal c in contractTerminalLists[resource])
+        foreach (ContractTerminal c in contractTerminalLists[Resource.MilitaryCapacity])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Economy])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.MilitaryGoods])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.ShipParts])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.CivilianGoods])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Minerals])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Food])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Water])
+        {
+            c.EvaluateContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Energy])
         {
             c.EvaluateContracts();
         }
     }
 
-    private void GrowDevelopments()
+    // Each industry grows, calculates its output, and fulfills it's export contracts
+    private void FulfillContracts()
     {
-        foreach (KeyValuePair<Resource, List<ContractTerminal>> kvp in contractTerminalLists)
+        foreach (ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
         {
-            foreach (ContractTerminal c in kvp.Value)
-            {
-                c.Grow();
-            }
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Energy])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Water])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Food])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Minerals])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.MilitaryGoods])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.ShipParts])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.CivilianGoods])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.MilitaryCapacity])
+        {
+            c.FulfillContracts();
+        }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.Economy])
+        {
+            c.FulfillContracts();
         }
     }
 

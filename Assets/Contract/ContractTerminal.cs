@@ -97,7 +97,7 @@ public class ContractTerminal
     public virtual Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
     {
         amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
-        Contract newContract = new Contract(resource, amount, cost[resource], this, importer);
+        Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
         if (amount > 0)
         {
             exportContracts[resource].Add(newContract);
@@ -106,9 +106,29 @@ public class ContractTerminal
         return newContract;
     }
 
-    public void Grow()
+    public virtual void FulfillContracts()
     {
-        owner.Grow();
+        // Grows into its bought capacity and returns how many resources it generated this turn
+        float output = owner.GenerateOutput();
+
+        // Reverse the exportContracts' order so that the oldest contracts get fulfilled first
+        Contract[] reversedExportContracts = new Contract[exportContracts[resource].Count];
+        exportContracts[resource].CopyTo(reversedExportContracts);
+        Array.Reverse(reversedExportContracts);
+
+        // Limit the amount of any contracts that we can't fulfill
+        foreach (Contract c in reversedExportContracts)
+        {
+            if (output < c.amount)
+            {
+                c.amount = output;
+                output = 0;
+            }
+            else
+            {
+                output -= c.amount;
+            }
+        }
     }
 
     protected virtual void InitializeImportContracts()

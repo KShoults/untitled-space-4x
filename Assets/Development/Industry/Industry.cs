@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class Industry : Development, IContractEndpoint
 {
     public ContractTerminal contractTerminal;
+    // The number of minerals used to run 1 development for an advanced industry
+    public const float MINERALTODEVRATIO = .01f;
     // The ratio of resources produced per point of tile development
     // Recalculated during capacity calculation
     private float outputPerDevelopment;
@@ -62,8 +64,8 @@ public class Industry : Development, IContractEndpoint
             {
                 cost += c.cost * c.amount;
             }
-            // The input capacity for advanced industries is 10 times their output capacity
-            float inputCapacity = newDevelopment;
+            // Convert from development to input minerals
+            float inputCapacity = newDevelopment / MINERALTODEVRATIO;
             // Add future mineral costs
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
             {
@@ -95,19 +97,33 @@ public class Industry : Development, IContractEndpoint
         return importDemand;
     }
 
-    public override void Grow()
+    public float GenerateOutput()
     {
+        float newDevelopment = contractTerminal.boughtCapacity[resource];
+
         // Sort the tiles by the order they should be developed
         // We only need to sort for basic industries
-        if (resource == Resource.Energy ||
-            resource == Resource.Water ||
-            resource == Resource.Food ||
-            resource == Resource.Minerals)
+        // We also need to convert boughtCapacity into development
+        if ((int)resource < 100)
         {
             SortTiles();
         }
+        else
+        {
+            // Find the total amount of minerals imported
+            float totalMinerals = 0;
+            foreach (Contract c in contractTerminal.importContracts[Resource.Minerals])
+            {
+                totalMinerals += c.amount;
+            }
+            // Limit by the amount of minerals
+            newDevelopment = newDevelopment < totalMinerals * MINERALTODEVRATIO ? newDevelopment : totalMinerals * MINERALTODEVRATIO;
+        }
 
-        base.Grow();
+        Grow(newDevelopment, contractTerminal);
+        // Convert from development to resource output
+        UpdateOutputPerDevelopment();
+        return totalDevelopment * outputPerDevelopment;
     }
 
     /**************************************************************
@@ -155,7 +171,7 @@ public class Industry : Development, IContractEndpoint
         }
         else
         {
-            outputPerDevelopment = 1;
+            outputPerDevelopment = .01f;
         }
     }
 

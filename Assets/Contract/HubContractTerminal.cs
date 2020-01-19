@@ -41,7 +41,7 @@ public class HubContractTerminal : ContractTerminal
     public override Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
     {
         amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
-        Contract newContract = new Contract(resource, amount, cost[resource], this, importer);
+        Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
         if (amount > 0)
         {
             exportContracts[resource].Add(newContract);
@@ -51,6 +51,37 @@ public class HubContractTerminal : ContractTerminal
             }
         }
         return newContract;
+    }
+
+    public override void FulfillContracts()
+    {
+        // Grows into its bought capacity and returns how much transport capacity it has this turn.
+        float output = owner.GenerateOutput();
+
+        // Add all of the contracts to a sorted set to sort by age and resource
+        SortedSet<Contract> sortedOutputContracts = new SortedSet<Contract>(new ByAgeThenResource()); 
+
+        foreach (KeyValuePair<Resource, List<Contract>> kvp in exportContracts)
+        {
+            foreach (Contract c in kvp.Value)
+            {
+                sortedOutputContracts.Add(c);
+            }
+        }
+
+        // Limit the amount of any contracts that we can't fulfill
+        foreach (Contract c in sortedOutputContracts)
+        {
+            if (output < c.amount)
+            {
+                c.amount = output;
+                output = 0;
+            }
+            else
+            {
+                output -= c.amount;
+            }
+        }
     }
 
     protected override void InitializeExportContracts()
@@ -63,5 +94,37 @@ public class HubContractTerminal : ContractTerminal
         exportContracts.Add(Resource.CivilianGoods, new List<Contract>());
         exportContracts.Add(Resource.MilitaryGoods, new List<Contract>());
         exportContracts.Add(Resource.ShipParts, new List<Contract>());
+    }
+
+    // Defines a comparer to create a sorted set of contracts
+    // that is sorted by the age of the contract then by the resource
+    private class ByAgeThenResource : IComparer<Contract>
+    {
+        public int Compare(Contract x, Contract y)
+        {
+            if (x.startDate == y.startDate)
+            {
+                if (x.resource == y.resource)
+                {
+                    return 0;
+                }
+                if ((int)x.resource < (int)y.resource)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            else if (x.startDate < y.startDate)
+            {
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
     }
 }

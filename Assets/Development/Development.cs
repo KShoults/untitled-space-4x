@@ -225,9 +225,10 @@ public abstract class Development
         return developmentDemand;
     }
 
-    public virtual void Grow()
+    // Grow the development as much as it can limited by amount
+    // Returns how much it ended up growing
+    public virtual float Grow(float amount, ContractTerminal contractTerminal)
     {
-        
         // Identify the population source
         // For now we create it from nothing
         
@@ -241,6 +242,56 @@ public abstract class Development
 
         // Calculate how much new development this will give us
         float newDevelopment = (float)populationToAdd / POPTODEVRATIO;
+        // Limit by amount
+        newDevelopment = newDevelopment < amount ? newDevelopment : amount;
+
+        // Calculate total energy, water, and food imports
+        float totalEnergy = 0, totalWater = 0, totalFood = 0;
+        if (!contractTerminal.exportContracts.ContainsKey(Resource.Energy))
+        {
+            foreach (Contract c in contractTerminal.importContracts[Resource.Energy])
+            {
+                totalEnergy += c.amount;
+            }
+        }
+        else
+        {
+            totalEnergy = newDevelopment;
+        }
+        if (!contractTerminal.exportContracts.ContainsKey(Resource.Water))
+        {
+            foreach (Contract c in contractTerminal.importContracts[Resource.Water])
+            {
+                totalWater += c.amount;
+            }
+        }
+        else
+        {
+            totalWater = newDevelopment;
+        }
+        if (!contractTerminal.exportContracts.ContainsKey(Resource.Food))
+        {
+            foreach (Contract c in contractTerminal.importContracts[Resource.Food])
+            {
+                totalFood += c.amount;
+            }
+        }
+        else
+        {
+            totalFood = newDevelopment;
+        }
+
+        // Calculate how much development these imports can support
+        float energyDevelopment = totalEnergy / ENERGYTODEVRATIO;
+        float waterDevelopment = totalWater / WATERTOPOPRATIO / POPTODEVRATIO;
+        float foodDevelopment = totalFood / FOODTOPOPRATIO / POPTODEVRATIO;
+
+        // Limit to the most restrictive
+        float resourceDevelopment = energyDevelopment < waterDevelopment ? energyDevelopment < foodDevelopment ? energyDevelopment : foodDevelopment : waterDevelopment < foodDevelopment ? waterDevelopment : foodDevelopment;
+
+        // Subtract totalDevelopment to get just new development
+        newDevelopment = newDevelopment < resourceDevelopment - totalDevelopment ? newDevelopment : resourceDevelopment - totalDevelopment;
+        float developmentToAdd = newDevelopment;
 
         // Allocate the new development to the highest priority tile
         foreach (Tile t in tiles)
@@ -248,18 +299,18 @@ public abstract class Development
             // If it isn't developed yet then create it with the new development
             if (!tileDevelopments.ContainsKey(t))
             {
-                tileDevelopments.Add(t, newDevelopment);
+                tileDevelopments.Add(t, developmentToAdd);
             }
             else
             {
-                tileDevelopments[t] += newDevelopment;
+                tileDevelopments[t] += developmentToAdd;
             }
 
             // If we went over 100 development then the extra
             // can be added in the next loop to the next tile
             if (tileDevelopments[t] > 100)
             {
-                newDevelopment = tileDevelopments[t] - 100;
+                developmentToAdd = tileDevelopments[t] - 100;
                 tileDevelopments[t] = 100;
             }
             else
@@ -268,6 +319,7 @@ public abstract class Development
                 break;
             }
         }
+        return newDevelopment;
     }
 
     protected virtual List<Resource> GetImportResources()

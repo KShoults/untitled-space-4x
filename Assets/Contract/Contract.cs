@@ -6,6 +6,8 @@ public class Contract
 {
     // The resource in this contract
     public Resource resource;
+    // The turn that this contract was created
+    public int startDate;
     // The amount of resources in this contract
     public float amount;
     // The cost per unit of resources
@@ -15,9 +17,10 @@ public class Contract
     // The ContractTerminal importing the goods
     public ContractTerminal importer;
 
-    public Contract(Resource resource, float amount, float cost, ContractTerminal exporter, ContractTerminal importer)
+    public Contract(Resource resource, int startDate, float amount, float cost, ContractTerminal exporter, ContractTerminal importer)
     {
         this.resource = resource;
+        this.startDate = startDate;
         this.amount = amount;
         this.cost = cost;
         this.exporter = exporter;

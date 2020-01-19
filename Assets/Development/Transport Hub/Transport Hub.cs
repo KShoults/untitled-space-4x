@@ -22,6 +22,8 @@ public class TransportHub : Development, IContractEndpoint
     public const float IDEALRATIO = 3;
     // The minimum ratio at which a stockpile is marked as having a surplus
     public const float SURPLUSRATIO = 5;
+    // The ratio of transportation capacity to development
+    public const float TRANSPORTTODEVRATIO = 10;
 
     public TransportHub(Resource resource) : base()
     {
@@ -156,6 +158,15 @@ public class TransportHub : Development, IContractEndpoint
         }
 
         return importDemand;
+    }
+
+    public float GenerateOutput()
+    {
+        float newDevelopment = contractTerminal.boughtCapacity[Resource.Minerals];
+
+        Grow(newDevelopment, contractTerminal);
+
+        return totalDevelopment * TRANSPORTTODEVRATIO;
     }
 
     /**************************************************************
