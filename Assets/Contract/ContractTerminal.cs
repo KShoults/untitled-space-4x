@@ -82,8 +82,16 @@ public class ContractTerminal
                 
                 if (newContract.amount > 0)
                 {
-                    importContracts[r].Add(newContract);
-                    resourcesAdded += amount;
+                    // See if there already exists a contract with this terminal
+                    Contract existingContract = importContracts[r].Find(x => x.exporter == newContract.exporter);
+
+                    if (existingContract == null)
+                    {
+                        importContracts[r].Add(newContract);
+                    }
+                    // We don't need an else because the exporter already took care of updating the existing contract
+
+                    resourcesAdded += newContract.amount;
                     if (resourcesAdded > importDemand[r])
                     {
                         // We've added enough import contracts
@@ -98,10 +106,23 @@ public class ContractTerminal
     {
         amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
         Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
-        if (amount > 0)
+        if (newContract.amount > 0)
         {
-            exportContracts[resource].Add(newContract);
-            boughtCapacity[resource] += amount;
+            // See if there already exists a contract with this terminal
+            Contract existingContract = exportContracts[resource].Find(x => x.importer == newContract.importer);
+
+            if (existingContract == null)
+            {
+                exportContracts[resource].Add(newContract);
+                boughtCapacity[resource] += newContract.amount;
+            }
+            else
+            {
+                // Calculate the new cost
+                // newCost = (oldAmount * oldCost + newAmount * newCost) / (oldAmount + newAmount)
+                existingContract.cost = (existingContract.amount * existingContract.cost + newContract.amount * newContract.cost) / (existingContract.amount + newContract.amount);
+                existingContract.amount += newContract.amount;
+            }
         }
         return newContract;
     }
