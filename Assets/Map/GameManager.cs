@@ -76,32 +76,32 @@ public class GameManager : MonoBehaviour
         homeworld.tiles = tiles;
 
         // Assign those tiles to developments
-        Industry energyIndustry = new Industry(Resource.Energy);
+        Industry energyIndustry = new BasicIndustry(Resource.Energy);
         homeworld.developments.Add(Resource.Energy, energyIndustry);
         energyIndustry.tiles.Add(tiles[0]);
         tiles[0].development = energyIndustry;
 
-        Industry waterIndustry = new Industry(Resource.Water);
+        Industry waterIndustry = new BasicIndustry(Resource.Water);
         homeworld.developments.Add(Resource.Water, waterIndustry);
         waterIndustry.tiles.Add(tiles[1]);
         tiles[1].development = waterIndustry;
 
-        Industry foodIndustry = new Industry(Resource.Food);
+        Industry foodIndustry = new BasicIndustry(Resource.Food);
         homeworld.developments.Add(Resource.Food, foodIndustry);
         foodIndustry.tiles.Add(tiles[2]);
         tiles[2].development = foodIndustry;
 
-        Industry mineralsIndustry = new Industry(Resource.Minerals);
+        Industry mineralsIndustry = new BasicIndustry(Resource.Minerals);
         homeworld.developments.Add(Resource.Minerals, mineralsIndustry);
         mineralsIndustry.tiles.Add(tiles[3]);
         tiles[3].development = mineralsIndustry;
 
-        Industry civilianIndustry = new Industry(Resource.CivilianGoods);
+        Industry civilianIndustry = new AdvancedIndustry(Resource.CivilianGoods);
         homeworld.developments.Add(Resource.CivilianGoods, civilianIndustry);
         civilianIndustry.tiles.Add(tiles[4]);
         tiles[4].development = civilianIndustry;
 
-        Industry shipyard = new Industry(Resource.ShipParts);
+        Industry shipyard = new AdvancedIndustry(Resource.ShipParts);
         homeworld.developments.Add(Resource.ShipParts, shipyard);
         shipyard.tiles.Add(tiles[5]);
         tiles[5].development = shipyard;

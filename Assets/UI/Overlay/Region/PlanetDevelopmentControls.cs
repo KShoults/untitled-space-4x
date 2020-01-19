@@ -286,10 +286,15 @@ public class PlanetDevelopmentControls : OverlayObject
         // The planet might not have this development yet
         if (!planet.developments.ContainsKey(resource))
         {
+            // If it's a basic industry
+            if ((int)resource < 100)
+            {
+                planet.developments.Add(resource, new BasicIndustry(resource));
+            }
             // If it's a basic or advanced industry
             if ((int)resource < 200)
             {
-                planet.developments.Add(resource, new Industry(resource));
+                planet.developments.Add(resource, new AdvancedIndustry(resource));
             }
             if (resource == Resource.TransportCapacity)
             {
