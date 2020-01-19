@@ -174,6 +174,10 @@ public class ContractSystem
         {
             c.FulfillContracts();
         }
+        foreach (ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
+        {
+            c.FulfillContracts();
+        }
     }
 
     // Defines a comparer to create a sorted set of import suppliers

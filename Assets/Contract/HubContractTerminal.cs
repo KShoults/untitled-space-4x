@@ -10,6 +10,10 @@ public class HubContractTerminal : ContractTerminal
     // Determines if the first stage of contract evaluations has occured
     // Transport hubs evaluate their contracts in two waves
     public bool completedFirstStageContractEvaluation;
+    // Determines if the first stage of contract fulfillment has occured
+    // Transport hubs fulfill their export contracts in the first wave
+    // They then build their stockpiles with import contracts in the second wave
+    public bool completedFirstStageContractFulfillment;
     public HubContractTerminal(TransportHub owner, Resource resource, List<Resource> importResources) : base(owner, resource, importResources)
     {
         hubOwner = owner;
@@ -18,7 +22,10 @@ public class HubContractTerminal : ContractTerminal
 
     public override void CalculateCapacity()
     {
+        // A couple of flags that need to be reset at the beginning of end turn calculations
         completedFirstStageContractEvaluation = false;
+        completedFirstStageContractFulfillment = false;
+
         boughtCapacity.Clear();
         // Find our suppliers
         suppliers.Clear();
@@ -59,33 +66,42 @@ public class HubContractTerminal : ContractTerminal
 
     public override void FulfillContracts()
     {
-        // Grows into its bought capacity and returns how much transport capacity it has this turn.
-        float output = owner.GenerateOutput();
-
-        // Add all of the contracts to a sorted set to sort by age and resource
-        SortedSet<Contract> sortedOutputContracts = new SortedSet<Contract>(new ByAgeThenResource()); 
-
-        foreach (KeyValuePair<Resource, List<Contract>> kvp in exportContracts)
+        if (completedFirstStageContractFulfillment)
         {
-            foreach (Contract c in kvp.Value)
+            // Grows into its bought capacity and returns how much transport capacity it has this turn.
+            float output = owner.GenerateOutput();
+
+            // Add all of the contracts to a sorted set to sort by age and resource
+            SortedSet<Contract> sortedOutputContracts = new SortedSet<Contract>(new ByAgeThenResource()); 
+
+            foreach (KeyValuePair<Resource, List<Contract>> kvp in exportContracts)
             {
-                sortedOutputContracts.Add(c);
+                foreach (Contract c in kvp.Value)
+                {
+                    sortedOutputContracts.Add(c);
+                }
+            }
+
+            // Limit the amount of any contracts that we can't fulfill
+            foreach (Contract c in sortedOutputContracts)
+            {
+                if (output < c.amount)
+                {
+                    c.amount = output;
+                    output = 0;
+                }
+                else
+                {
+                    output -= c.amount;
+                }
             }
         }
-
-        // Limit the amount of any contracts that we can't fulfill
-        foreach (Contract c in sortedOutputContracts)
+        else
         {
-            if (output < c.amount)
-            {
-                c.amount = output;
-                output = 0;
-            }
-            else
-            {
-                output -= c.amount;
-            }
+            hubOwner.GrowStockpile();
         }
+
+        completedFirstStageContractFulfillment = true;
     }
 
     protected override void InitializeExportContracts()

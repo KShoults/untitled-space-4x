@@ -25,6 +25,16 @@ public class TransportHub : Development, IContractEndpoint
     // The ratio of transportation capacity to development
     public const float TRANSPORTTODEVRATIO = 10;
 
+    // The minimum amount of exports that the stockpile should be prepared for regardless of its current exports
+    private float minimumExportLevel
+    {
+        get
+        { 
+            float x = totalDevelopment * TRANSPORTTODEVRATIO * .01f;
+            return x > .01f ? x : .01f;
+        }
+    }
+
     public TransportHub() : base(Resource.TransportCapacity)
     {
         contractTerminal = new HubContractTerminal(this, Resource.TransportCapacity, GetImportResources());
@@ -130,29 +140,31 @@ public class TransportHub : Development, IContractEndpoint
 
         foreach (Resource r in contractTerminal.importResources)
         {
+            // The minimum export level to consider
+            float effectiveExportLevel = totalExports[r] > minimumExportLevel ? totalExports[r] : minimumExportLevel;
             if (stockpileRatio[r] < SHORTAGERATIO)
             {
                 // We are at critical stockpile level
                 // Target trend is .5
-                importDemand[r] = .5f * totalExports[r] + totalExports[r] - totalImports[r];
+                importDemand[r] = .5f * effectiveExportLevel + effectiveExportLevel - totalImports[r];
             }
             else if (stockpileRatio[r] < IDEALRATIO)
             {
                 // We are at shortage stockpile level
                 // Target trend is .1
-                importDemand[r] = .1f * totalExports[r] + totalExports[r] - totalImports[r];
+                importDemand[r] = .1f * effectiveExportLevel + effectiveExportLevel - totalImports[r];
             }
             else if (stockpileRatio[r] < SURPLUSRATIO)
             {
                 // We are at ideal stockpile level
                 // Target trend is .05
-                importDemand[r] = .05f * totalExports[r] + totalExports[r] - totalImports[r];
+                importDemand[r] = .05f * effectiveExportLevel + effectiveExportLevel - totalImports[r];
             }
             else
             {
                 // We are at surplus stockpile level
                 // Target trend is -.05
-                importDemand[r] = -.5f * totalExports[r] + totalExports[r] - totalImports[r];
+                importDemand[r] = -.5f * effectiveExportLevel + effectiveExportLevel - totalImports[r];
             }
         }
 
@@ -172,6 +184,17 @@ public class TransportHub : Development, IContractEndpoint
     /**************************************************************
         Personal Members
     **************************************************************/
+
+    public void GrowStockpile()
+    {
+        foreach (Resource r in contractTerminal.importResources)
+        {
+            foreach (Contract c in contractTerminal.importContracts[r])
+            {
+                stockpile[r] += c.amount;
+            }
+        }
+    }
 
     protected override List<Resource> GetImportResources()
     {
@@ -230,9 +253,6 @@ public class TransportHub : Development, IContractEndpoint
 
     private void CalculateStockpileRatios()
     {
-        // The minimum amount of exports that the stockpile should be prepared for regardless of its current exports
-        float minimumExportLevel = totalDevelopment * TRANSPORTTODEVRATIO * .01f;
-        minimumExportLevel = minimumExportLevel > .01f ? minimumExportLevel : .01f;
         // Add up the imports and exports
         foreach (Resource r in contractTerminal.importResources)
         {
