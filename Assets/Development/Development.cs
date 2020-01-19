@@ -225,9 +225,9 @@ public abstract class Development
         return developmentDemand;
     }
 
-    // Grow the development as much as it can limited by amount
+    // Grow the development as much as it can limited by desiredDevelopment
     // Returns how much it ended up growing
-    public virtual float Grow(float amount, ContractTerminal contractTerminal)
+    public virtual float Grow(float desiredDevelopment, ContractTerminal contractTerminal)
     {
         // Identify the population source
         // For now we create it from nothing
@@ -240,10 +240,11 @@ public abstract class Development
         ulong maxPop = (ulong)tiles.Count * 100 * POPTODEVRATIO;
         populationToAdd = (int)(maxPop - population) >= populationToAdd ? populationToAdd : (int)(maxPop - population);
 
-        // Calculate how much new development this will give us
-        float newDevelopment = (float)populationToAdd / POPTODEVRATIO;
-        // Limit by amount
-        newDevelopment = newDevelopment < amount ? newDevelopment : amount;
+        // Add this to our current population to get the total population we can have
+        ulong totalPopulation = population + (ulong)populationToAdd;
+
+        // Calculate how much total development this will give us
+        float populationDevelopment = totalPopulation / (float)POPTODEVRATIO;
 
         // Calculate total energy, water, and food imports
         float totalEnergy = 0, totalWater = 0, totalFood = 0;
@@ -256,7 +257,7 @@ public abstract class Development
         }
         else
         {
-            totalEnergy = newDevelopment;
+            totalEnergy = populationDevelopment * ENERGYTODEVRATIO;
         }
         if (!contractTerminal.exportContracts.ContainsKey(Resource.Water))
         {
@@ -267,7 +268,7 @@ public abstract class Development
         }
         else
         {
-            totalWater = newDevelopment;
+            totalWater = populationDevelopment * WATERTOPOPRATIO * POPTODEVRATIO;
         }
         if (!contractTerminal.exportContracts.ContainsKey(Resource.Food))
         {
@@ -278,22 +279,28 @@ public abstract class Development
         }
         else
         {
-            totalFood = newDevelopment;
+            totalFood = populationDevelopment * FOODTOPOPRATIO * POPTODEVRATIO;
         }
 
-        // Calculate how much development these imports can support
+        // Calculate how much total development these imports can support
         float energyDevelopment = totalEnergy / ENERGYTODEVRATIO;
         float waterDevelopment = totalWater / WATERTOPOPRATIO / POPTODEVRATIO;
         float foodDevelopment = totalFood / FOODTOPOPRATIO / POPTODEVRATIO;
 
         // Limit to the most restrictive
         float resourceDevelopment = energyDevelopment < waterDevelopment ? energyDevelopment < foodDevelopment ? energyDevelopment : foodDevelopment : waterDevelopment < foodDevelopment ? waterDevelopment : foodDevelopment;
-
+        // Limit to the populationDevelopment
+        float development = populationDevelopment < resourceDevelopment ? populationDevelopment : resourceDevelopment;
         // Subtract totalDevelopment to get just new development
-        newDevelopment = newDevelopment < resourceDevelopment - totalDevelopment ? newDevelopment : resourceDevelopment - totalDevelopment;
-        float developmentToAdd = newDevelopment;
+        float newDevelopment = development - totalDevelopment;
+        // Limit by desired development
+        newDevelopment = newDevelopment < desiredDevelopment ? newDevelopment : desiredDevelopment;
+        
+        // Add the new population to the development
+        population += (uint)(newDevelopment * POPTODEVRATIO);
 
         // Allocate the new development to the highest priority tile
+        float developmentToAdd = newDevelopment;
         foreach (Tile t in tiles)
         {
             // If it isn't developed yet then create it with the new development
