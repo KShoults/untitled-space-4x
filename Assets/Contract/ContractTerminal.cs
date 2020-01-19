@@ -145,6 +145,13 @@ public class ContractTerminal
             {
                 c.amount = output;
                 output = 0;
+
+                // Cancel any contracts that are reduced to 0
+                if (c.amount == 0)
+                {
+                    c.importer.importContracts[c.resource].Remove(c);
+                    exportContracts[c.resource].Remove(c);
+                }
             }
             else
             {
