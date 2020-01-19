@@ -191,8 +191,31 @@ public class TransportHub : Development, IContractEndpoint
         {
             foreach (Contract c in contractTerminal.importContracts[r])
             {
+                // Add import amounts
                 stockpile[r] += c.amount;
             }
+
+            // Calculate hub's usage of this resource
+            float resourceUsage = 0;
+            if (r == Resource.Energy)
+            {
+                resourceUsage = totalDevelopment * ENERGYTODEVRATIO;
+            }
+            else if (r == Resource.Water)
+            {
+                resourceUsage = totalDevelopment * WATERTOPOPRATIO * POPTODEVRATIO;
+            }
+            else if (r == Resource.Food)
+            {
+                resourceUsage = totalDevelopment * FOODTOPOPRATIO * POPTODEVRATIO;
+            }
+            // Later we can add usage for ship parts here
+
+            // Subtract hub resource usage
+            stockpile[r] -= resourceUsage;
+
+            // Never go below 0 stockpile amount
+            stockpile[r] = stockpile[r] > 0 ? stockpile[r] : 0;
         }
     }
 
