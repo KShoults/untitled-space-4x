@@ -47,20 +47,20 @@ public class HubContractTerminal : ContractTerminal
 
     // In this override we just want to additionally increase every resource's boughtCapacity by the same amount
     // This simulates the reduced transport capacity due to each contract
+
     public override Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
     {
-        // Limit by the amount of capacity left for that resource
-        amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
-        Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
-        if (amount > 0)
+        Contract newContract = base.RequestContract(resource, amount, importer);
+
+        if (newContract.amount > 0)
         {
-            exportContracts[resource].Add(newContract);
             foreach (Resource r in importResources)
             {
-                boughtCapacity[r] += amount;
+                boughtCapacity[r] += newContract.amount;
             }
-            boughtCapacity[Resource.TransportCapacity] += amount;
+            boughtCapacity[Resource.TransportCapacity] += newContract.amount;
         }
+
         return newContract;
     }
 

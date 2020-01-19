@@ -104,6 +104,7 @@ public class ContractTerminal
 
     public virtual Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
     {
+        // Limit by the amount of capacity left for that resource
         amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
         Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
         if (newContract.amount > 0)
