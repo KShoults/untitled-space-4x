@@ -26,14 +26,7 @@ public abstract class Industry : Development, IContractEndpoint
         return CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource]);
     }
 
-    public virtual float GenerateOutput()
-    {
-        float newDevelopment = contractTerminal.boughtCapacity[resource];
-
-        Grow(newDevelopment, contractTerminal);
-
-        return totalDevelopment;
-    }
+    public abstract float GenerateOutput();
 
     /**************************************************************
         Personal Members

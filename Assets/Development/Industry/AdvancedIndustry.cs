@@ -5,8 +5,10 @@ using System.Collections.Generic;
 // Defines a development that creates and exports an advanced resource from basic resources
 public class AdvancedIndustry : Industry
 {
+    // The amount of resources created by 1 unity of development
+    public const float OUTPUTTODEVRATIO = .01f;
     // The number of minerals used to run 1 development
-    public const float MINERALTODEVRATIO = .01f;
+    public const float MINERALTODEVRATIO = .1f;
 
     public AdvancedIndustry(Resource resource) : base(resource)
     { }
@@ -30,7 +32,7 @@ public class AdvancedIndustry : Industry
         }
         developmentCapacity -= mineralShortage;
 
-        return new Dictionary<Resource, float> {{resource, developmentCapacity}};
+        return new Dictionary<Resource, float> {{resource, developmentCapacity * OUTPUTTODEVRATIO}};
     }
 
     public override Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
@@ -57,7 +59,7 @@ public class AdvancedIndustry : Industry
         // Divide by total output
         if (totalDevelopment > 0)
         {
-            cost = cost / totalDevelopment;
+            cost = cost / (totalDevelopment * OUTPUTTODEVRATIO);
         }
 
         return new Dictionary<Resource, float> {{resource, cost}};
@@ -75,7 +77,7 @@ public class AdvancedIndustry : Industry
 
     public override float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[resource];
+        float newDevelopment = contractTerminal.boughtCapacity[resource] / MINERALTODEVRATIO;
 
         // Find the total amount of minerals imported
         float totalMinerals = 0;
@@ -88,7 +90,7 @@ public class AdvancedIndustry : Industry
 
         Grow(newDevelopment, contractTerminal);
 
-        return totalDevelopment;
+        return totalDevelopment * OUTPUTTODEVRATIO;
     }
 
     protected override List<Resource> GetImportResources()
@@ -96,7 +98,7 @@ public class AdvancedIndustry : Industry
         List<Resource> importResources = base.GetImportResources();
         
         importResources.Add(Resource.Minerals);
-        
+
         return importResources;
     }
 }
