@@ -145,6 +145,8 @@ public class TransportHub : Development, IContractEndpoint
             importDemand.Add(Resource.Minerals, 0);
         }
 
+        CalculateStockpileRatios();
+
         foreach (Resource r in contractTerminal.importResources)
         {
             // The minimum export level to consider

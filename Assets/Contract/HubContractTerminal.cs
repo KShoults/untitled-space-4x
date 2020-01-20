@@ -97,18 +97,20 @@ public class HubContractTerminal : ContractTerminal
                 if (output < c.amount)
                 {
                     c.amount = output;
-                    output = 0;
-
-                    // Cancel any contracts that are reduced to 0
-                    if (c.amount == 0)
-                    {
-                        c.importer.importContracts[c.resource].Remove(c);
-                        exportContracts[c.resource].Remove(c);
-                    }
                 }
-                else
+                if (hubOwner.stockpile[c.resource] < c.amount)
                 {
-                    output -= c.amount;
+                    c.amount = hubOwner.stockpile[c.resource];
+                }
+
+                output -= c.amount;
+                hubOwner.stockpile[c.resource] -= c.amount;
+
+                // Cancel any contracts that are reduced to 0
+                if (c.amount == 0)
+                {
+                    c.importer.importContracts[c.resource].Remove(c);
+                    exportContracts[c.resource].Remove(c);
                 }
             }
         }

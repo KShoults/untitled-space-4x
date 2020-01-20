@@ -54,13 +54,13 @@ public class Palace : IContractEndpoint
         }
         militaryTotalReceived += militaryTurnReceived;
         civilianTurnReceived = 0;
-        foreach (Contract c in contractTerminal.importContracts[Resource.MilitaryGoods])
+        foreach (Contract c in contractTerminal.importContracts[Resource.CivilianGoods])
         {
             civilianTurnReceived += c.amount;
         }
         civilianTotalReceived += civilianTurnReceived;
         shipTurnReceived = 0;
-        foreach (Contract c in contractTerminal.importContracts[Resource.MilitaryGoods])
+        foreach (Contract c in contractTerminal.importContracts[Resource.ShipParts])
         {
             shipTurnReceived += c.amount;
         }
