@@ -39,7 +39,7 @@ public class PalacePanel : MonoBehaviour
     {
         if (palace != null)
         {
-            palace.civilianDemand = (int)civilianDemandSlider.value;
+            palace.civilianDemand = civilianDemandSlider.value;
         }
     }
 
@@ -47,7 +47,7 @@ public class PalacePanel : MonoBehaviour
     {
         if (palace != null)
         {
-            palace.militaryDemand = (int)militaryDemandSlider.value;
+            palace.militaryDemand = militaryDemandSlider.value;
         }
     }
 
@@ -55,7 +55,7 @@ public class PalacePanel : MonoBehaviour
     {
         if (palace != null)
         {
-            palace.shipDemand = (int)shipDemandSlider.value;
+            palace.shipDemand = shipDemandSlider.value;
         }
     }
 }
