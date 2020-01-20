@@ -185,7 +185,7 @@ public class TransportHub : Development, IContractEndpoint
     // Grows the development and returns the new transport capacity
     public float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[Resource.TransportCapacity];
+        float newDevelopment = contractTerminal.boughtCapacity[Resource.TransportCapacity] / TRANSPORTTODEVRATIO;
 
         Grow(newDevelopment, contractTerminal);
 
