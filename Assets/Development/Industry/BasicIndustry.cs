@@ -33,6 +33,12 @@ public class BasicIndustry : Industry
         return new Dictionary<Resource, float> {{resource, cost}};
     }
 
+    public override Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    {
+        return CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource] / CalculateOutputPerDevelopment(contractTerminal.boughtCapacity[resource]));
+    }
+
+
     public override float GenerateOutput()
     {
         // Sort the tiles by the order they should be developed

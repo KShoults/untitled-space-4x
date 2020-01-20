@@ -67,17 +67,17 @@ public class AdvancedIndustry : Industry
 
     public override Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        Dictionary<Resource, float> importDemand = base.CalculateImportDemand(suppliers);
+        Dictionary<Resource, float> importDemand = CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO);
 
         // Add mineral demand
-        importDemand.Add(Resource.Minerals, totalDevelopment + contractTerminal.boughtCapacity[resource]);
+        importDemand.Add(Resource.Minerals, (totalDevelopment + contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO) * MINERALTODEVRATIO);
 
         return importDemand;
     }
 
     public override float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[resource] / MINERALTODEVRATIO;
+        float newDevelopment = contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO;
 
         // Find the total amount of minerals imported
         float totalMinerals = 0;
@@ -86,7 +86,7 @@ public class AdvancedIndustry : Industry
             totalMinerals += c.amount;
         }
         // Limit by the amount of minerals
-        newDevelopment = newDevelopment < totalMinerals * MINERALTODEVRATIO ? newDevelopment : totalMinerals * MINERALTODEVRATIO;
+        newDevelopment = newDevelopment < totalMinerals / MINERALTODEVRATIO ? newDevelopment : totalMinerals / MINERALTODEVRATIO;
 
         Grow(newDevelopment, contractTerminal);
 

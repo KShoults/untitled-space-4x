@@ -71,7 +71,9 @@ public class ContractTerminal
         // Get the import demand from the owner
         Dictionary<Resource, float> importDemand = owner.CalculateImportDemand(suppliers);
         
-        foreach (Resource r in importResources)
+        Resource[] keys = new Resource[importDemand.Count];
+        importDemand.Keys.CopyTo(keys, 0);
+        foreach (Resource r in keys)
         {
             if (importDemand[r] > 0)
             {

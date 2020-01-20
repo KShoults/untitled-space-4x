@@ -147,7 +147,9 @@ public class TransportHub : Development, IContractEndpoint
 
         CalculateStockpileRatios();
 
-        foreach (Resource r in contractTerminal.importResources)
+        Resource[] keys = new Resource[importDemand.Count];
+        importDemand.Keys.CopyTo(keys, 0);
+        foreach (Resource r in keys)
         {
             // The minimum export level to consider
             float effectiveExportLevel = totalExports[r] > minimumExportLevel ? totalExports[r] : minimumExportLevel;
