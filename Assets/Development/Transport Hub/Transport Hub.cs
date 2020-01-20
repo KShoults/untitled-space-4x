@@ -110,7 +110,6 @@ public class TransportHub : Development, IContractEndpoint
             else
             {
                 resourceOutputs.Add(r, 0);
-                costs.Add(r, suppliers[r].Min.Item3);
             }
         }
 

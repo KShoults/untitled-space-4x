@@ -27,11 +27,9 @@ public class HubContractTerminal : ContractTerminal
         completedFirstStageContractFulfillment = false;
 
         boughtCapacity.Clear();
-        // Find our suppliers
         suppliers.Clear();
         foreach (Resource r in importResources)
         {
-            suppliers.Add(r, contractSystem.FindSuppliers(r));
             boughtCapacity.Add(r, 0);
         }
         boughtCapacity.Add(Resource.TransportCapacity, 0);
@@ -41,6 +39,14 @@ public class HubContractTerminal : ContractTerminal
 
     public override void EvaluateContracts()
     {
+        if (!completedFirstStageContractEvaluation)
+        {
+            // Now transport hubs find suppliers
+            foreach (Resource r in importResources)
+            {
+                suppliers.Add(r, contractSystem.FindSuppliers(r));
+            }
+        }
         base.EvaluateContracts();
         completedFirstStageContractEvaluation = true;
     }
