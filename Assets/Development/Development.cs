@@ -70,9 +70,10 @@ public abstract class Development
         developmentCapacity = developmentCapacity <= MAXPOPTOMOVE / POPTODEVRATIO ? developmentCapacity : MAXPOPTOMOVE / POPTODEVRATIO;
 
         // Check for suppliers for new development and limit our development by what can be procured
+        // We skip this for essentials since they will likely get a contract with transport hubs even when they don't report capacity
         
         // Check for energy
-        if (resource != Resource.Energy)
+        if (resource != Resource.Energy && resource != Resource.Water && resource != Resource.Food)
         {
             float energyShortage = developmentCapacity * ENERGYTODEVRATIO;
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Energy])
@@ -86,11 +87,7 @@ public abstract class Development
                 }
             }
             developmentCapacity -= energyShortage / ENERGYTODEVRATIO;
-        }
 
-        // Check for water
-        if (resource != Resource.Water)
-        {
             float waterShortage = developmentCapacity * POPTODEVRATIO * WATERTOPOPRATIO;
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Water])
             {
@@ -103,11 +100,7 @@ public abstract class Development
                 }
             }
             developmentCapacity -= waterShortage / POPTODEVRATIO / WATERTOPOPRATIO;
-        }
-
-        // Check for food
-        if (resource != Resource.Food)
-        {
+            
             float foodShortage = developmentCapacity * POPTODEVRATIO * FOODTOPOPRATIO;
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Food])
             {
