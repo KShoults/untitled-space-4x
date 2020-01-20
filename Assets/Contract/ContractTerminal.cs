@@ -123,7 +123,6 @@ public class ContractTerminal
             if (existingContract == null)
             {
                 exportContracts[resource].Add(newContract);
-                boughtCapacity[resource] += newContract.amount;
             }
             else
             {
@@ -132,6 +131,7 @@ public class ContractTerminal
                 existingContract.cost = (existingContract.amount * existingContract.cost + newContract.amount * newContract.cost) / (existingContract.amount + newContract.amount);
                 existingContract.amount += newContract.amount;
             }
+            boughtCapacity[resource] += newContract.amount;
         }
         return newContract;
     }

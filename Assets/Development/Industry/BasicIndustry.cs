@@ -35,7 +35,7 @@ public class BasicIndustry : Industry
 
     public override Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        return CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource] / CalculateOutputPerDevelopment(contractTerminal.boughtCapacity[resource]));
+        return CalculateDevelopmentDemand(CalculateDevelopmentPerCapacity(contractTerminal.boughtCapacity[resource]));
     }
 
 
@@ -45,13 +45,13 @@ public class BasicIndustry : Industry
         SortTiles();
 
         // Convert boughtCapacity into development
-        float newDevelopment = contractTerminal.boughtCapacity[resource] * CalculateDevelopmentPerCapacity(contractTerminal.boughtCapacity[resource]);
+        float newDevelopment = CalculateDevelopmentPerCapacity(contractTerminal.boughtCapacity[resource]);
 
         // Grow the new development
         Grow(newDevelopment, contractTerminal);
 
         // Convert from development to resource output
-        return newDevelopment * CalculateOutputPerDevelopment(0);
+        return totalDevelopment * CalculateOutputPerDevelopment(0);
     }
 
     public override Dictionary<Resource, float> CalculatePrice()
@@ -159,7 +159,7 @@ public class BasicIndustry : Industry
                 float tileDevelopmentNeeded = capacity / (int)t.resources[resource] * 100f;
                 float tileDevelopmentToAdd = tileDevelopmentNeeded < 100 ? tileDevelopmentNeeded : 100;
                 developmentNeeded += tileDevelopmentToAdd;
-                capacity -= tileDevelopmentToAdd * (int)t.resources[resource];
+                capacity -= tileDevelopmentToAdd * (int)t.resources[resource] / 100f;
             }
             else if (tileDevelopments[t] < 100)
             {
