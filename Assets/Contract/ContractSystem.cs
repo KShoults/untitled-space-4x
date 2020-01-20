@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class ContractSystem
 {
     // A dictionary of the lists of contract terminals used by the contract system
-    // The lists' orders should be maintained as the age of the contract terminal determines its priority
     public Dictionary<Resource, List<ContractTerminal>> contractTerminalLists;
 
     public ContractSystem()
@@ -181,18 +180,32 @@ public class ContractSystem
     }
 
     // Defines a comparer to create a sorted set of import suppliers
-    // that is sorted by the cost per unit of the goods which is the last part of the tuple
+    // that is sorted by the cost per unit of the goods which is the last part of the tuple,
+    // then by the age of the industry
     private class ByUnitCost : IComparer<Tuple<ContractTerminal, float, float>>
     {
         public int Compare(Tuple<ContractTerminal, float, float> x, Tuple<ContractTerminal, float, float> y)
         {
-            if (x.Item3 == y.Item3)
+            // These are duplicates
+            if (x.Item1 == y.Item1)
             {
                 return 0;
             }
             else if (x.Item3 < y.Item3)
             {
                 return -1;
+            }
+            // Same cost, let's check for age
+            else if (x.Item3 == y.Item3)
+            {
+                if (x.Item1.startDate < y.Item1.startDate)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }
             }
             else
             {

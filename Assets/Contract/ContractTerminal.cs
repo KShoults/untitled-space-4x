@@ -10,6 +10,8 @@ public class ContractTerminal
     public IContractEndpoint owner;
     // The resource that the owner produces
     public Resource resource;
+    // The turn that this contract terminal was created
+    public int startDate = 0;
     // The resources that the owner needs to import
     public List<Resource> importResources;
     // The available amount of resources that the owner of this can produce
