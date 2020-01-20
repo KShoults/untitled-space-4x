@@ -15,7 +15,7 @@ public abstract class Development
     // The amount of water needed to support one person
     public const float WATERTOPOPRATIO = .00001f;
     // This is the max population that can be moved into this development in a turn
-    public const int MAXPOPTOMOVE = 10000;
+    public const int MAXPOPTOMOVE = 1000;
     // The tiles that are allocated to this development
     public List<Tile> tiles;
     // The development per tile
