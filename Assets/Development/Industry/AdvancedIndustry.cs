@@ -19,18 +19,19 @@ public class AdvancedIndustry : Industry
         float developmentCapacity = CalculateDevelopmentCapacity(suppliers);
 
         // Search for a supplier of minerals for this new capacity
-        float mineralShortage = developmentCapacity;
+        float mineralShortage = developmentCapacity * MINERALTODEVRATIO;
         foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
         {
             mineralShortage -= s.Item2;
             if (mineralShortage < 0)
             {
-                // We've found enough energy for our new development
+                // We've found enough minerals for our new development
                 mineralShortage = 0;
                 break;
             }
         }
-        developmentCapacity -= mineralShortage;
+        // Limit by the available minerals
+        developmentCapacity -= mineralShortage / MINERALTODEVRATIO;
 
         return new Dictionary<Resource, float> {{resource, developmentCapacity * OUTPUTTODEVRATIO}};
     }

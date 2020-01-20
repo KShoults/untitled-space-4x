@@ -75,6 +75,14 @@ public class ContractTerminal
         importDemand.Keys.CopyTo(keys, 0);
         foreach (Resource r in keys)
         {
+            if (importContracts.ContainsKey(r))
+            {
+                // Reduce our demand by our existing import contracts' amounts
+                foreach (Contract c in importContracts[r])
+                {
+                    importDemand[r] -= c.amount;
+                }
+            }
             if (importDemand[r] > 0)
             {
                 float resourcesAdded = 0;

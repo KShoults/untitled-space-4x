@@ -85,7 +85,7 @@ public abstract class Development
                     break;
                 }
             }
-            developmentCapacity -= energyShortage;
+            developmentCapacity -= energyShortage / ENERGYTODEVRATIO;
         }
 
         // Check for water
@@ -102,7 +102,7 @@ public abstract class Development
                     break;
                 }
             }
-            developmentCapacity -= waterShortage;
+            developmentCapacity -= waterShortage / POPTODEVRATIO / WATERTOPOPRATIO;
         }
 
         // Check for food
@@ -119,7 +119,7 @@ public abstract class Development
                     break;
                 }
             }
-            developmentCapacity -= foodShortage;
+            developmentCapacity -= foodShortage / POPTODEVRATIO / FOODTOPOPRATIO;
         }
 
         return developmentCapacity;
