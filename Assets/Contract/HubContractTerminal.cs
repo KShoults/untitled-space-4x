@@ -51,20 +51,64 @@ public class HubContractTerminal : ContractTerminal
         completedFirstStageContractEvaluation = true;
     }
 
-    // In this override we just want to additionally increase every resource's boughtCapacity by the same amount
+    // In this override we selectively increase capacity in the case of industries creating an essential resource we have a shortage of
+    // This makes sure we try to develop those industries if at all possible when we need to
+    // We are also 
     // This simulates the reduced transport capacity due to each contract
 
-    public override Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
+    public override Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
-        Contract newContract = base.RequestContract(resource, amount, importer);
+        // If this is a energy producing resource and we have a shortage of energy, make sure we provide it what it needs
+        if (importer.resource == Resource.Energy && hubOwner.stockpileRatio[Resource.Energy] < TransportHub.IDEALRATIO)
+        {
+            if (r == Resource.Water && capacity[Resource.Water] - boughtCapacity[Resource.Water] < amount)
+            {
+                capacity[Resource.Water] = amount + boughtCapacity[Resource.Water];
+            }
+            if (r == Resource.Food && capacity[Resource.Food] - boughtCapacity[Resource.Food] < amount)
+            {
+                capacity[Resource.Food] = amount + boughtCapacity[Resource.Food];
+            }
+        }
+        // If this is a water producing resource and we have a shortage of water, make sure we provide it what it needs
+        if (importer.resource == Resource.Water && hubOwner.stockpileRatio[Resource.Water] < TransportHub.IDEALRATIO)
+        {
+            if (r == Resource.Energy && capacity[Resource.Energy] - boughtCapacity[Resource.Energy] < amount)
+            {
+                capacity[Resource.Energy] = amount + boughtCapacity[Resource.Energy];
+            }
+            if (r == Resource.Food && capacity[Resource.Food] - boughtCapacity[Resource.Food] < amount)
+            {
+                capacity[Resource.Food] = amount + boughtCapacity[Resource.Food];
+            }
+        }
+        // If this is a food producing resource and we have a shortage of food, make sure we provide it what it needs
+        if (importer.resource == Resource.Food && hubOwner.stockpileRatio[Resource.Food] < TransportHub.IDEALRATIO)
+        {
+            if (r == Resource.Energy && capacity[Resource.Energy] - boughtCapacity[Resource.Energy] < amount)
+            {
+                capacity[Resource.Energy] = amount + boughtCapacity[Resource.Energy];
+            }
+            if (r == Resource.Water && capacity[Resource.Water] - boughtCapacity[Resource.Water] < amount)
+            {
+                capacity[Resource.Water] = amount + boughtCapacity[Resource.Water];
+            }
+        }
+
+        Contract newContract = base.RequestContract(r, amount, importer);
 
         if (newContract.amount > 0)
         {
-            foreach (Resource r in importResources)
-            {
-                boughtCapacity[r] += newContract.amount;
-            }
             boughtCapacity[Resource.TransportCapacity] += newContract.amount;
+
+            foreach (Resource res in importResources)
+            {
+                // If there isn't enough transport capacity to fulfill the remaining capacity of this resource
+                // then we want to increase the bought capacity so that the difference can't be bought
+                float transportCapacityLeft = capacity[Resource.TransportCapacity] - boughtCapacity[Resource.TransportCapacity];
+                float capacityLeft = capacity[res] - boughtCapacity[res];
+                boughtCapacity[res] = capacityLeft >  transportCapacityLeft ? boughtCapacity[res] : capacity[res] - transportCapacityLeft;
+            }
         }
 
         return newContract;

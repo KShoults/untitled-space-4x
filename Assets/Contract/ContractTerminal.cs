@@ -80,7 +80,16 @@ public class ContractTerminal
                 float resourcesAdded = 0;
                 foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
                 {
-                    float amount = c.Item2 < importDemand[r] - resourcesAdded ? c.Item2 : importDemand[r] - resourcesAdded;
+                    float amount;
+                    if (resource == Resource.Energy || resource == Resource.Water || resource == Resource.Food)
+                    {
+                        // We need to request from the transport hub regardless of reported capacity if we're an essential resource
+                        amount = importDemand[r] - resourcesAdded;
+                    }
+                    else
+                    {
+                        amount = c.Item2 < importDemand[r] - resourcesAdded ? c.Item2 : importDemand[r] - resourcesAdded;
+                    }
                     if (amount > 0)
                     {
                         // Create a contract
@@ -110,19 +119,19 @@ public class ContractTerminal
         }
     }
 
-    public virtual Contract RequestContract(Resource resource, float amount, ContractTerminal importer)
+    public virtual Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
         // Limit by the amount of capacity left for that resource
-        amount = amount < capacity[resource] - boughtCapacity[resource] ? amount : capacity[resource] - boughtCapacity[resource];
-        Contract newContract = new Contract(resource, GameManager.gameManager.turnCounter, amount, cost[resource], this, importer);
+        amount = amount < capacity[r] - boughtCapacity[r] ? amount : capacity[r] - boughtCapacity[r];
+        Contract newContract = new Contract(r, GameManager.gameManager.turnCounter, amount, cost[r], this, importer);
         if (newContract.amount > 0)
         {
             // See if there already exists a contract with this terminal
-            Contract existingContract = exportContracts[resource].Find(x => x.importer == newContract.importer);
+            Contract existingContract = exportContracts[r].Find(x => x.importer == newContract.importer);
 
             if (existingContract == null)
             {
-                exportContracts[resource].Add(newContract);
+                exportContracts[r].Add(newContract);
             }
             else
             {
@@ -131,7 +140,7 @@ public class ContractTerminal
                 existingContract.cost = (existingContract.amount * existingContract.cost + newContract.amount * newContract.cost) / (existingContract.amount + newContract.amount);
                 existingContract.amount += newContract.amount;
             }
-            boughtCapacity[resource] += newContract.amount;
+            boughtCapacity[r] += newContract.amount;
         }
         return newContract;
     }
