@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
         transportHub.stockpile[Resource.Water] = 1;
         transportHub.stockpile[Resource.Food] = 1;
         transportHub.stockpile[Resource.Minerals] = 8;
-        transportHub.stockpile[Resource.CivilianGoods] = .8f;
+        transportHub.stockpile[Resource.CivilianGoods] = 1;
         transportHub.stockpile[Resource.ShipParts] = 1;
 
         /*TransportHub economy = new Economy();

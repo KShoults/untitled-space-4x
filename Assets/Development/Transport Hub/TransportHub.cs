@@ -162,14 +162,14 @@ public class TransportHub : Development, IContractEndpoint
             else if (stockpileRatio[r] < IDEALRATIO)
             {
                 // We are at shortage stockpile level
-                // Target trend is .1
+                // Target trend is 1
                 importDemand[r] = 1 * effectiveExportLevel + effectiveExportLevel;
             }
             else if (stockpileRatio[r] < SURPLUSRATIO)
             {
                 // We are at ideal stockpile level
-                // Target trend is .05
-                importDemand[r] = .05f * effectiveExportLevel + effectiveExportLevel;
+                // Target trend is 0
+                importDemand[r] = totalExports[r];
             }
             else
             {
