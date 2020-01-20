@@ -30,8 +30,8 @@ public class TransportHub : Development, IContractEndpoint
     {
         get
         { 
-            float x = totalDevelopment * TRANSPORTTODEVRATIO * .01f;
-            return x > .01f ? x : .01f;
+            float x = totalDevelopment * TRANSPORTTODEVRATIO * .005f;
+            return x > .005f ? x : .005f;
         }
     }
 
