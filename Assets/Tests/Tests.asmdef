@@ -3,7 +3,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "GameAssembly"
+        "Main"
     ],
     "includePlatforms": [
         "Editor"
@@ -12,7 +12,9 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [
