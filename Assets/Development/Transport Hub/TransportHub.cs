@@ -15,7 +15,7 @@ public class TransportHub : Development, IContractEndpoint
     // All stockpile ratios are ratios of the current amount in the stockpile compared to the total amount in export contracts
     public Dictionary<Resource, float> stockpileRatios;
     // How much the stockpile is trending upwards or downwards as a ratio
-    public Dictionary<Resource, float> stockpileTrend;
+    public Dictionary<Resource, float> stockpileTrends;
     // The minimum ratio at which a stockpile is marked as having a shortage
     public const float SHORTAGERATIO = 1;
     // The minimum ratio at which a stockpile is marked as being ideal
@@ -328,7 +328,7 @@ public class TransportHub : Development, IContractEndpoint
         totalImports = new Dictionary<Resource, float>();
         totalExports = new Dictionary<Resource, float>();
         stockpileRatios = new Dictionary<Resource, float>();
-        stockpileTrend = new Dictionary<Resource, float>();
+        stockpileTrends = new Dictionary<Resource, float>();
 
         foreach (Resource r in contractTerminal.importResources)
         {
@@ -336,7 +336,7 @@ public class TransportHub : Development, IContractEndpoint
             totalImports.Add(r, 0);
             totalExports.Add(r, 0);
             stockpileRatios.Add(r, 0);
-            stockpileTrend.Add(r, 0);
+            stockpileTrends.Add(r, 0);
         }
     }
 
@@ -366,7 +366,7 @@ public class TransportHub : Development, IContractEndpoint
             stockpileRatios[r] = stockpile[r] / effectiveExportLevel;
 
             // Calculate the stockpile trend
-            stockpileTrend[r] = totalExports[r] > 0 ? (totalImports[r] - totalExports[r]) / totalExports[r] : 0;
+            stockpileTrends[r] = totalExports[r] > 0 ? (totalImports[r] - totalExports[r]) / totalExports[r] : 0;
         }
     }
 }
