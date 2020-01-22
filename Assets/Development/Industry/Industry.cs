@@ -16,13 +16,13 @@ public abstract class Industry : Development, IContractEndpoint
         IContractEndpoint Member Implementations
     **************************************************************/
 
-    public abstract Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
+    public abstract Dictionary<Resource, float> EstimateResourceCapacity();
 
-    public abstract Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
+    public abstract Dictionary<Resource, float> EstimateCost();
 
     public virtual Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        return CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource]);
+        return CalculateDevelopmentDemand(contractTerminal.boughtResourceCapacity[producedResource]);
     }
 
     public abstract float GenerateOutput();

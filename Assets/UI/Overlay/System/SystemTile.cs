@@ -24,7 +24,7 @@ public class SystemTile : MonoBehaviour
         }
         else
         {
-            GetComponent<Image>().color = ResourceUtil.ResourceColors[tile.development.resource];
+            GetComponent<Image>().color = ResourceUtil.ResourceColors[tile.development.producedResource];
         }
     }
 }

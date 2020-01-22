@@ -13,14 +13,17 @@ public class AdvancedIndustry : Industry
     public AdvancedIndustry(Resource resource) : base(resource)
     { }
 
-    public override Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    // Estimates the available amount of resources that this AdvancedIndustry can produce
+    public override Dictionary<Resource, float> EstimateResourceCapacity()
     {
         // Get the development capacity
-        float developmentCapacity = CalculateDevelopmentCapacity(suppliers);
+        float developmentCapacity = EstimateDevelopmentCapacity(contractTerminal.suppliers);
+
+        // Determine the amount of minerals we need to run the new capacity
+        float mineralShortage = developmentCapacity * MINERALTODEVRATIO;
 
         // Search for a supplier of minerals for this new capacity
-        float mineralShortage = developmentCapacity * MINERALTODEVRATIO;
-        foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
+        foreach (Tuple<ContractTerminal, float, float> s in contractTerminal.suppliers[Resource.Minerals])
         {
             mineralShortage -= s.Item2;
             if (mineralShortage < 0)
@@ -33,14 +36,18 @@ public class AdvancedIndustry : Industry
         // Limit by the available minerals
         developmentCapacity -= mineralShortage / MINERALTODEVRATIO;
 
-        return new Dictionary<Resource, float> {{resource, developmentCapacity * OUTPUTTODEVRATIO}};
+        // Convert from development to resource output
+        float resourceCapacity = developmentCapacity * OUTPUTTODEVRATIO;
+
+        // Return the resourceCapacity
+        return new Dictionary<Resource, float> {{producedResource, resourceCapacity}};
     }
 
-    public override Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public override Dictionary<Resource, float> EstimateCost()
     {
-        float newDevelopment = contractTerminal.capacity[resource];
+        float newDevelopment = contractTerminal.resourceCapacity[producedResource];
         // Start with development costs
-        float cost = CalculateDevelopmentCosts(suppliers, contractTerminal, newDevelopment);
+        float cost = CalculateDevelopmentCost(contractTerminal.suppliers, contractTerminal, newDevelopment);
 
         // Add mineral costs
         foreach (Contract c in contractTerminal.importContracts[Resource.Minerals])
@@ -50,7 +57,7 @@ public class AdvancedIndustry : Industry
         // Convert from development to input minerals
         float inputCapacity = newDevelopment / MINERALTODEVRATIO;
         // Add future mineral costs
-        foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Minerals])
+        foreach (Tuple<ContractTerminal, float, float> s in contractTerminal.suppliers[Resource.Minerals])
         {
             float capacityToUse = s.Item2 < inputCapacity ? s.Item2 : inputCapacity;
             cost += s.Item3 * capacityToUse;
@@ -63,22 +70,22 @@ public class AdvancedIndustry : Industry
             cost = cost / (totalDevelopment * OUTPUTTODEVRATIO);
         }
 
-        return new Dictionary<Resource, float> {{resource, cost}};
+        return new Dictionary<Resource, float> {{producedResource, cost}};
     }
 
     public override Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        Dictionary<Resource, float> importDemand = CalculateDevelopmentDemand(contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO);
+        Dictionary<Resource, float> importDemand = CalculateDevelopmentDemand(contractTerminal.boughtResourceCapacity[producedResource] / OUTPUTTODEVRATIO);
 
         // Add mineral demand
-        importDemand.Add(Resource.Minerals, (totalDevelopment + contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO) * MINERALTODEVRATIO);
+        importDemand.Add(Resource.Minerals, (totalDevelopment + contractTerminal.boughtResourceCapacity[producedResource] / OUTPUTTODEVRATIO) * MINERALTODEVRATIO);
 
         return importDemand;
     }
 
     public override float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[resource] / OUTPUTTODEVRATIO;
+        float newDevelopment = contractTerminal.boughtResourceCapacity[producedResource] / OUTPUTTODEVRATIO;
 
         // Find the total amount of minerals imported
         float totalMinerals = 0;
@@ -96,7 +103,7 @@ public class AdvancedIndustry : Industry
 
     public override Dictionary<Resource, float> CalculatePrice()
     {
-        float cost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+        float cost = CalculateDevelopmentCost(null, contractTerminal, 0);
 
         // Add mineral costs
         foreach (Contract c in contractTerminal.importContracts[Resource.Minerals])
@@ -106,11 +113,11 @@ public class AdvancedIndustry : Industry
 
         if (totalDevelopment > 0)
         {
-            return new Dictionary<Resource, float>() {{resource, cost / (totalDevelopment * OUTPUTTODEVRATIO)}};
+            return new Dictionary<Resource, float>() {{producedResource, cost / (totalDevelopment * OUTPUTTODEVRATIO)}};
         }
         else
         {
-            return new Dictionary<Resource, float>() {{resource, cost}};
+            return new Dictionary<Resource, float>() {{producedResource, cost}};
         }
     }
 

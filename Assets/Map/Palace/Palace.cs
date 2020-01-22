@@ -23,12 +23,12 @@ public class Palace : IContractEndpoint
         IContractEndpoint Member Implementations
     **************************************************************/
 
-    public Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public Dictionary<Resource, float> EstimateResourceCapacity()
     {
         return new Dictionary<Resource, float>();
     }
 
-    public Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public Dictionary<Resource, float> EstimateCost()
     {
         return new Dictionary<Resource, float>();
     }

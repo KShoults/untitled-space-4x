@@ -61,7 +61,7 @@ public class PlanetDevelopmentControls : OverlayObject
             // Update the tile control's color and update the background mask to show development
             if (tile.development != null)
             {
-                TileControls[i].TileOutline.color = ResourceUtil.ResourceColors[tile.development.resource];
+                TileControls[i].TileOutline.color = ResourceUtil.ResourceColors[tile.development.producedResource];
                 if (tile.development.tileDevelopments.ContainsKey(tile))
                 {
                     float development = tile.development.tileDevelopments[tile];

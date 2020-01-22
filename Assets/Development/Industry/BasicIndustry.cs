@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,21 +8,25 @@ public class BasicIndustry : Industry
     public BasicIndustry(Resource resource) : base(resource)
     { }
 
-    public override Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    // Estimates the available amount of resources that this BasicIndustry can produce
+    public override Dictionary<Resource, float> EstimateResourceCapacity()
     {
         // Get the development capacity
-        float developmentCapacity = CalculateDevelopmentCapacity(suppliers);
+        float developmentCapacity = EstimateDevelopmentCapacity(contractTerminal.suppliers);
 
         // Convert from development to resource output
-        return new Dictionary<Resource, float> {{resource, developmentCapacity * CalculateOutputPerDevelopment(developmentCapacity)}};
+        float resourceCapacity = developmentCapacity * CalculateOutputPerDevelopment(developmentCapacity);
+
+        // Return the resourceCapacity
+        return new Dictionary<Resource, float> {{producedResource, resourceCapacity}};
     }
 
-    public override Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public override Dictionary<Resource, float> EstimateCost()
     {
-        float newOutputPerDevelopment = CalculateOutputPerDevelopment(contractTerminal.capacity[resource]);
-        float newDevelopment = contractTerminal.capacity[resource] / newOutputPerDevelopment;
+        float newOutputPerDevelopment = CalculateOutputPerDevelopment(contractTerminal.resourceCapacity[producedResource]);
+        float newDevelopment = contractTerminal.resourceCapacity[producedResource] / newOutputPerDevelopment;
         // Start with development costs
-        float cost = CalculateDevelopmentCosts(suppliers, contractTerminal, newDevelopment);
+        float cost = CalculateDevelopmentCost(contractTerminal.suppliers, contractTerminal, newDevelopment);
 
         // Divide by total output
         if (totalDevelopment > 0)
@@ -30,12 +34,12 @@ public class BasicIndustry : Industry
             cost = cost / (totalDevelopment * newOutputPerDevelopment);
         }
 
-        return new Dictionary<Resource, float> {{resource, cost}};
+        return new Dictionary<Resource, float> {{producedResource, cost}};
     }
 
     public override Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
-        return CalculateDevelopmentDemand(CalculateDevelopmentPerCapacity(contractTerminal.boughtCapacity[resource]));
+        return CalculateDevelopmentDemand(CalculateDevelopmentPerCapacity(contractTerminal.boughtResourceCapacity[producedResource]));
     }
 
 
@@ -45,7 +49,7 @@ public class BasicIndustry : Industry
         SortTiles();
 
         // Convert boughtCapacity into development
-        float newDevelopment = CalculateDevelopmentPerCapacity(contractTerminal.boughtCapacity[resource]);
+        float newDevelopment = CalculateDevelopmentPerCapacity(contractTerminal.boughtResourceCapacity[producedResource]);
 
         // Grow the new development
         Grow(newDevelopment, contractTerminal);
@@ -56,15 +60,15 @@ public class BasicIndustry : Industry
 
     public override Dictionary<Resource, float> CalculatePrice()
     {
-        float cost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+        float cost = CalculateDevelopmentCost(null, contractTerminal, 0);
 
         if (totalDevelopment > 0)
         {
-            return new Dictionary<Resource, float>() {{resource, cost / (totalDevelopment * CalculateOutputPerDevelopment(0))}};
+            return new Dictionary<Resource, float>() {{producedResource, cost / (totalDevelopment * CalculateOutputPerDevelopment(0))}};
         }
         else
         {
-            return new Dictionary<Resource, float>() {{resource, cost}};
+            return new Dictionary<Resource, float>() {{producedResource, cost}};
         }
     }
 
@@ -72,7 +76,7 @@ public class BasicIndustry : Industry
     {
         tiles.Sort(delegate(Tile x, Tile y)
         {
-            if ((int)x.resources[resource] > (int)y.resources[resource])
+            if ((int)x.resources[producedResource] > (int)y.resources[producedResource])
             {
                 return -1;
             }
@@ -87,9 +91,9 @@ public class BasicIndustry : Industry
     {
         List<Resource> importResources = base.GetImportResources();
 
-        if (importResources.Contains(resource))
+        if (importResources.Contains(producedResource))
         {
-            importResources.Remove(resource);
+            importResources.Remove(producedResource);
         }
 
         return importResources;
@@ -102,29 +106,26 @@ public class BasicIndustry : Industry
     {
         float totalResources = 0;
         // Add up current output
-        foreach (Tile t in tiles)
-        {
-            if (tileDevelopments.ContainsKey(t))
+        foreach (KeyValuePair<Tile, float> kvp in tileDevelopments)
             {
-                totalResources += (int)t.resources[resource] * tileDevelopments[t] / 100;
-            }
+            totalResources += (int)kvp.Key.resources[producedResource] * kvp.Value / 100f;
         }
 
+        // Add up projected output
         if (addedDevelopment > 0)
         {
-            // Add up projected output
             float developmentToAdd = addedDevelopment;
             foreach (Tile t in tiles)
             {
                 if (!tileDevelopments.ContainsKey(t))
                 {
-                    totalResources += (int)t.resources[resource] * (developmentToAdd < 100 ? developmentToAdd : 100) / 100;
+                    totalResources += (int)t.resources[producedResource] * (developmentToAdd < 100 ? developmentToAdd : 100) / 100;
                     developmentToAdd -= developmentToAdd < 100 ? developmentToAdd : 100;
                 }
                 else if (tileDevelopments[t] < 100)
                 {
                     float developmentRoomOnTile = 100 - tileDevelopments[t];
-                    totalResources += (int)t.resources[resource] * (developmentToAdd < developmentRoomOnTile ? developmentToAdd : developmentRoomOnTile) / 100;
+                    totalResources += (int)t.resources[producedResource] * (developmentToAdd < developmentRoomOnTile ? developmentToAdd : developmentRoomOnTile) / 100;
                     developmentToAdd -= developmentToAdd < developmentRoomOnTile ? developmentToAdd : developmentRoomOnTile;
                 }
 
@@ -136,6 +137,7 @@ public class BasicIndustry : Industry
             }
         }
 
+        // Return the outputPerDevelopment
         if (totalDevelopment + addedDevelopment > 0)
         {
             return totalResources / (totalDevelopment + addedDevelopment);
@@ -156,17 +158,17 @@ public class BasicIndustry : Industry
         {
             if (!tileDevelopments.ContainsKey(t))
             {
-                float tileDevelopmentNeeded = capacity / (int)t.resources[resource] * 100f;
+                float tileDevelopmentNeeded = capacity / (int)t.resources[producedResource] * 100f;
                 float tileDevelopmentToAdd = tileDevelopmentNeeded < 100 ? tileDevelopmentNeeded : 100;
                 developmentNeeded += tileDevelopmentToAdd;
-                capacity -= tileDevelopmentToAdd * (int)t.resources[resource] / 100f;
+                capacity -= tileDevelopmentToAdd * (int)t.resources[producedResource] / 100f;
             }
             else if (tileDevelopments[t] < 100)
             {
-                float tileDevelopmentNeeded = capacity / (int)t.resources[resource] * 100f;
+                float tileDevelopmentNeeded = capacity / (int)t.resources[producedResource] * 100f;
                 float tileDevelopmentToAdd = tileDevelopmentNeeded < 100 - tileDevelopments[t] ? tileDevelopmentNeeded : 100 - tileDevelopments[t];
                 developmentNeeded += tileDevelopmentToAdd;
-                capacity -= tileDevelopmentToAdd * (int)t.resources[resource];
+                capacity -= tileDevelopmentToAdd * (int)t.resources[producedResource];
             }
 
             if (capacity < 0)

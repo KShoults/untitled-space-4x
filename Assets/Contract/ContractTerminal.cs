@@ -9,14 +9,14 @@ public class ContractTerminal
     // The owner of this contractTerminal
     public IContractEndpoint owner;
     // The resource that the owner produces
-    public Resource resource;
+    public Resource producedResource;
     // The turn that this contract terminal was created
     public int startDate = 0;
     // The resources that the owner needs to import
     public List<Resource> importResources;
     // The available amount of resources that the owner of this can produce
     // This dictionary is recalculated at the start of every contract system evaluation 
-    public Dictionary<Resource, float> capacity;
+    public Dictionary<Resource, float> resourceCapacity;
     // The cost of the owner's current capacity
     // This dictionary is recalculated at the same time as capacity
     public Dictionary<Resource, float> cost;
@@ -25,7 +25,7 @@ public class ContractTerminal
     // This dictionary is recalculated at the same time as capacity
     public Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers;
     // The amount of capacity that has been contracted by others this turn
-    public Dictionary<Resource, float> boughtCapacity;
+    public Dictionary<Resource, float> boughtResourceCapacity;
     // This ContractTerminals import contracts
     public Dictionary<Resource, List<Contract>> importContracts;
     // This ContractTerminals export contracts
@@ -37,30 +37,36 @@ public class ContractTerminal
     public ContractTerminal(IContractEndpoint owner, Resource resource, List<Resource> importResources)
     {
         this.owner = owner;
-        this.resource = resource;
+        this.producedResource = resource;
         this.importResources = importResources;
         suppliers = new Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>>();
-        capacity = new Dictionary<Resource, float> {{resource, 0}};
+        resourceCapacity = new Dictionary<Resource, float> {{resource, 0}};
         cost = new Dictionary<Resource, float> {{resource, 0}};
-        boughtCapacity = new Dictionary<Resource, float>();
+        boughtResourceCapacity = new Dictionary<Resource, float>();
         InitializeImportContracts();
         InitializeExportContracts();
-        contractSystem = GameManager.gameManager.contractSystem;
+        contractSystem = GameManager.contractSystem;
         contractSystem.RegisterTerminal(resource, this);
     }
 
-    public virtual void CalculateCapacity()
+    public virtual void EstimateResourceCapacity()
     {
-        boughtCapacity.Clear();
-        boughtCapacity.Add(resource, 0);
-        // Find our suppliers
+        // Clean up outdated fields
+        boughtResourceCapacity.Clear();
+        boughtResourceCapacity.Add(producedResource, 0);
         suppliers.Clear();
+
+        // Find our suppliers
         foreach (Resource r in importResources)
         {
             suppliers.Add(r, contractSystem.FindHubSuppliers(r));
         }
-        capacity = owner.CalculateCapacity(suppliers);
-        cost = owner.CalculateCost(suppliers);
+        
+        // Get the estimate capacity
+        resourceCapacity = owner.EstimateResourceCapacity();
+
+        // Get the estimate cost
+        cost = owner.EstimateCost();
     }
 
     // Reevaluates the 10% (min 5) most expensive current import contracts
@@ -91,7 +97,7 @@ public class ContractTerminal
                 foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
                 {
                     float amount;
-                    if (resource == Resource.Energy || resource == Resource.Water || resource == Resource.Food)
+                    if (producedResource == Resource.Energy || producedResource == Resource.Water || producedResource == Resource.Food)
                     {
                         // We need to request from the transport hub regardless of reported capacity if we're an essential resource
                         amount = importDemand[r] - resourcesAdded;
@@ -132,7 +138,7 @@ public class ContractTerminal
     public virtual Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
         // Limit by the amount of capacity left for that resource
-        amount = amount < capacity[r] - boughtCapacity[r] ? amount : capacity[r] - boughtCapacity[r];
+        amount = amount < resourceCapacity[r] - boughtResourceCapacity[r] ? amount : resourceCapacity[r] - boughtResourceCapacity[r];
         Contract newContract = new Contract(r, GameManager.gameManager.turnCounter, amount, cost[r], this, importer);
         if (newContract.amount > 0)
         {
@@ -150,7 +156,7 @@ public class ContractTerminal
                 existingContract.cost = (existingContract.amount * existingContract.cost + newContract.amount * newContract.cost) / (existingContract.amount + newContract.amount);
                 existingContract.amount += newContract.amount;
             }
-            boughtCapacity[r] += newContract.amount;
+            boughtResourceCapacity[r] += newContract.amount;
         }
         return newContract;
     }
@@ -163,8 +169,8 @@ public class ContractTerminal
         Dictionary<Resource, float> price = owner.CalculatePrice();
 
         // Reverse the exportContracts' order so that the oldest contracts get fulfilled first
-        Contract[] reversedExportContracts = new Contract[exportContracts[resource].Count];
-        exportContracts[resource].CopyTo(reversedExportContracts);
+        Contract[] reversedExportContracts = new Contract[exportContracts[producedResource].Count];
+        exportContracts[producedResource].CopyTo(reversedExportContracts);
         Array.Reverse(reversedExportContracts);
 
         // Limit the amount of any contracts that we can't fulfill
@@ -202,6 +208,6 @@ public class ContractTerminal
     protected virtual void InitializeExportContracts()
     {
         exportContracts = new Dictionary<Resource, List<Contract>>();
-        exportContracts.Add(resource, new List<Contract>());
+        exportContracts.Add(producedResource, new List<Contract>());
     }
 }

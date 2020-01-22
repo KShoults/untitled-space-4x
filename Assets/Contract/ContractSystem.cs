@@ -21,7 +21,7 @@ public class ContractSystem
     // Called at the beginning of the end turn calculations to run the entire contract system
     public void EvaluateContractSystem()
     {
-        CalculateCapacities();
+        EstimateResourceCapacities();
         EvaluateContracts();
         FulfillContracts();
     }
@@ -33,7 +33,7 @@ public class ContractSystem
         SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>(new ByUnitCost());
         foreach(ContractTerminal c in contractTerminalLists[resource])
         {
-            suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.capacity[resource], c.cost[resource]));
+            suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.resourceCapacity[resource], c.cost[resource]));
         }
         return suppliers;
     }
@@ -45,7 +45,7 @@ public class ContractSystem
         SortedSet<Tuple<ContractTerminal, float, float>> suppliers = new SortedSet<Tuple<ContractTerminal, float, float>>(new ByUnitCost());
         foreach(ContractTerminal c in contractTerminalLists[Resource.TransportCapacity])
         {
-            suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.capacity[resource], c.cost[resource]));
+            suppliers.Add(new Tuple<ContractTerminal, float, float>(c, c.resourceCapacity[resource], c.cost[resource]));
         }
         return suppliers;
     }
@@ -69,14 +69,14 @@ public class ContractSystem
         };
     }
 
-    // Tells all of the registered ContractTerminals to calculate their capacity and cost for goods
-    private void CalculateCapacities()
+    // Tells all of the registered ContractTerminals to estimate their capacity and cost for goods
+    private void EstimateResourceCapacities()
     {
         foreach (KeyValuePair<Resource, List<ContractTerminal>> kvp in contractTerminalLists)
         {
             foreach (ContractTerminal c in kvp.Value)
             {
-                c.CalculateCapacity();
+                c.EstimateResourceCapacity();
             }
         }
     }

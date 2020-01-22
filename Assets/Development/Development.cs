@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public abstract class Development
 {
     // The resource produced by this development
-    public Resource resource;
+    public Resource producedResource;
     // The amount of energy needed to run a point of development
     public const float ENERGYTODEVRATIO = .01f;
     // The ratio of population to a point of development
@@ -43,11 +43,11 @@ public abstract class Development
     }
     public Development(Resource resource) : this()
     {
-        this.resource = resource;
+        this.producedResource = resource;
     }
 
-    // Calculate the amount of available room for this development
-    protected virtual float CalculateDevelopmentCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    // Calculate the amount of available development capacity for this development
+    protected virtual float EstimateDevelopmentCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
         float developmentCapacity = 0;
 
@@ -71,9 +71,7 @@ public abstract class Development
 
         // Check for suppliers for new development and limit our development by what can be procured
         // We skip this for essentials since they will likely get a contract with transport hubs even when they don't report capacity
-        
-        // Check for energy
-        if (resource != Resource.Energy && resource != Resource.Water && resource != Resource.Food)
+        if (producedResource != Resource.Energy && producedResource != Resource.Water && producedResource != Resource.Food)
         {
             float energyShortage = developmentCapacity * ENERGYTODEVRATIO;
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Energy])
@@ -118,13 +116,13 @@ public abstract class Development
         return developmentCapacity;
     }
 
-    protected float CalculateDevelopmentCosts(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers,
+    protected float CalculateDevelopmentCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers,
                                               ContractTerminal contractTerminal, float newDevelopment)
     {
         float cost = 0;
         
         // Add energy costs
-        if (resource != Resource.Energy)
+        if (producedResource != Resource.Energy)
         {
             foreach (Contract c in contractTerminal.importContracts[Resource.Energy])
             {
@@ -133,7 +131,7 @@ public abstract class Development
         }
         
         // Add water costs
-        if (resource != Resource.Water)
+        if (producedResource != Resource.Water)
         {
             foreach (Contract c in contractTerminal.importContracts[Resource.Water])
             {
@@ -142,7 +140,7 @@ public abstract class Development
         }
         
         // Add food costs
-        if (resource != Resource.Food)
+        if (producedResource != Resource.Food)
         {
             foreach (Contract c in contractTerminal.importContracts[Resource.Food])
             {
@@ -153,7 +151,7 @@ public abstract class Development
         if (newDevelopment > 0)
         {
             // Add future energy costs
-            if (resource != Resource.Energy)
+            if (producedResource != Resource.Energy)
             {
                 float energyCapacity = newDevelopment * ENERGYTODEVRATIO;
                 foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Energy])
@@ -165,7 +163,7 @@ public abstract class Development
             }
 
             // Add future water costs
-            if (resource != Resource.Water)
+            if (producedResource != Resource.Water)
             {
                 float waterCapacity = newDevelopment * POPTODEVRATIO * WATERTOPOPRATIO;
                 foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Water])
@@ -177,7 +175,7 @@ public abstract class Development
             }
 
             // Add future food costs
-            if (resource != Resource.Food)
+            if (producedResource != Resource.Food)
             {
                 float foodCapacity = newDevelopment * POPTODEVRATIO * FOODTOPOPRATIO;
                 foreach (Tuple<ContractTerminal, float, float> s in suppliers[Resource.Food])
@@ -198,19 +196,19 @@ public abstract class Development
         Dictionary<Resource, float> developmentDemand = new Dictionary<Resource, float>();
         float development = totalDevelopment + addedDevelopment;
 
-        if (resource != Resource.Energy)
+        if (producedResource != Resource.Energy)
         {
             float energyNeed = development* ENERGYTODEVRATIO;
             developmentDemand.Add(Resource.Energy, energyNeed);
         }
 
-        if (resource != Resource.Water)
+        if (producedResource != Resource.Water)
         {
             float waterNeed = development * WATERTOPOPRATIO * POPTODEVRATIO;
             developmentDemand.Add(Resource.Water, waterNeed);
         }
 
-        if (resource != Resource.Food)
+        if (producedResource != Resource.Food)
         {
             float foodNeed = development * FOODTOPOPRATIO * POPTODEVRATIO;
             developmentDemand.Add(Resource.Food, foodNeed);

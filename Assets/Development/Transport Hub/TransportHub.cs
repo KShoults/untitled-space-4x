@@ -13,7 +13,7 @@ public class TransportHub : Development, IContractEndpoint
     public Dictionary<Resource, float> totalExports;
     // The current ratio of the stockpile
     // All stockpile ratios are ratios of the current amount in the stockpile compared to the total amount in export contracts
-    public Dictionary<Resource, float> stockpileRatio;
+    public Dictionary<Resource, float> stockpileRatios;
     // How much the stockpile is trending upwards or downwards as a ratio
     public Dictionary<Resource, float> stockpileTrend;
     // The minimum ratio at which a stockpile is marked as having a shortage
@@ -45,45 +45,50 @@ public class TransportHub : Development, IContractEndpoint
         IContractEndpoint Member Implementations
     **************************************************************/
 
-    public Dictionary<Resource, float> CalculateCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    // Estimates the available amount of resources that this TransportHub can produce
+    public Dictionary<Resource, float> EstimateResourceCapacity()
     {
-        // Get the maximum development capacity
+        // Get the development capacity
         // This tells us as a transport hub how much more resources total we can output
-        float developmentCapacity = CalculateDevelopmentCapacity(suppliers);
-        Dictionary<Resource, float> capacity = new Dictionary<Resource, float>();
+        // Suppliers is empty at this point because we pull resources from our own stockpile
+        float developmentCapacity = EstimateDevelopmentCapacity(contractTerminal.suppliers);
+        Dictionary<Resource, float> resourceCapacity = new Dictionary<Resource, float>();
 
-        CalculateStockpileRatios();
+        // Update the stockpile ratios
+        UpdateStockpileRatios();
 
-        // Determine whether we want to export (and how much) based on our current stockpile
+        // Determine whether we want to export based on our stockpile ratios
         foreach (Resource r in contractTerminal.importResources)
         {
-            if (stockpileRatio[r] < SHORTAGERATIO)
+            if (stockpileRatios[r] < SHORTAGERATIO)
             {
                 // We are at critical stockpile level
-                capacity.Add(r, 0);
+                resourceCapacity.Add(r, 0);
             }
-            else if (stockpileRatio[r] < IDEALRATIO)
+            else if (stockpileRatios[r] < IDEALRATIO)
             {
                 // We are at shortage stockpile level
-                capacity.Add(r, 0);
+                resourceCapacity.Add(r, 0);
             }
-            else if (stockpileRatio[r] < SURPLUSRATIO)
+            else if (stockpileRatios[r] < SURPLUSRATIO)
             {
                 // We are at ideal stockpile level
-                capacity.Add(r, developmentCapacity);
+                resourceCapacity.Add(r, developmentCapacity);
             }
             else
             {
                 // We are at surplus stockpile level
-                capacity.Add(r, developmentCapacity);
+                resourceCapacity.Add(r, developmentCapacity);
             }
         }
-        capacity.Add(Resource.TransportCapacity, developmentCapacity);
 
-        return capacity;
+        // Add the transport capacity
+        resourceCapacity.Add(Resource.TransportCapacity, developmentCapacity);
+
+        return resourceCapacity;
     }
 
-    public Dictionary<Resource, float> CalculateCost(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public Dictionary<Resource, float> EstimateCost()
     {
         Dictionary<Resource, float> costs = new Dictionary<Resource, float>();
         Dictionary<Resource, float> resourceOutputs = new Dictionary<Resource, float>();
@@ -114,7 +119,7 @@ public class TransportHub : Development, IContractEndpoint
         }
 
         // Add the base cost to each resource proportionally by output
-        float baseCost = CalculateDevelopmentCosts(suppliers, contractTerminal, 0);
+        float baseCost = CalculateDevelopmentCost(contractTerminal.suppliers, contractTerminal, 0);
         foreach (Resource r in contractTerminal.importResources)
         {
             if (totalOutput != 0)
@@ -145,7 +150,7 @@ public class TransportHub : Development, IContractEndpoint
             importDemand.Add(Resource.Minerals, 0);
         }
 
-        CalculateStockpileRatios();
+        UpdateStockpileRatios();
 
         Resource[] keys = new Resource[importDemand.Count];
         importDemand.Keys.CopyTo(keys, 0);
@@ -153,19 +158,19 @@ public class TransportHub : Development, IContractEndpoint
         {
             // The minimum export level to consider
             float effectiveExportLevel = totalExports[r] > minimumExportLevel ? totalExports[r] : minimumExportLevel;
-            if (stockpileRatio[r] < SHORTAGERATIO)
+            if (stockpileRatios[r] < SHORTAGERATIO)
             {
                 // We are at critical stockpile level
                 // Target trend is 3
                 importDemand[r] = 3 * effectiveExportLevel + effectiveExportLevel;
             }
-            else if (stockpileRatio[r] < IDEALRATIO)
+            else if (stockpileRatios[r] < IDEALRATIO)
             {
                 // We are at shortage stockpile level
                 // Target trend is 1
                 importDemand[r] = 1 * effectiveExportLevel + effectiveExportLevel;
             }
-            else if (stockpileRatio[r] < SURPLUSRATIO)
+            else if (stockpileRatios[r] < SURPLUSRATIO)
             {
                 // We are at ideal stockpile level
                 // Target trend is 0
@@ -185,7 +190,7 @@ public class TransportHub : Development, IContractEndpoint
     // Grows the development and returns the new transport capacity
     public float GenerateOutput()
     {
-        float newDevelopment = contractTerminal.boughtCapacity[Resource.TransportCapacity] / TRANSPORTTODEVRATIO;
+        float newDevelopment = contractTerminal.boughtResourceCapacity[Resource.TransportCapacity] / TRANSPORTTODEVRATIO;
 
         Grow(newDevelopment, contractTerminal);
 
@@ -194,7 +199,7 @@ public class TransportHub : Development, IContractEndpoint
 
     public Dictionary<Resource, float> CalculatePrice()
     {
-        float developmentCost = CalculateDevelopmentCosts(null, contractTerminal, 0);
+        float developmentCost = CalculateDevelopmentCost(null, contractTerminal, 0);
         // The exports of each resource
         Dictionary<Resource, float> totalExports = new Dictionary<Resource, float>();
         // The exports of all resources
@@ -292,7 +297,7 @@ public class TransportHub : Development, IContractEndpoint
 
     // Calculate the amount of available room for this development
     // In the case of transport hubs we're not checking for suppliers
-    protected override float CalculateDevelopmentCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    protected override float EstimateDevelopmentCapacity(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
     {
         float developmentCapacity = 0;
 
@@ -322,7 +327,7 @@ public class TransportHub : Development, IContractEndpoint
         stockpile = new Dictionary<Resource, float>();
         totalImports = new Dictionary<Resource, float>();
         totalExports = new Dictionary<Resource, float>();
-        stockpileRatio = new Dictionary<Resource, float>();
+        stockpileRatios = new Dictionary<Resource, float>();
         stockpileTrend = new Dictionary<Resource, float>();
 
         foreach (Resource r in contractTerminal.importResources)
@@ -330,30 +335,37 @@ public class TransportHub : Development, IContractEndpoint
             stockpile.Add(r, 0);
             totalImports.Add(r, 0);
             totalExports.Add(r, 0);
-            stockpileRatio.Add(r, 0);
+            stockpileRatios.Add(r, 0);
             stockpileTrend.Add(r, 0);
         }
     }
 
-    private void CalculateStockpileRatios()
+    private void UpdateStockpileRatios()
     {
-        // Add up the imports and exports
-        foreach (Resource r in contractTerminal.importResources)
+        // Update each stockpile
+        foreach (Resource r in stockpile.Keys)
         {
+            // Add up the exports
             totalExports[r] = 0;
-            totalImports[r] = 0;
             foreach (Contract c in contractTerminal.exportContracts[r])
             {
                 totalExports[r] += c.amount;
             }
+
+            // Add up the imports
+            totalImports[r] = 0;
             foreach (Contract c in contractTerminal.importContracts[r])
             {
                 totalImports[r] += c.amount;
             }
 
+            // Limit by the minimum export level
             float effectiveExportLevel = totalExports[r] > minimumExportLevel ? totalExports[r] : minimumExportLevel;
-            stockpileRatio[r] = stockpile[r] / effectiveExportLevel;
 
+            // Calculate the stockpile ratio
+            stockpileRatios[r] = stockpile[r] / effectiveExportLevel;
+
+            // Calculate the stockpile trend
             stockpileTrend[r] = totalExports[r] > 0 ? (totalImports[r] - totalExports[r]) / totalExports[r] : 0;
         }
     }

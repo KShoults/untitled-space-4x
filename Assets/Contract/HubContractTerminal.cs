@@ -20,21 +20,24 @@ public class HubContractTerminal : ContractTerminal
 
     }
 
-    public override void CalculateCapacity()
+    public override void EstimateResourceCapacity()
     {
-        // A couple of flags that need to be reset at the beginning of end turn calculations
+        // Clean up outdated fields
+        boughtResourceCapacity.Clear();
+        suppliers.Clear();
         completedFirstStageContractEvaluation = false;
         completedFirstStageContractFulfillment = false;
-
-        boughtCapacity.Clear();
-        suppliers.Clear();
         foreach (Resource r in importResources)
         {
-            boughtCapacity.Add(r, 0);
+            boughtResourceCapacity.Add(r, 0);
         }
-        boughtCapacity.Add(Resource.TransportCapacity, 0);
-        capacity = hubOwner.CalculateCapacity(suppliers);
-        cost = hubOwner.CalculateCost(suppliers);
+        boughtResourceCapacity.Add(Resource.TransportCapacity, 0);
+
+        // Get the estimateCapacity
+        resourceCapacity = owner.EstimateResourceCapacity();
+
+        // Get the estimate cost
+        cost = owner.EstimateCost();
     }
 
     public override void EvaluateContracts()
@@ -59,39 +62,39 @@ public class HubContractTerminal : ContractTerminal
     public override Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
         // If this is a energy producing resource and we have a shortage of energy, make sure we provide it what it needs
-        if (importer.resource == Resource.Energy && hubOwner.stockpileRatio[Resource.Energy] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Energy && hubOwner.stockpileRatios[Resource.Energy] < TransportHub.IDEALRATIO)
         {
-            if (r == Resource.Water && capacity[Resource.Water] - boughtCapacity[Resource.Water] < amount)
+            if (r == Resource.Water && resourceCapacity[Resource.Water] - boughtResourceCapacity[Resource.Water] < amount)
             {
-                capacity[Resource.Water] = amount + boughtCapacity[Resource.Water];
+                resourceCapacity[Resource.Water] = amount + boughtResourceCapacity[Resource.Water];
             }
-            if (r == Resource.Food && capacity[Resource.Food] - boughtCapacity[Resource.Food] < amount)
+            if (r == Resource.Food && resourceCapacity[Resource.Food] - boughtResourceCapacity[Resource.Food] < amount)
             {
-                capacity[Resource.Food] = amount + boughtCapacity[Resource.Food];
+                resourceCapacity[Resource.Food] = amount + boughtResourceCapacity[Resource.Food];
             }
         }
         // If this is a water producing resource and we have a shortage of water, make sure we provide it what it needs
-        if (importer.resource == Resource.Water && hubOwner.stockpileRatio[Resource.Water] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Water && hubOwner.stockpileRatios[Resource.Water] < TransportHub.IDEALRATIO)
         {
-            if (r == Resource.Energy && capacity[Resource.Energy] - boughtCapacity[Resource.Energy] < amount)
+            if (r == Resource.Energy && resourceCapacity[Resource.Energy] - boughtResourceCapacity[Resource.Energy] < amount)
             {
-                capacity[Resource.Energy] = amount + boughtCapacity[Resource.Energy];
+                resourceCapacity[Resource.Energy] = amount + boughtResourceCapacity[Resource.Energy];
             }
-            if (r == Resource.Food && capacity[Resource.Food] - boughtCapacity[Resource.Food] < amount)
+            if (r == Resource.Food && resourceCapacity[Resource.Food] - boughtResourceCapacity[Resource.Food] < amount)
             {
-                capacity[Resource.Food] = amount + boughtCapacity[Resource.Food];
+                resourceCapacity[Resource.Food] = amount + boughtResourceCapacity[Resource.Food];
             }
         }
         // If this is a food producing resource and we have a shortage of food, make sure we provide it what it needs
-        if (importer.resource == Resource.Food && hubOwner.stockpileRatio[Resource.Food] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Food && hubOwner.stockpileRatios[Resource.Food] < TransportHub.IDEALRATIO)
         {
-            if (r == Resource.Energy && capacity[Resource.Energy] - boughtCapacity[Resource.Energy] < amount)
+            if (r == Resource.Energy && resourceCapacity[Resource.Energy] - boughtResourceCapacity[Resource.Energy] < amount)
             {
-                capacity[Resource.Energy] = amount + boughtCapacity[Resource.Energy];
+                resourceCapacity[Resource.Energy] = amount + boughtResourceCapacity[Resource.Energy];
             }
-            if (r == Resource.Water && capacity[Resource.Water] - boughtCapacity[Resource.Water] < amount)
+            if (r == Resource.Water && resourceCapacity[Resource.Water] - boughtResourceCapacity[Resource.Water] < amount)
             {
-                capacity[Resource.Water] = amount + boughtCapacity[Resource.Water];
+                resourceCapacity[Resource.Water] = amount + boughtResourceCapacity[Resource.Water];
             }
         }
 
@@ -99,15 +102,15 @@ public class HubContractTerminal : ContractTerminal
 
         if (newContract.amount > 0)
         {
-            boughtCapacity[Resource.TransportCapacity] += newContract.amount;
+            boughtResourceCapacity[Resource.TransportCapacity] += newContract.amount;
 
             foreach (Resource res in importResources)
             {
                 // If there isn't enough transport capacity to fulfill the remaining capacity of this resource
                 // then we want to increase the bought capacity so that the difference can't be bought
-                float transportCapacityLeft = capacity[Resource.TransportCapacity] - boughtCapacity[Resource.TransportCapacity];
-                float capacityLeft = capacity[res] - boughtCapacity[res];
-                boughtCapacity[res] = capacityLeft >  transportCapacityLeft ? boughtCapacity[res] : capacity[res] - transportCapacityLeft;
+                float transportCapacityLeft = resourceCapacity[Resource.TransportCapacity] - boughtResourceCapacity[Resource.TransportCapacity];
+                float capacityLeft = resourceCapacity[res] - boughtResourceCapacity[res];
+                boughtResourceCapacity[res] = capacityLeft >  transportCapacityLeft ? boughtResourceCapacity[res] : resourceCapacity[res] - transportCapacityLeft;
             }
         }
 
