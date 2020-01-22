@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
+    public static ContractSystem contractSystem;
     public NameManager nameManager;
-    public ContractSystem contractSystem;
     public Text TurnCounterText;
     public int turnCounter;
     // Galaxy generation default settings

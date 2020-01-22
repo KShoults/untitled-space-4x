@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -107,7 +107,7 @@ public class BasicIndustry : Industry
         float totalResources = 0;
         // Add up current output
         foreach (KeyValuePair<Tile, float> kvp in tileDevelopments)
-            {
+        {
             totalResources += (int)kvp.Key.resources[producedResource] * kvp.Value / 100f;
         }
 
@@ -135,6 +135,9 @@ public class BasicIndustry : Industry
                     break;
                 }
             }
+
+            // Subtract development we couldn't add
+            addedDevelopment -= developmentToAdd;
         }
 
         // Return the outputPerDevelopment
