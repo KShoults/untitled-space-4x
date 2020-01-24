@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -105,6 +105,7 @@ public class BasicIndustry : Employer
             }
         }
             
+        // Return the total resources
         return totalResources;
     }
 

@@ -7,16 +7,17 @@ using UnityEngine;
 
 namespace Tests
 {
-    public class ContractSystemTestSuite
+    public class BasicIndustryTestSuite
     {
-        public class CalculateOutputPerDevelopment
+        public class CalculateOutputAtDevelopment
         {
-            [TestCase(1, 10, 10, ExpectedResult=.1f)]
-            [TestCase(2, 10, 10, ExpectedResult=.1f)]
-            [TestCase(3, 195, 15, ExpectedResult=16.2f / 210)]
-            [TestCase(5, 495, 10, ExpectedResult=22f / 500)]
-            [TestCase(5, 500, 10, ExpectedResult=22f / 500)]
-            public float CalculateOutputPerDevelopmentReturnCorrectOutput(int numberOfTiles, float totalDevelopment, float addedDevelopment)
+            [TestCase(1, 50, 50, ExpectedResult=5)]
+            [TestCase(1, 50, 25, ExpectedResult=2.5)]
+            [TestCase(1, 50, 75, ExpectedResult=7.5f)]
+            [TestCase(2, 50, 75, ExpectedResult=7.5f)]
+            [TestCase(5, 495, 510, ExpectedResult=22)]
+            [TestCase(5, 500, 510, ExpectedResult=22)]
+            public float CalculateOutputAtDevelopmentReturnsCorrectOutput(int numberOfTiles, float startingDevelopment, float targetDevelopment)
             {
                 // Make an empty contract system
                 GameManager.contractSystem = new ContractSystem();
@@ -27,7 +28,7 @@ namespace Tests
                 // Add some tiles to the basic industry with the needed development
                 List<Tile> tiles = new List<Tile>();
                 Dictionary<Tile, float> tileDevelopments = new Dictionary<Tile, float>();
-                float developmentToAdd = totalDevelopment;
+                float developmentToAdd = startingDevelopment;
                 for (int i = 0; i < numberOfTiles; i++)
                 {
                     Tile newTile = new Tile();
@@ -57,7 +58,7 @@ namespace Tests
                 // Use PrivateObject to reach CalculateOutputPerDevelopment
                 PrivateObject privateBasicIndustry = new PrivateObject(basicIndustry);
 
-                return (float)privateBasicIndustry.Invoke("CalculateOutputPerDevelopment", new object[] {addedDevelopment});
+                return (float)privateBasicIndustry.Invoke("CalculateOutputAtDevelopment", new object[] {targetDevelopment});
             }
         }
     }
