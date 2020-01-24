@@ -61,5 +61,52 @@ namespace Tests
                 return (float)privateBasicIndustry.Invoke("CalculateOutputAtDevelopment", new object[] {targetDevelopment});
             }
         }
+
+        public class SortTiles
+        {
+            [Test]
+            public void SortTilesSortsCorrectly()
+            {
+                // Make an empty contract system
+                GameManager.contractSystem = new ContractSystem();
+
+                // The basic industry for testing
+                BasicIndustry basicIndustry = new BasicIndustry(Resource.Energy);
+
+                // Add some tiles to the basic industry
+                List<Tile> tiles = new List<Tile>();
+
+                Tile newTile = new Tile();
+                newTile.resources = new Dictionary<Resource, Yield>() {{Resource.Energy, Yield.Low}, {Resource.Water, Yield.High}};
+                tiles.Add(newTile);
+
+                newTile = new Tile();
+                newTile.resources = new Dictionary<Resource, Yield>() {{Resource.Energy, Yield.Low}, {Resource.Water, Yield.Low}};
+                tiles.Add(newTile);
+
+                newTile = new Tile();
+                newTile.resources = new Dictionary<Resource, Yield>() {{Resource.Energy, Yield.Low}};
+                tiles.Add(newTile);
+
+                newTile = new Tile();
+                newTile.resources = new Dictionary<Resource, Yield>() {{Resource.Energy, Yield.Medium}};
+                tiles.Add(newTile);
+
+                basicIndustry.tiles = tiles;
+
+                // Use PrivateObject to reach CalculateOutputPerDevelopment
+                PrivateObject privateBasicIndustry = new PrivateObject(basicIndustry);
+                privateBasicIndustry.Invoke("SortTiles");
+
+                // Check for the order
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[0].resources[Resource.Energy], Yield.Medium);
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[1].resources[Resource.Energy], Yield.Low);
+                NUnit.Framework.Assert.IsFalse(basicIndustry.tiles[1].resources.ContainsKey(Resource.Water));
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[2].resources[Resource.Energy], Yield.Low);
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[2].resources[Resource.Water], Yield.Low);
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[3].resources[Resource.Energy], Yield.Low);
+                NUnit.Framework.Assert.AreEqual(basicIndustry.tiles[3].resources[Resource.Water], Yield.High);
+            }
+        }
     }
 }

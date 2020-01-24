@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -104,7 +104,7 @@ public class BasicIndustry : Employer
                 }
             }
         }
-            
+
         // Return the total resources
         return totalResources;
     }
@@ -201,6 +201,7 @@ public class BasicIndustry : Employer
     // then by the yield of their secondary resource
     private void SortTiles()
     {
+        // Sort the tiles
         tiles.Sort(delegate(Tile x, Tile y)
         {
             // Compare yields for the produced resource
