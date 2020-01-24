@@ -58,8 +58,6 @@ namespace Tests
                 privateTransportHub.Invoke("UpdateStockpileRatios");
 
                 // Assert the outputs
-                NUnit.Framework.Assert.AreEqual(exports, transportHub.totalExports[r]);
-                NUnit.Framework.Assert.AreEqual(imports, transportHub.totalImports[r]);
                 NUnit.Framework.Assert.AreEqual(expectedRatio, transportHub.stockpileRatios[r]);
                 NUnit.Framework.Assert.AreEqual(expectedTrend, transportHub.stockpileTrends[r]);
             }

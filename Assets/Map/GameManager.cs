@@ -76,52 +76,52 @@ public class GameManager : MonoBehaviour
         homeworld.tiles = tiles;
 
         // Assign those tiles to developments
-        Industry energyIndustry = new BasicIndustry(Resource.Energy);
-        homeworld.developments.Add(Resource.Energy, energyIndustry);
+        BasicIndustry energyIndustry = new BasicIndustry(Resource.Energy);
+        homeworld.producers.Add(Resource.Energy, energyIndustry);
         energyIndustry.tiles.Add(tiles[0]);
-        tiles[0].development = energyIndustry;
+        tiles[0].tileOccupier = energyIndustry;
         energyIndustry.tileDevelopments.Add(tiles[0], 3);
-        energyIndustry.population += 3 * Development.POPTODEVRATIO;
+        energyIndustry.population += 3 * Employer.POPTODEVRATIO;
 
-        Industry waterIndustry = new BasicIndustry(Resource.Water);
-        homeworld.developments.Add(Resource.Water, waterIndustry);
+        BasicIndustry waterIndustry = new BasicIndustry(Resource.Water);
+        homeworld.producers.Add(Resource.Water, waterIndustry);
         waterIndustry.tiles.Add(tiles[1]);
-        tiles[1].development = waterIndustry;
+        tiles[1].tileOccupier = waterIndustry;
         waterIndustry.tileDevelopments.Add(tiles[1], 3);
-        waterIndustry.population += 3 * Development.POPTODEVRATIO;
+        waterIndustry.population += 3 * Employer.POPTODEVRATIO;
 
-        Industry foodIndustry = new BasicIndustry(Resource.Food);
-        homeworld.developments.Add(Resource.Food, foodIndustry);
+        BasicIndustry foodIndustry = new BasicIndustry(Resource.Food);
+        homeworld.producers.Add(Resource.Food, foodIndustry);
         foodIndustry.tiles.Add(tiles[2]);
-        tiles[2].development = foodIndustry;
+        tiles[2].tileOccupier = foodIndustry;
         foodIndustry.tileDevelopments.Add(tiles[2], 3);
-        foodIndustry.population += 3 * Development.POPTODEVRATIO;
+        foodIndustry.population += 3 * Employer.POPTODEVRATIO;
 
-        Industry mineralsIndustry = new BasicIndustry(Resource.Minerals);
-        homeworld.developments.Add(Resource.Minerals, mineralsIndustry);
+        BasicIndustry mineralsIndustry = new BasicIndustry(Resource.Minerals);
+        homeworld.producers.Add(Resource.Minerals, mineralsIndustry);
         mineralsIndustry.tiles.Add(tiles[3]);
-        tiles[3].development = mineralsIndustry;
+        tiles[3].tileOccupier = mineralsIndustry;
         mineralsIndustry.tileDevelopments.Add(tiles[3], 34);
-        mineralsIndustry.population += 34 * Development.POPTODEVRATIO;
+        mineralsIndustry.population += 34 * Employer.POPTODEVRATIO;
 
-        Industry civilianIndustry = new AdvancedIndustry(Resource.CivilianGoods);
-        homeworld.developments.Add(Resource.CivilianGoods, civilianIndustry);
+        AdvancedIndustry civilianIndustry = new AdvancedIndustry(Resource.CivilianGoods);
+        homeworld.producers.Add(Resource.CivilianGoods, civilianIndustry);
         civilianIndustry.tiles.Add(tiles[4]);
-        tiles[4].development = civilianIndustry;
+        tiles[4].tileOccupier = civilianIndustry;
         civilianIndustry.tileDevelopments.Add(tiles[4], 20);
-        civilianIndustry.population += 20 * Development.POPTODEVRATIO;
+        civilianIndustry.population += 20 * Employer.POPTODEVRATIO;
 
-        Industry shipyard = new AdvancedIndustry(Resource.ShipParts);
-        homeworld.developments.Add(Resource.ShipParts, shipyard);
+        AdvancedIndustry shipyard = new AdvancedIndustry(Resource.ShipParts);
+        homeworld.producers.Add(Resource.ShipParts, shipyard);
         shipyard.tiles.Add(tiles[5]);
-        tiles[5].development = shipyard;
+        tiles[5].tileOccupier = shipyard;
 
         TransportHub transportHub = new TransportHub();
-        homeworld.developments.Add(Resource.TransportCapacity, transportHub);
+        homeworld.producers.Add(Resource.TransportCapacity, transportHub);
         transportHub.tiles.Add(tiles[6]);
-        tiles[6].development = transportHub;
+        tiles[6].tileOccupier = transportHub;
         transportHub.tileDevelopments.Add(tiles[6], 5);
-        transportHub.population += 5 * Development.POPTODEVRATIO;
+        transportHub.population += 5 * Employer.POPTODEVRATIO;
 
         // Add starting stockpiles to the transport hub
         transportHub.stockpile[Resource.Energy] = 1;

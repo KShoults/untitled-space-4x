@@ -14,11 +14,11 @@ public class Planet : MonoBehaviour
     public Tile[] tiles;
     // The habitability is from 1 - 100
     public int habitability;
-    public Dictionary<Resource, Development> developments;
+    public Dictionary<Resource, Producer> producers;
     public Palace palace;
 
     void Awake()
     {
-        developments = new Dictionary<Resource, Development>();
+        producers = new Dictionary<Resource, Producer>();
     }
 }

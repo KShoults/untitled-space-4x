@@ -9,13 +9,13 @@ public interface IContractEndpoint
     Dictionary<Resource, float> EstimateResourceCapacity();
     // Estimates the cost per unit of buying the resources that this IContractEndpoint produces
     // This method is called just after CalculateCapacity
-    Dictionary<Resource, float> EstimateCost();
+    Dictionary<Resource, float> EstimateCost(float targetResourceCapacity);
     // Calculates the need for each resource to determine contract reevaluation
     // This method is called after every contract terminal has calculated their capacity and cost
-    Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers);
-    // Grows into its bought capacity and return how much resources it generated this turn
+    Dictionary<Resource, float> CalculateImportDemand(float targetResourceCapacity);
+    // Grows into its bought capacity and returns how much resources it generated this turn
     // This method is called at the end of the contract system evaluation during contract fulfillment
-    float GenerateOutput();
+    float GenerateOutput(float boughtResourceCapacity);
     // Determines the final sale price of this IContractEndpoint's exports
     // This method is called just after GenerateOutput
     Dictionary<Resource, float> CalculatePrice();

@@ -16,7 +16,7 @@ public class Tile
     // The resource yields on this tile
     public Dictionary<Resource, Yield> resources;
     // The development that this tile is allocated to
-    public Development development;
+    public TileOccupier tileOccupier;
 
     public Tile()
     {

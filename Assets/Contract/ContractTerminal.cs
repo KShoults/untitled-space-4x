@@ -30,7 +30,6 @@ public class ContractTerminal
     public Dictionary<Resource, List<Contract>> importContracts;
     // This ContractTerminals export contracts
     public Dictionary<Resource, List<Contract>> exportContracts;
-    
     // The contract system we are a part of
     protected ContractSystem contractSystem;
 
@@ -66,7 +65,7 @@ public class ContractTerminal
         resourceCapacity = owner.EstimateResourceCapacity();
 
         // Get the estimate cost
-        cost = owner.EstimateCost();
+        cost = owner.EstimateCost(resourceCapacity[producedResource]);
     }
 
     // Reevaluates the 10% (min 5) most expensive current import contracts
@@ -77,7 +76,7 @@ public class ContractTerminal
         // This will be done as part of a later issue
 
         // Get the import demand from the owner
-        Dictionary<Resource, float> importDemand = owner.CalculateImportDemand(suppliers);
+        Dictionary<Resource, float> importDemand = owner.CalculateImportDemand(resourceCapacity[producedResource]);
         
         Resource[] keys = new Resource[importDemand.Count];
         importDemand.Keys.CopyTo(keys, 0);
@@ -164,7 +163,7 @@ public class ContractTerminal
     public virtual void FulfillContracts()
     {
         // Grows into its bought capacity and returns how many resources it generated this turn
-        float output = owner.GenerateOutput();
+        float output = owner.GenerateOutput(boughtResourceCapacity[producedResource]);
         // Determines the final price per unit of its exports
         Dictionary<Resource, float> price = owner.CalculatePrice();
 
@@ -194,6 +193,151 @@ public class ContractTerminal
                 output -= c.amount;
             }
         }
+    }
+
+    // Check existing imports and for suppliers of resource to fulfill demand and return however much demand cannot be supplied
+    // We skip this for essentials since they will likely get a contract with transport hubs even when they don't report capacity
+    public float CheckForSuppliers(Resource resource, float demand)
+    {
+        if (producedResource != Resource.Energy && producedResource != Resource.Water && producedResource != Resource.Food)
+        {
+            float resourceShortage = demand;
+
+            // Check existing contracts
+            if (resourceShortage > 0)
+            {
+                foreach (Contract c in importContracts[resource])
+                {
+                    resourceShortage -= c.amount;
+                    if (resourceShortage < 0)
+                    {
+                        // We've found enough resource for our demand
+                        resourceShortage = 0;
+                        break;
+                    }
+                }
+            }
+
+            // Check for new suppliers
+            if (resourceShortage > 0)
+            {
+                foreach (Tuple<ContractTerminal, float, float> s in suppliers[resource])
+                {
+                    resourceShortage -= s.Item2;
+                    if (resourceShortage < 0)
+                    {
+                        // We've found enough resource for our deman
+                        resourceShortage = 0;
+                        break;
+                    }
+                }
+            }
+            
+            // Return whatever shortage we have left
+            return resourceShortage;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    // Estimate the cost of importing demand amount of resources including existing import contracts and suppliers
+    public float EstimateImportCost(Resource resource, float demand)
+    {
+        float resourceCost = 0;
+        float resourceShortage = demand;
+
+        // Check existing contracts
+        if (resourceShortage > 0)
+        {
+            foreach (Contract c in importContracts[resource])
+            {
+                resourceShortage -= c.amount;
+                resourceCost += c.cost;
+                if (resourceShortage < 0)
+                {
+                    // We've found enough resource for our demand
+                    resourceShortage = 0;
+                    break;
+                }
+            }
+        }
+
+        // Check for new suppliers
+        if (resourceShortage > 0)
+        {
+            foreach (Tuple<ContractTerminal, float, float> s in suppliers[resource])
+            {
+                resourceShortage -= s.Item2;
+                resourceCost += s.Item3;
+                if (resourceShortage < 0)
+                {
+                    // We've found enough resource for our deman
+                    resourceShortage = 0;
+                    break;
+                }
+            }
+        }
+        
+        // Return whatever shortage we have left
+        return resourceCost;
+    }
+
+    // Calculate the total import amounts for a resource
+    public float CalculateTotalImports(Resource resource)
+    {
+        float total = 0;
+        if (importContracts.ContainsKey(resource))
+        {
+            foreach (Contract c in importContracts[resource])
+            {
+                total += c.amount;
+            }
+        }
+        return total;
+    }
+
+    // Calculate the total export amounts for a resource
+    public float CalculateTotalExports(Resource resource)
+    {
+        float total = 0;
+        if (exportContracts.ContainsKey(resource))
+        {
+            foreach (Contract c in exportContracts[resource])
+            {
+                total += c.amount;
+            }
+        }
+        return total;
+    }
+
+    // Calculate the total import costs for a resource
+    public float CalculateImportCosts(Resource resource)
+    {
+        float total = 0;
+        if (importContracts.ContainsKey(resource))
+        {
+            foreach (Contract c in importContracts[resource])
+            {
+                total += c.amount * c.cost;
+            }
+        }
+        return total;
+    }
+
+    // Calculate the total export costs for a resource
+    public float CalculateExportCosts(Resource resource)
+    {
+        float total = 0;
+        if (exportContracts.ContainsKey(resource))
+        {
+            foreach (Contract c in exportContracts[resource])
+            {
+                total += c.amount * c.cost;
+            }
+        }
+        return total;
     }
 
     protected virtual void InitializeImportContracts()

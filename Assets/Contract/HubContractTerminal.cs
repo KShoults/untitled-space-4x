@@ -6,17 +6,10 @@ using System.Collections.Generic;
 public class HubContractTerminal : ContractTerminal
 {
     // The transport hub that owns this contract terminal
-    public TransportHub hubOwner;
-    // Determines if the first stage of contract evaluations has occured
-    // Transport hubs evaluate their contracts in two waves
-    public bool completedFirstStageContractEvaluation;
-    // Determines if the first stage of contract fulfillment has occured
-    // Transport hubs fulfill their export contracts in the first wave
-    // They then build their stockpiles with import contracts in the second wave
-    public bool completedFirstStageContractFulfillment;
+    public new TransportHub owner;
     public HubContractTerminal(TransportHub owner, Resource resource, List<Resource> importResources) : base(owner, resource, importResources)
     {
-        hubOwner = owner;
+        this.owner = owner;
 
     }
 
@@ -25,8 +18,8 @@ public class HubContractTerminal : ContractTerminal
         // Clean up outdated fields
         boughtResourceCapacity.Clear();
         suppliers.Clear();
-        completedFirstStageContractEvaluation = false;
-        completedFirstStageContractFulfillment = false;
+        owner.completedFirstStageContractEvaluation = false;
+        owner.completedFirstStageContractFulfillment = false;
         foreach (Resource r in importResources)
         {
             boughtResourceCapacity.Add(r, 0);
@@ -37,12 +30,12 @@ public class HubContractTerminal : ContractTerminal
         resourceCapacity = owner.EstimateResourceCapacity();
 
         // Get the estimate cost
-        cost = owner.EstimateCost();
+        cost = owner.EstimateCost(resourceCapacity[producedResource]);
     }
 
     public override void EvaluateContracts()
     {
-        if (!completedFirstStageContractEvaluation)
+        if (!owner.completedFirstStageContractEvaluation)
         {
             // Now transport hubs find suppliers
             foreach (Resource r in importResources)
@@ -51,7 +44,7 @@ public class HubContractTerminal : ContractTerminal
             }
         }
         base.EvaluateContracts();
-        completedFirstStageContractEvaluation = true;
+        owner.completedFirstStageContractEvaluation = true;
     }
 
     // In this override we selectively increase capacity in the case of industries creating an essential resource we have a shortage of
@@ -62,7 +55,7 @@ public class HubContractTerminal : ContractTerminal
     public override Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
         // If this is a energy producing resource and we have a shortage of energy, make sure we provide it what it needs
-        if (importer.producedResource == Resource.Energy && hubOwner.stockpileRatios[Resource.Energy] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Energy && owner.stockpileRatios[Resource.Energy] < TransportHub.IDEALRATIO)
         {
             if (r == Resource.Water && resourceCapacity[Resource.Water] - boughtResourceCapacity[Resource.Water] < amount)
             {
@@ -74,7 +67,7 @@ public class HubContractTerminal : ContractTerminal
             }
         }
         // If this is a water producing resource and we have a shortage of water, make sure we provide it what it needs
-        if (importer.producedResource == Resource.Water && hubOwner.stockpileRatios[Resource.Water] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Water && owner.stockpileRatios[Resource.Water] < TransportHub.IDEALRATIO)
         {
             if (r == Resource.Energy && resourceCapacity[Resource.Energy] - boughtResourceCapacity[Resource.Energy] < amount)
             {
@@ -86,7 +79,7 @@ public class HubContractTerminal : ContractTerminal
             }
         }
         // If this is a food producing resource and we have a shortage of food, make sure we provide it what it needs
-        if (importer.producedResource == Resource.Food && hubOwner.stockpileRatios[Resource.Food] < TransportHub.IDEALRATIO)
+        if (importer.producedResource == Resource.Food && owner.stockpileRatios[Resource.Food] < TransportHub.IDEALRATIO)
         {
             if (r == Resource.Energy && resourceCapacity[Resource.Energy] - boughtResourceCapacity[Resource.Energy] < amount)
             {
@@ -119,10 +112,10 @@ public class HubContractTerminal : ContractTerminal
 
     public override void FulfillContracts()
     {
-        if (!completedFirstStageContractFulfillment)
+        if (!owner.completedFirstStageContractFulfillment)
         {
             // Grows into its bought capacity and returns how much transport capacity it has this turn.
-            float output = owner.GenerateOutput();
+            float output = owner.GenerateOutput(boughtResourceCapacity[producedResource]);
             // Determines the final price per unit of its exports
             Dictionary<Resource, float> price = owner.CalculatePrice();
 
@@ -145,13 +138,13 @@ public class HubContractTerminal : ContractTerminal
                 {
                     c.amount = output;
                 }
-                if (hubOwner.stockpile[c.resource] < c.amount)
+                if (owner.stockpile[c.resource] < c.amount)
                 {
-                    c.amount = hubOwner.stockpile[c.resource];
+                    c.amount = owner.stockpile[c.resource];
                 }
 
                 output -= c.amount;
-                hubOwner.stockpile[c.resource] -= c.amount;
+                owner.stockpile[c.resource] -= c.amount;
 
                 // Cancel any contracts that are reduced to 0
                 if (c.amount == 0)
@@ -163,10 +156,24 @@ public class HubContractTerminal : ContractTerminal
         }
         else
         {
-            hubOwner.GrowStockpile();
+            owner.GrowStockpile();
         }
 
-        completedFirstStageContractFulfillment = true;
+        owner.completedFirstStageContractFulfillment = true;
+    }
+
+    // Calculates the total amount of resources exported
+    public float CalculateTotalOutput()
+    {
+        float total = 0;
+        foreach (List<Contract> l in exportContracts.Values)
+        {
+            foreach (Contract c in l)
+            {
+                total += c.amount;
+            }
+        }
+        return total;
     }
 
     protected override void InitializeExportContracts()

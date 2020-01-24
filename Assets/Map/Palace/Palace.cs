@@ -25,15 +25,15 @@ public class Palace : IContractEndpoint
 
     public Dictionary<Resource, float> EstimateResourceCapacity()
     {
-        return new Dictionary<Resource, float>();
+        return new Dictionary<Resource, float>() {{Resource.Economy, 0}};
     }
 
-    public Dictionary<Resource, float> EstimateCost()
+    public Dictionary<Resource, float> EstimateCost(float targetResourceCapacity)
     {
-        return new Dictionary<Resource, float>();
+        return new Dictionary<Resource, float>() {{Resource.Economy, 0}};
     }
 
-    public Dictionary<Resource, float> CalculateImportDemand(Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers)
+    public Dictionary<Resource, float> CalculateImportDemand(float targetResourceCapacity)
     {
         Dictionary<Resource, float> importDemand = new Dictionary<Resource, float>();
 
@@ -44,7 +44,7 @@ public class Palace : IContractEndpoint
         return importDemand;
     }
 
-    public float GenerateOutput()
+    public float GenerateOutput(float boughtResourceCapacity)
     {
         // Update our resources received values
         militaryTurnReceived = 0;
