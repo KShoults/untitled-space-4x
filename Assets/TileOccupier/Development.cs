@@ -34,7 +34,7 @@ public abstract class Development : TileOccupier
     protected float CalculateDevelopmentCapacity()
     {
 
-        // Add up the development of undeveloped tiles
+        // Add up the development of tiles
         float developmentCapacity = 100 * tiles.Count;
 
         // Return the development capacity
@@ -42,6 +42,7 @@ public abstract class Development : TileOccupier
     }
 
     // Grow the development as much as it can limited by targetDevelopment
+    // This can reduce the development if targetDevelopment is less than current development
     public virtual void Grow(float targetDevelopment)
     {
         float developmentToAdd = targetDevelopment;
@@ -58,36 +59,39 @@ public abstract class Development : TileOccupier
             // Reduce development if we went over targetDevelopment
             if (developmentToAdd < 0)
             {
-                tileDevelopments[t] -= developmentToAdd;
+                tileDevelopments[t] += developmentToAdd;
                 developmentToAdd = 0;
             }
         }
 
-        // Allocate the desired development to the highest priority tile
-        foreach (Tile t in tiles)
+        if (developmentToAdd > 0)
         {
-            // If it's already developed then develop whatever room's left
-            if (tileDevelopments.ContainsKey(t))
+            // Allocate the desired development to the highest priority tile
+            foreach (Tile t in tiles)
             {
-                tileDevelopments[t] += developmentToAdd;
-            }
-            // Else add up to 100 development
-            else
-            {
-                tileDevelopments.Add(t, 100 < developmentToAdd ? 100 : developmentToAdd);
-            }
+                // If it's already developed then develop whatever room's left
+                if (tileDevelopments.ContainsKey(t))
+                {
+                    tileDevelopments[t] += developmentToAdd;
+                }
+                // Else add up to 100 development
+                else
+                {
+                    tileDevelopments.Add(t, 100 < developmentToAdd ? 100 : developmentToAdd);
+                }
 
-            // If we went over 100 development then the extra
-            // can be added in the next loop to the next tile
-            if (tileDevelopments[t] > 100)
-            {
-                developmentToAdd = tileDevelopments[t] - 100;
-                tileDevelopments[t] = 100;
-            }
-            else
-            {
-                // If we didn't go over 100 development then we're done
-                break;
+                // If we went over 100 development then the extra
+                // can be added in the next loop to the next tile
+                if (tileDevelopments[t] > 100)
+                {
+                    developmentToAdd = tileDevelopments[t] - 100;
+                    tileDevelopments[t] = 100;
+                }
+                else
+                {
+                    // If we didn't go over 100 development then we're done
+                    break;
+                }
             }
         }
     }
