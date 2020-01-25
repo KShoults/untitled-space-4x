@@ -69,20 +69,17 @@ public abstract class Development : TileOccupier
             // Allocate the desired development to the highest priority tile
             foreach (Tile t in tiles)
             {
-                // If it's already developed then develop whatever room's left
-                if (tileDevelopments.ContainsKey(t))
+                // If it isn't already developed then add the tile to tile developments
+                if (!tileDevelopments.ContainsKey(t))
                 {
-                    tileDevelopments[t] += developmentToAdd;
+                    tileDevelopments.Add(t, 0);
                 }
-                // Else add up to 100 development
-                else
-                {
-                    tileDevelopments.Add(t, 100 < developmentToAdd ? 100 : developmentToAdd);
-                }
+
+                tileDevelopments[t] += developmentToAdd;
 
                 // If we went over 100 development then the extra
                 // can be added in the next loop to the next tile
-                if (tileDevelopments[t] > 100)
+                if (tileDevelopments[t] >= 100)
                 {
                     developmentToAdd = tileDevelopments[t] - 100;
                     tileDevelopments[t] = 100;

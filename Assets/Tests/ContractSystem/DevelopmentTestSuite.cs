@@ -15,6 +15,7 @@ namespace Tests
         [TestCase(new float[3] {0, 50, 0}, 75, new float[3] {25, 50, 0})]
         [TestCase(new float[3] {0, 50, 0}, 25, new float[3] {0, 25, 0})]
         [TestCase(new float[3] {0, 50, 0}, 400, new float[3] {100, 100, 100})]
+        [TestCase(new float[3] {0, 0, 0}, 200, new float[3] {100, 100, 0})]
         public void GrowAllocatesdevelopmentCorrectly(float[] startingDevelopments, float targetDevelopment, float[] tileDevelopmentExpectations)
         {
             // Create the mock development
@@ -26,7 +27,10 @@ namespace Tests
             for (int i = 0; i < startingDevelopments.Length; i++)
             {
                 tiles.Add(new Tile());
-                tileDevelopments.Add(tiles[i], startingDevelopments[i]);
+                if (startingDevelopments[i] > 0)
+                {
+                    tileDevelopments.Add(tiles[i], startingDevelopments[i]);
+                }
             }
             development.tiles = tiles;
             development.tileDevelopments = tileDevelopments;
@@ -37,7 +41,14 @@ namespace Tests
             // Assert the tileDevelopmentExpectations
             for (int i = 0; i < startingDevelopments.Length; i++)
             {
-                Assert.AreEqual(tileDevelopmentExpectations[i], development.tileDevelopments[development.tiles[i]]);
+                if (development.tileDevelopments.ContainsKey(development.tiles[i]))
+                {
+                    Assert.AreEqual(tileDevelopmentExpectations[i], development.tileDevelopments[development.tiles[i]]);
+                }
+                else
+                {
+                    Assert.AreEqual(tileDevelopmentExpectations[i], 0);
+                }
             }
         }
     }
