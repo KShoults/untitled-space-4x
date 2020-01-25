@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -6,6 +6,19 @@ namespace Tests
 {
     public class AdvancedIndustryTestSuite
     {
+        [TestCase(0, ExpectedResult=0)]
+        [TestCase(15, ExpectedResult=150)]
+        public float CalculateImportDemandReturnsCorrectDemand(float targetResourceCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            AdvancedIndustry advancedIndustry = new AdvancedIndustry(Resource.CivilianGoods);
+
+            // Call EstimateCost
+            return advancedIndustry.CalculateImportDemand(targetResourceCapacity)[Resource.Minerals];
+        }
 
         [TestCase(new float[] {10}, new float[] {1},
                   new float[] {0}, new float[] {0},
