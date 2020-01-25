@@ -43,6 +43,36 @@ namespace Tests
             return employer.CalculateImportDemand(targetResourceCapacity)[Resource.Water];
         }
 
+        [TestCase(new float[] {}, new float[] {}, ExpectedResult=0)]
+        [TestCase(new float[] {1}, new float[] {.5f}, ExpectedResult=3)]
+        [TestCase(new float[] {10}, new float[] {2}, ExpectedResult=120)]
+        public float CalculatePriceReturnsCorrectPrice(float[] imports, float[] importCosts)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            EmployerMock employer = new EmployerMock(Resource.Minerals);
+
+            // Add some tiles with developments
+            for (int i = 0; i < 5; i++)
+            {
+                employer.tiles.Add(new Tile());
+            }
+            employer.tileDevelopments.Add(employer.tiles[0], 50);
+
+            // Add the imports
+            for (int i = 0; i < imports.Length; i++)
+            {
+                employer.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], importCosts[i], null, employer.contractTerminal));
+                employer.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, imports[i], importCosts[i], null, employer.contractTerminal));
+                employer.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, imports[i], importCosts[i], null, employer.contractTerminal));
+            }
+
+            // Call EstimateCost
+            return employer.CalculatePrice()[Resource.Minerals];
+        }
+
         [TestCase(new float[] {1}, new float[] {1},
                   new float[] {1}, new float[] {2},
                   1.5f, ExpectedResult=2 * 3 / 1.5f)]
