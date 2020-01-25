@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -6,6 +6,81 @@ namespace Tests
 {
     public class AdvancedIndustryTestSuite
     {
+
+        [TestCase(new float[] {10}, new float[] {1},
+                  new float[] {0}, new float[] {0},
+                  1, ExpectedResult=11.5f)]
+        [TestCase(new float[] {2}, new float[] {1},
+                  new float[] {0}, new float[] {2},
+                  1, ExpectedResult=3.5f)]
+        public float EstimateCostReturnsCorrectCost(float[] mineralImports, float[] mineralImportCosts,
+                                                    float[] mineralSuppliers, float[] mineralSupplierCosts, float targetCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our advancedIndustry
+            AdvancedIndustry advancedIndustry = new AdvancedIndustry(Resource.CivilianGoods);
+
+            // Add the imports
+            float[] imports = new float[] {1, 1};
+            float[] importCosts = new float[] {.5f, 1};
+            for (int i = 0; i < imports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+            }
+            
+            // Add the mineral imports
+            for (int i = 0; i < mineralImports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Minerals].Add(new Contract(Resource.Minerals, 0, mineralImports[i], mineralImportCosts[i], null, advancedIndustry.contractTerminal));
+            }
+
+            // Add the suppliers
+            float[] suppliers = new float[] {1, 1};
+            float[] supplierCosts = new float[] {.5f, 1};
+            if (!advancedIndustry.contractTerminal.suppliers.ContainsKey(Resource.Energy))
+            {
+                advancedIndustry.contractTerminal.suppliers.Add(Resource.Energy, GameManager.contractSystem.FindSuppliers(Resource.Energy));
+            }
+            if (!advancedIndustry.contractTerminal.suppliers.ContainsKey(Resource.Water))
+            {
+                advancedIndustry.contractTerminal.suppliers.Add(Resource.Water, GameManager.contractSystem.FindSuppliers(Resource.Water));
+            }
+            if (!advancedIndustry.contractTerminal.suppliers.ContainsKey(Resource.Food))
+            {
+                advancedIndustry.contractTerminal.suppliers.Add(Resource.Food, GameManager.contractSystem.FindSuppliers(Resource.Food));
+            }
+            for (int i = 0; i < suppliers.Length; i++)
+            {
+                advancedIndustry.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
+                                                                         new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                         suppliers[i], supplierCosts[i]));
+                advancedIndustry.contractTerminal.suppliers[Resource.Water].Add(new System.Tuple<ContractTerminal, float, float>(
+                                                                        new ContractTerminal(null, Resource.Water, new List<Resource>()),
+                                                                        suppliers[i], supplierCosts[i]));
+                advancedIndustry.contractTerminal.suppliers[Resource.Food].Add(new System.Tuple<ContractTerminal, float, float>(
+                                                                       new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                       suppliers[i], supplierCosts[i]));
+            }
+
+            // Add the mineral suppliers
+            if (!advancedIndustry.contractTerminal.suppliers.ContainsKey(Resource.Minerals))
+            {
+                advancedIndustry.contractTerminal.suppliers.Add(Resource.Minerals, GameManager.contractSystem.FindSuppliers(Resource.Minerals));
+            }
+            for (int i = 0; i < mineralSuppliers.Length; i++)
+            {
+                advancedIndustry.contractTerminal.suppliers[Resource.Minerals].Add(new System.Tuple<ContractTerminal, float, float>(
+                                                                         new ContractTerminal(null, Resource.Minerals, new List<Resource>()),
+                                                                         mineralSuppliers[i], mineralSupplierCosts[i]));
+            }
+
+            // Call EstimateCost
+            return advancedIndustry.EstimateCost(targetCapacity)[Resource.CivilianGoods];
+        }
 
         [TestCase(new float[] {50}, new float[] {2}, new float[] {6},
                   ExpectedResult=.51f)]
