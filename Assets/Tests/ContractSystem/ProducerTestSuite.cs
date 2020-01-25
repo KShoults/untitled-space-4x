@@ -28,6 +28,20 @@ namespace Tests
             }
         }
 
+        [TestCase(0, ExpectedResult=0)]
+        [TestCase(15, ExpectedResult=15)]
+        public float CalculateImportDemandReturnsCorrectDemand(float targetResourceCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            ProducerMock producer = new ProducerMock(Resource.Minerals);
+
+            // Call EstimateCost
+            return producer.CalculateImportDemand(targetResourceCapacity)[Resource.Energy];
+        }
+
         [TestCase(new float[] {1}, new float[] {1},
                   new float[] {1}, new float[] {2},
                   1.5f, ExpectedResult=2 / 1.5f)]
@@ -108,6 +122,32 @@ namespace Tests
 
             // Call EstimateResourceCapacity
             return producer.EstimateResourceCapacity()[Resource.Minerals];
+        }
+
+        [TestCase(new float[] {5}, 2, ExpectedResult=2)]
+        [TestCase(new float[] {1}, 2, ExpectedResult=1)]
+        public float GenerateOutputReturnsCorrectOutput(float[] imports, float boughtCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            ProducerMock producer = new ProducerMock(Resource.Minerals);
+
+            // Add some tiles 
+            for (int i = 0; i < 5; i++)
+            {
+                producer.tiles.Add(new Tile());
+            }
+
+            // Add the imports
+            for (int i = 0; i < imports.Length; i++)
+            {
+                producer.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], 0, null, producer.contractTerminal));
+            }
+
+            // Call EstimateResourceCapacity
+            return producer.GenerateOutput(boughtCapacity);
         }
     }
 }

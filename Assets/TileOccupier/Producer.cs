@@ -87,14 +87,13 @@ public abstract class Producer : Development, IContractEndpoint
     public virtual float GenerateOutput(float boughtCapacity)
     {
         // Convert boughtCapacity into development
-        float outputPerDevelopment = CalculateOutputAtDevelopment(boughtCapacity);
-        float boughtDevelopment = boughtCapacity / outputPerDevelopment;
+        float boughtDevelopment = CalculateDevelopmentAtOutput(boughtCapacity);
 
         // Calculate how much total development our energy imports can support
         float energyDevelopment = contractTerminal.CalculateTotalImports(Resource.Energy) / ENERGYTODEVRATIO;
         
         // Limit by the energy imports
-        float targetDevelopment = boughtCapacity < energyDevelopment ? boughtCapacity : energyDevelopment;
+        float targetDevelopment = boughtDevelopment < energyDevelopment ? boughtDevelopment : energyDevelopment;
 
         // Grow the new development
         Grow(targetDevelopment);
