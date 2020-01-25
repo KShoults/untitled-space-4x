@@ -42,6 +42,34 @@ namespace Tests
             return producer.CalculateImportDemand(targetResourceCapacity)[Resource.Energy];
         }
 
+        [TestCase(new float[] {}, new float[] {}, ExpectedResult=0)]
+        [TestCase(new float[] {1}, new float[] {.5f}, ExpectedResult=1)]
+        [TestCase(new float[] {10}, new float[] {2}, ExpectedResult=40)]
+        public float CalculatePriceReturnsCorrectPrice(float[] imports, float[] importCosts)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            ProducerMock producer = new ProducerMock(Resource.Minerals);
+
+            // Add some tiles with developments
+            for (int i = 0; i < 5; i++)
+            {
+                producer.tiles.Add(new Tile());
+            }
+            producer.tileDevelopments.Add(producer.tiles[0], 50);
+
+            // Add the imports
+            for (int i = 0; i < imports.Length; i++)
+            {
+                producer.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], importCosts[i], null, producer.contractTerminal));
+            }
+
+            // Call EstimateCost
+            return producer.CalculatePrice()[Resource.Minerals];
+        }
+
         [TestCase(new float[] {1}, new float[] {1},
                   new float[] {1}, new float[] {2},
                   1.5f, ExpectedResult=2 / 1.5f)]
