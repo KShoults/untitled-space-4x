@@ -176,7 +176,7 @@ public abstract class Employer : Producer
             population -= (uint)newPopulation;
         }
 
-        return base.GenerateOutput(targetDevelopment);
+        return base.GenerateOutput(CalculateOutputAtDevelopment(targetDevelopment));
     }
 
     // Determines the final sale price per unit of this IContractEndpoint's exports
