@@ -29,6 +29,20 @@ namespace Tests
             }
         }
 
+        [TestCase(0, ExpectedResult=0)]
+        [TestCase(15, ExpectedResult=15)]
+        public float CalculateImportDemandReturnsCorrectDemand(float targetResourceCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            EmployerMock employer = new EmployerMock(Resource.Minerals);
+
+            // Call EstimateCost
+            return employer.CalculateImportDemand(targetResourceCapacity)[Resource.Water];
+        }
+
         [TestCase(new float[] {1}, new float[] {1},
                   new float[] {1}, new float[] {2},
                   1.5f, ExpectedResult=2 * 3 / 1.5f)]
