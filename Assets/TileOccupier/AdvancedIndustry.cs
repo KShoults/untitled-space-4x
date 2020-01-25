@@ -25,8 +25,8 @@ public class AdvancedIndustry : Employer
         Dictionary<Resource, float> resourceCapacity = base.EstimateResourceCapacity();
 
         // Find mineral suppliers for the new capacity
-        float mineralDemand = (totalDevelopment + CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * MINERALTODEVRATIO;
-        float mineralShortage = contractTerminal.CheckForSuppliers(Resource.Food, mineralDemand);
+        float mineralDemand = (CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * MINERALTODEVRATIO;
+        float mineralShortage = contractTerminal.CheckForSuppliers(Resource.Minerals, mineralDemand);
 
         // Reduce by mineral shortage
         resourceCapacity[producedResource] -= CalculateOutputAtDevelopment(mineralShortage / MINERALTODEVRATIO);
