@@ -34,28 +34,30 @@ public abstract class Employer : Producer
 
         // Determine how much population we can move
         // It will eventually be based on transport costs
-        float populationOutputCapacity = CalculateOutputAtDevelopment(MAXPOPTOMOVE / (float)POPTODEVRATIO);
+        float populationOutputCapacity = CalculateOutputAtDevelopment((population + MAXPOPTOMOVE) / (float)POPTODEVRATIO);
 
         // Limit by available population
         resourceCapacity[producedResource] = resourceCapacity[producedResource] < populationOutputCapacity ? resourceCapacity[producedResource] : populationOutputCapacity;
 
+        // Limit by available water imports
         if (!contractTerminal.exportContracts.ContainsKey(Resource.Water))
         {
             // Find water suppliers for development
-            float waterDemand = (totalDevelopment + CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * WATERTOPOPRATIO * POPTODEVRATIO;
+            float waterDemand = (CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * WATERTOPOPRATIO * POPTODEVRATIO;
             float waterShortage = contractTerminal.CheckForSuppliers(Resource.Water, waterDemand);
 
-            // Reduce by energy shortage
+            // Reduce by water shortage
             resourceCapacity[producedResource] -= CalculateOutputAtDevelopment(waterShortage / WATERTOPOPRATIO / POPTODEVRATIO);
         }
 
+        // Limit by available food imports
         if (!contractTerminal.exportContracts.ContainsKey(Resource.Food))
         {
             // Find food suppliers for development
-            float foodDemand = (totalDevelopment + CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * FOODTOPOPRATIO * POPTODEVRATIO;
+            float foodDemand = (CalculateDevelopmentAtOutput(resourceCapacity[producedResource])) * FOODTOPOPRATIO * POPTODEVRATIO;
             float foodShortage = contractTerminal.CheckForSuppliers(Resource.Food, foodDemand);
 
-            // Reduce by energy shortage
+            // Reduce by food shortage
             resourceCapacity[producedResource] -= CalculateOutputAtDevelopment(foodShortage / FOODTOPOPRATIO / POPTODEVRATIO);
         }
 
