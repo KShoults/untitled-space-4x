@@ -209,7 +209,7 @@ public class ContractTerminal
                 foreach (Contract c in importContracts[resource])
                 {
                     resourceShortage -= c.amount;
-                    if (resourceShortage < 0)
+                    if (resourceShortage <= 0)
                     {
                         // We've found enough resource for our demand
                         resourceShortage = 0;
@@ -224,7 +224,7 @@ public class ContractTerminal
                 foreach (Tuple<ContractTerminal, float, float> s in suppliers[resource])
                 {
                     resourceShortage -= s.Item2;
-                    if (resourceShortage < 0)
+                    if (resourceShortage <= 0)
                     {
                         // We've found enough resource for our deman
                         resourceShortage = 0;
@@ -243,6 +243,7 @@ public class ContractTerminal
     }
 
     // Estimate the cost of importing demand amount of resources including existing import contracts and suppliers
+    // If there isn't enough imports/suppliers for the demand it returns the cost of the most demand it can fulfill
     public float EstimateImportCost(Resource resource, float demand)
     {
         float resourceCost = 0;
@@ -253,9 +254,10 @@ public class ContractTerminal
         {
             foreach (Contract c in importContracts[resource])
             {
-                resourceShortage -= c.amount;
-                resourceCost += c.cost;
-                if (resourceShortage < 0)
+                float amount = c.amount < resourceShortage ? c.amount : resourceShortage;
+                resourceShortage -= amount;
+                resourceCost += c.cost * amount;
+                if (resourceShortage <= 0)
                 {
                     // We've found enough resource for our demand
                     resourceShortage = 0;
@@ -269,11 +271,12 @@ public class ContractTerminal
         {
             foreach (Tuple<ContractTerminal, float, float> s in suppliers[resource])
             {
+                float amount = s.Item2 < resourceShortage ? s.Item2 : resourceShortage;
                 resourceShortage -= s.Item2;
-                resourceCost += s.Item3;
-                if (resourceShortage < 0)
+                resourceCost += s.Item3 * amount;
+                if (resourceShortage <= 0)
                 {
-                    // We've found enough resource for our deman
+                    // We've found enough resource for our demand
                     resourceShortage = 0;
                     break;
                 }
