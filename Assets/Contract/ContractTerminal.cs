@@ -132,7 +132,7 @@ public abstract class ContractTerminal
     {
         // Limit by the amount of capacity left for that resource
         amount = amount < resourceCapacity[r] - boughtResourceCapacity[r] ? amount : resourceCapacity[r] - boughtResourceCapacity[r];
-        Contract newContract = new Contract(r, GameManager.gameManager.turnCounter, amount, cost[r], this, importer);
+        Contract newContract = new Contract(r, GameManager.turnCounter, amount, cost[r], this, importer);
         if (newContract.amount > 0)
         {
             // See if there already exists a contract with this terminal

@@ -7,9 +7,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
     public static ContractSystem contractSystem;
+    public static int turnCounter = 1;
     public NameManager nameManager;
     public Text TurnCounterText;
-    public int turnCounter;
     // Galaxy generation default settings
     public int numClusters, numSystemsAvg, numSystemsVar, sizePlanetsAvg, sizePlanetsVar;
     public Sector sector;
