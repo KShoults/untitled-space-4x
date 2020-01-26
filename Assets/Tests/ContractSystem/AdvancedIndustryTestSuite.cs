@@ -20,6 +20,44 @@ namespace Tests
             return advancedIndustry.CalculateImportDemand(targetResourceCapacity)[Resource.Minerals];
         }
 
+        [TestCase(new float[] {}, new float[] {}, ExpectedResult=60)]
+        [TestCase(new float[] {10}, new float[] {.5f}, ExpectedResult=70)]
+        [TestCase(new float[] {100}, new float[] {2}, ExpectedResult=460)]
+        public float CalculatePriceReturnsCorrectPrice(float[] mineralImports, float[] mineralImportCosts)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our advanced industry
+            AdvancedIndustry advancedIndustry = new AdvancedIndustry(Resource.CivilianGoods);
+
+            // Add some tiles with developments
+            for (int i = 0; i < 5; i++)
+            {
+                advancedIndustry.tiles.Add(new Tile());
+            }
+            advancedIndustry.tileDevelopments.Add(advancedIndustry.tiles[0], 50);
+
+            // Add the imports
+            float[] imports = new float[] {10};
+            float[] importCosts = new float[] {1};
+            for (int i = 0; i < imports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, imports[i], importCosts[i], null, advancedIndustry.contractTerminal));
+            }
+
+            // Add the mineral imports
+            for (int i = 0; i < mineralImports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Minerals].Add(new Contract(Resource.Minerals, 0, mineralImports[i], mineralImportCosts[i], null, advancedIndustry.contractTerminal));
+            }
+
+            // Call EstimateCost
+            return advancedIndustry.CalculatePrice()[Resource.CivilianGoods];
+        }
+
         [TestCase(new float[] {10}, new float[] {1},
                   new float[] {0}, new float[] {0},
                   1, ExpectedResult=11.5f)]
