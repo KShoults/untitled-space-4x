@@ -179,7 +179,7 @@ public abstract class Employer : Producer
         }
         else
         {
-            population -= (uint)newPopulation;
+            population -= (uint)-newPopulation;
         }
 
         return base.GenerateOutput(CalculateOutputAtDevelopment(targetDevelopment));

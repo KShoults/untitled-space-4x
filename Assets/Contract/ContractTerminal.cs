@@ -42,6 +42,7 @@ public class ContractTerminal
         resourceCapacity = new Dictionary<Resource, float> {{resource, 0}};
         cost = new Dictionary<Resource, float> {{resource, 0}};
         boughtResourceCapacity = new Dictionary<Resource, float>();
+        boughtResourceCapacity.Add(producedResource, 0);
         InitializeImportContracts();
         InitializeExportContracts();
         contractSystem = GameManager.contractSystem;
@@ -51,16 +52,22 @@ public class ContractTerminal
     public virtual void EstimateResourceCapacity()
     {
         // Clean up outdated fields
-        boughtResourceCapacity.Clear();
-        boughtResourceCapacity.Add(producedResource, 0);
         suppliers.Clear();
+        Resource[] boughtKeys = new Resource[boughtResourceCapacity.Keys.Count];
+        boughtResourceCapacity.Keys.CopyTo(boughtKeys, 0);
+        foreach (Resource r in boughtKeys)
+        {
+            boughtResourceCapacity[r] = 0;
+        }
 
         // Find our suppliers
-        foreach (Resource r in importResources)
+        if (producedResource != Resource.TransportCapacity)
         {
-            suppliers.Add(r, contractSystem.FindHubSuppliers(r));
+            foreach (Resource r in importResources)
+            {
+                suppliers.Add(r, contractSystem.FindHubSuppliers(r));
+            }
         }
-        
         // Get the estimate capacity
         resourceCapacity = owner.EstimateResourceCapacity();
 
@@ -82,17 +89,17 @@ public class ContractTerminal
         importDemand.Keys.CopyTo(keys, 0);
         foreach (Resource r in keys)
         {
+            float resourcesAdded = 0;
             if (importContracts.ContainsKey(r))
             {
                 // Reduce our demand by our existing import contracts' amounts
                 foreach (Contract c in importContracts[r])
                 {
-                    importDemand[r] -= c.amount;
+                    resourcesAdded += c.amount;
                 }
             }
             if (importDemand[r] > 0)
             {
-                float resourcesAdded = 0;
                 foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
                 {
                     float amount;

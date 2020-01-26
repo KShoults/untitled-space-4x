@@ -10,27 +10,21 @@ public class HubContractTerminal : ContractTerminal
     public HubContractTerminal(TransportHub owner, Resource resource, List<Resource> importResources) : base(owner, resource, importResources)
     {
         this.owner = owner;
+        foreach (Resource r in importResources)
+        {
+            boughtResourceCapacity.Add(r, 0);
+        }
 
     }
 
     public override void EstimateResourceCapacity()
     {
-        // Clean up outdated fields
-        boughtResourceCapacity.Clear();
-        suppliers.Clear();
+        // Clean up additional outdated fields
         owner.completedFirstStageContractEvaluation = false;
         owner.completedFirstStageContractFulfillment = false;
-        foreach (Resource r in importResources)
-        {
-            boughtResourceCapacity.Add(r, 0);
-        }
-        boughtResourceCapacity.Add(Resource.TransportCapacity, 0);
 
-        // Get the estimateCapacity
-        resourceCapacity = owner.EstimateResourceCapacity();
-
-        // Get the estimate cost
-        cost = owner.EstimateCost(resourceCapacity[producedResource]);
+        // Get the capacity and cost
+        base.EstimateResourceCapacity();
     }
 
     public override void EvaluateContracts()
@@ -97,13 +91,13 @@ public class HubContractTerminal : ContractTerminal
         {
             boughtResourceCapacity[Resource.TransportCapacity] += newContract.amount;
 
+            // If there isn't enough transport capacity to fulfill the remaining capacity of this resource
+            // then we want to increase the bought capacity so that the difference can't be bought
+            float transportCapacityLeft = resourceCapacity[Resource.TransportCapacity] - boughtResourceCapacity[Resource.TransportCapacity];
             foreach (Resource res in importResources)
             {
-                // If there isn't enough transport capacity to fulfill the remaining capacity of this resource
-                // then we want to increase the bought capacity so that the difference can't be bought
-                float transportCapacityLeft = resourceCapacity[Resource.TransportCapacity] - boughtResourceCapacity[Resource.TransportCapacity];
                 float capacityLeft = resourceCapacity[res] - boughtResourceCapacity[res];
-                boughtResourceCapacity[res] = capacityLeft >  transportCapacityLeft ? boughtResourceCapacity[res] : resourceCapacity[res] - transportCapacityLeft;
+                boughtResourceCapacity[res] = capacityLeft <  transportCapacityLeft ? boughtResourceCapacity[res] : transportCapacityLeft;
             }
         }
 
