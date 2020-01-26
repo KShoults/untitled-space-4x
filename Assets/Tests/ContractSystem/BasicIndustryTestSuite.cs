@@ -109,6 +109,83 @@ namespace Tests
             return (float)privateBasicIndustry.Invoke("CalculateOutputAtDevelopment", new object[] {targetDevelopment});
         }
 
+        [TestCase(Resource.Energy)]
+        [TestCase(Resource.Water)]
+        [TestCase(Resource.Food)]
+        public void EstimateResourceCapacityDoesNotLimitByProducedResource(Resource resource)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // The basic industry for testing
+            BasicIndustry basicIndustry = new BasicIndustry(resource);
+
+            // Add a tile
+            basicIndustry.tiles.Add(new Tile(resource, Yield.High));
+            
+            // Add some imports
+            if (resource != Resource.Energy)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+            if (resource != Resource.Water)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+            if (resource != Resource.Food)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+
+            // Call GenerateOutput
+            float resourceCapacity = basicIndustry.EstimateResourceCapacity()[resource];
+
+            // Check for development
+            NUnit.Framework.Assert.AreEqual(.1f, resourceCapacity);
+        }
+
+        [TestCase(Resource.Energy)]
+        [TestCase(Resource.Water)]
+        [TestCase(Resource.Food)]
+        public void GenerateOutputDoesNotLimitByProducedResource(Resource resource)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // The basic industry for testing
+            BasicIndustry basicIndustry = new BasicIndustry(resource);
+
+            // Add a tile
+            basicIndustry.tiles.Add(new Tile(resource, Yield.High));
+            
+            // Add some imports
+            if (resource != Resource.Energy)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+            if (resource != Resource.Water)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+            if (resource != Resource.Food)
+            {
+                basicIndustry.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, 1, 0,
+                                                                                    null, basicIndustry.contractTerminal));
+            }
+
+            // Call GenerateOutput
+            float boughtResourceCapacity = .1f;
+            float output = basicIndustry.GenerateOutput(boughtResourceCapacity);
+
+            // Check for development
+            NUnit.Framework.Assert.AreEqual(.1f, output);
+        }
+
         [Test]
         public void SortTilesSortsCorrectly()
         {

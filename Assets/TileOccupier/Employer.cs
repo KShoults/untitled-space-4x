@@ -153,17 +153,23 @@ public abstract class Employer : Producer
         // Limit by the population
         float targetDevelopment = boughtDevelopment < populationDevelopment ? boughtDevelopment : populationDevelopment;
 
-        // Calculate how much total development our water imports can support
-        float waterDevelopment = contractTerminal.CalculateTotalImports(Resource.Water) / WATERTOPOPRATIO / POPTODEVRATIO;
+        if (!contractTerminal.exportContracts.ContainsKey(Resource.Water))
+        {
+            // Calculate how much total development our water imports can support
+            float waterDevelopment = contractTerminal.CalculateTotalImports(Resource.Water) / WATERTOPOPRATIO / POPTODEVRATIO;
 
-        // Limit by our water imports
-        targetDevelopment = targetDevelopment < waterDevelopment ? targetDevelopment : waterDevelopment;
+            // Limit by our water imports
+            targetDevelopment = targetDevelopment < waterDevelopment ? targetDevelopment : waterDevelopment;
+        }
 
-        // Calculate how much total development our food imports can support
-        float foodDevelopment = contractTerminal.CalculateTotalImports(Resource.Food) / FOODTOPOPRATIO / POPTODEVRATIO;
+        if (!contractTerminal.exportContracts.ContainsKey(Resource.Food))
+        {
+            // Calculate how much total development our food imports can support
+            float foodDevelopment = contractTerminal.CalculateTotalImports(Resource.Food) / FOODTOPOPRATIO / POPTODEVRATIO;
 
-        // Limit by our food imports
-        targetDevelopment = targetDevelopment < foodDevelopment ? targetDevelopment : foodDevelopment;
+            // Limit by our food imports
+            targetDevelopment = targetDevelopment < foodDevelopment ? targetDevelopment : foodDevelopment;
+        }
         
         // Add the new population to the development
         int newPopulation = (int)((targetDevelopment - totalDevelopment) * POPTODEVRATIO);
