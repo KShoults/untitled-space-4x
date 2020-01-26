@@ -85,7 +85,7 @@ public class AdvancedIndustry : Employer
         // Limit by our mineral imports
         float targetDevelopment = boughtDevelopment < mineralDevelopment ? boughtDevelopment : mineralDevelopment;
 
-        return base.GenerateOutput(targetDevelopment);
+        return base.GenerateOutput(CalculateOutputAtDevelopment(targetDevelopment));
     }
 
     // Determines the final sale price per unit of this IContractEndpoint's exports

@@ -158,5 +158,42 @@ namespace Tests
             // Call EstimateResourceCapacity
             return advancedIndustry.EstimateResourceCapacity()[Resource.CivilianGoods];
         }
+
+        [TestCase(new float[] {20}, .01f, ExpectedResult=.01f)]
+        [TestCase(new float[] {20}, .05f, ExpectedResult=.01f)]
+        [TestCase(new float[] {.05f}, .0075f, ExpectedResult=.005f)]
+        [TestCase(new float[] {.05f}, .0025f, ExpectedResult=.0025f)]
+        public float GenerateOutputReturnsCorrectOutput(float[] mineralImports, float boughtCapacity)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+            
+            // Create our producer
+            AdvancedIndustry advancedIndustry = new AdvancedIndustry(Resource.CivilianGoods);
+
+            // Add some tiles 
+            for (int i = 0; i < 5; i++)
+            {
+                advancedIndustry.tiles.Add(new Tile());
+            }
+
+            // Add the imports
+            float[] imports = new float[] {2};
+            for (int i = 0; i < imports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, imports[i], 0, null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, imports[i], 0, null, advancedIndustry.contractTerminal));
+                advancedIndustry.contractTerminal.importContracts[Resource.Food].Add(new Contract(Resource.Food, 0, imports[i], 0, null, advancedIndustry.contractTerminal));
+            }
+
+            // Add the mineralimports
+            for (int i = 0; i < mineralImports.Length; i++)
+            {
+                advancedIndustry.contractTerminal.importContracts[Resource.Minerals].Add(new Contract(Resource.Minerals, 0, mineralImports[i], 0, null, advancedIndustry.contractTerminal));
+            }
+
+            // Call EstimateResourceCapacity
+            return advancedIndustry.GenerateOutput(boughtCapacity);
+        }
     }
 }
