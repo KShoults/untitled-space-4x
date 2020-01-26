@@ -107,13 +107,13 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 advancedIndustry.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                         new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                         new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                          suppliers[i], supplierCosts[i]));
                 advancedIndustry.contractTerminal.suppliers[Resource.Water].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Water, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Water, new List<Resource>()),
                                                                         suppliers[i], supplierCosts[i]));
                 advancedIndustry.contractTerminal.suppliers[Resource.Food].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                       new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                       new IndustryContractTerminal(null, Resource.Food, new List<Resource>()),
                                                                        suppliers[i], supplierCosts[i]));
             }
 
@@ -125,7 +125,7 @@ namespace Tests
             for (int i = 0; i < mineralSuppliers.Length; i++)
             {
                 advancedIndustry.contractTerminal.suppliers[Resource.Minerals].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                         new ContractTerminal(null, Resource.Minerals, new List<Resource>()),
+                                                                         new IndustryContractTerminal(null, Resource.Minerals, new List<Resource>()),
                                                                          mineralSuppliers[i], mineralSupplierCosts[i]));
             }
 
@@ -180,16 +180,16 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 advancedIndustry.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                         suppliers[i], 0));
                 advancedIndustry.contractTerminal.suppliers[Resource.Water].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Water, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Water, new List<Resource>()),
                                                                         suppliers[i], 0));
                 advancedIndustry.contractTerminal.suppliers[Resource.Food].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Food, new List<Resource>()),
                                                                         suppliers[i], 0));
                 advancedIndustry.contractTerminal.suppliers[Resource.Minerals].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Food, new List<Resource>()),
                                                                         mineralSuppliers[i], 0));
             }
 

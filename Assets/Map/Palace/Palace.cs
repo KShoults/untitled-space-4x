@@ -16,7 +16,7 @@ public class Palace : IContractEndpoint
 
     public Palace()
     {
-        contractTerminal = new ContractTerminal(this, Resource.Economy, GetImportResources());
+        contractTerminal = new IndustryContractTerminal(this, Resource.Economy, GetImportResources());
     }
 
     /**************************************************************

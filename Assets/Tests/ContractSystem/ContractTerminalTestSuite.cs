@@ -17,7 +17,7 @@ namespace Tests
             GameManager.contractSystem = new ContractSystem();
 
             // Make contract terminal for testing
-            ContractTerminal contractTerminal = new ContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
+            ContractTerminal contractTerminal = new IndustryContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
 
             // Add some imports
             contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, totalImports / 2, 0, null, contractTerminal));
@@ -54,7 +54,7 @@ namespace Tests
             GameManager.contractSystem = new ContractSystem();
 
             // Make contract terminal for testing
-            ContractTerminal contractTerminal = new ContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
+            ContractTerminal contractTerminal = new IndustryContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
 
             // Add the imports
             for (int i = 0; i < imports.Length; i++)
@@ -71,7 +71,7 @@ namespace Tests
             {
                 // We create a new contract terminal for each supplier because sorted set requires its elements to be unique
                 contractTerminal.suppliers[Resource.Energy].Add(new Tuple<ContractTerminal, float, float>(
-                                                                new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                                      suppliers[i], supplierCosts[i]));
             }
 

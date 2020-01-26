@@ -15,7 +15,7 @@ namespace Tests
 
             protected override ContractTerminal CreateContractTerminal()
             {
-                return new ContractTerminal(this, producedResource, GetImportResources());
+                return new IndustryContractTerminal(this, producedResource, GetImportResources());
             }
 
             protected override float CalculateDevelopmentAtOutput(float targetOutput)
@@ -121,13 +121,13 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 employer.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                         new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                         new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                          suppliers[i], supplierCosts[i]));
                 employer.contractTerminal.suppliers[Resource.Water].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Water, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Water, new List<Resource>()),
                                                                         suppliers[i], supplierCosts[i]));
                 employer.contractTerminal.suppliers[Resource.Food].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                       new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                       new IndustryContractTerminal(null, Resource.Food, new List<Resource>()),
                                                                        suppliers[i], supplierCosts[i]));
             }
 
@@ -178,13 +178,13 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 employer.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                         suppliers[i], 0));
                 employer.contractTerminal.suppliers[Resource.Water].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Water, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Water, new List<Resource>()),
                                                                         suppliers[i], 0));
                 employer.contractTerminal.suppliers[Resource.Food].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Food, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Food, new List<Resource>()),
                                                                         suppliers[i], 0));
             }
 

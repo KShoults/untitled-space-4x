@@ -30,7 +30,7 @@ public class BasicIndustry : Employer
     // Returns the contract terminal for this producer
     protected override ContractTerminal CreateContractTerminal()
     {
-        return new ContractTerminal(this, producedResource, GetImportResources());
+        return new IndustryContractTerminal(this, producedResource, GetImportResources());
     }
 
     // Returns the amount of output produced at the target development

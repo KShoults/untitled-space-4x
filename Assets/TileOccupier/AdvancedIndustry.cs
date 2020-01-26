@@ -116,7 +116,7 @@ public class AdvancedIndustry : Employer
     // Returns the contract terminal for this producer
     protected override ContractTerminal CreateContractTerminal()
     {
-        return new ContractTerminal(this, producedResource, GetImportResources());
+        return new IndustryContractTerminal(this, producedResource, GetImportResources());
     }
 
 

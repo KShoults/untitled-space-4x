@@ -14,7 +14,7 @@ namespace Tests
 
             protected override ContractTerminal CreateContractTerminal()
             {
-                return new ContractTerminal(this, producedResource, GetImportResources());
+                return new IndustryContractTerminal(this, producedResource, GetImportResources());
             }
 
             protected override float CalculateDevelopmentAtOutput(float targetOutput)
@@ -104,7 +104,7 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 producer.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                         suppliers[i], supplierCosts[i]));
             }
 
@@ -144,7 +144,7 @@ namespace Tests
             for (int i = 0; i < suppliers.Length; i++)
             {
                 producer.contractTerminal.suppliers[Resource.Energy].Add(new System.Tuple<ContractTerminal, float, float>(
-                                                                        new ContractTerminal(null, Resource.Energy, new List<Resource>()),
+                                                                        new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
                                                                         suppliers[i], 0));
             }
 

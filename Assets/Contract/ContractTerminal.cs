@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 // Provides the ability to interface with the contract system
 // Requires the owner to be an IContractEndpoint
-public class ContractTerminal
+public abstract class ContractTerminal
 {
     // The owner of this contractTerminal
     public IContractEndpoint owner;
@@ -26,9 +26,9 @@ public class ContractTerminal
     public Dictionary<Resource, SortedSet<Tuple<ContractTerminal, float, float>>> suppliers;
     // The amount of capacity that has been contracted by others this turn
     public Dictionary<Resource, float> boughtResourceCapacity;
-    // This ContractTerminals import contracts
+    // This ContractTerminal's import contracts
     public Dictionary<Resource, List<Contract>> importContracts;
-    // This ContractTerminals export contracts
+    // This ContractTerminal's export contracts
     public Dictionary<Resource, List<Contract>> exportContracts;
     // The contract system we are a part of
     protected ContractSystem contractSystem;
@@ -42,31 +42,21 @@ public class ContractTerminal
         resourceCapacity = new Dictionary<Resource, float> {{resource, 0}};
         cost = new Dictionary<Resource, float> {{resource, 0}};
         boughtResourceCapacity = new Dictionary<Resource, float>();
-        boughtResourceCapacity.Add(producedResource, 0);
         InitializeImportContracts();
         InitializeExportContracts();
         contractSystem = GameManager.contractSystem;
         contractSystem.RegisterTerminal(resource, this);
     }
 
+    // Estimates the resourceCapacity and cost per unit of output of the owner
     public virtual void EstimateResourceCapacity()
     {
         // Clean up outdated fields
-        suppliers.Clear();
         Resource[] boughtKeys = new Resource[boughtResourceCapacity.Keys.Count];
         boughtResourceCapacity.Keys.CopyTo(boughtKeys, 0);
         foreach (Resource r in boughtKeys)
         {
             boughtResourceCapacity[r] = 0;
-        }
-
-        // Find our suppliers
-        if (producedResource != Resource.TransportCapacity)
-        {
-            foreach (Resource r in importResources)
-            {
-                suppliers.Add(r, contractSystem.FindHubSuppliers(r));
-            }
         }
         // Get the estimate capacity
         resourceCapacity = owner.EstimateResourceCapacity();
@@ -75,13 +65,9 @@ public class ContractTerminal
         cost = owner.EstimateCost(resourceCapacity[producedResource]);
     }
 
-    // Reevaluates the 10% (min 5) most expensive current import contracts
-    // and evaluates an equal number of new, least expensive import contracts
+    // Finds new contracts for other terminals' capacities
     public virtual void EvaluateContracts()
     {
-        // Select the most expensive contracts to reevaluate
-        // This will be done as part of a later issue
-
         // Get the import demand from the owner
         Dictionary<Resource, float> importDemand = owner.CalculateImportDemand(resourceCapacity[producedResource]);
         
@@ -141,6 +127,7 @@ public class ContractTerminal
         }
     }
 
+    // Requests to buy some of this contractTerminal's capacity
     public virtual Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
         // Limit by the amount of capacity left for that resource
@@ -167,6 +154,7 @@ public class ContractTerminal
         return newContract;
     }
 
+    // Triggers the owner to create resources and fulfills the contracts
     public virtual void FulfillContracts()
     {
         // Grows into its bought capacity and returns how many resources it generated this turn
@@ -362,6 +350,5 @@ public class ContractTerminal
     protected virtual void InitializeExportContracts()
     {
         exportContracts = new Dictionary<Resource, List<Contract>>();
-        exportContracts.Add(producedResource, new List<Contract>());
     }
 }

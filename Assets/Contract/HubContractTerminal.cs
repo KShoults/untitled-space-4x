@@ -14,9 +14,12 @@ public class HubContractTerminal : ContractTerminal
         {
             boughtResourceCapacity.Add(r, 0);
         }
+        boughtResourceCapacity.Add(Resource.TransportCapacity, 0);
 
     }
 
+    // Estimates the resourceCapacity and cost per unit of output of the owner
+    // In this override we clean up some additional fields first
     public override void EstimateResourceCapacity()
     {
         // Clean up additional outdated fields
@@ -27,11 +30,14 @@ public class HubContractTerminal : ContractTerminal
         base.EstimateResourceCapacity();
     }
 
+    // Finds new contracts for other terminals' capacities
+    // In this override we find suppliers first
     public override void EvaluateContracts()
     {
         if (!owner.completedFirstStageContractEvaluation)
         {
             // Now transport hubs find suppliers
+            suppliers.Clear();
             foreach (Resource r in importResources)
             {
                 suppliers.Add(r, contractSystem.FindSuppliers(r));
@@ -41,10 +47,11 @@ public class HubContractTerminal : ContractTerminal
         owner.completedFirstStageContractEvaluation = true;
     }
 
+
+    // Requests to buy some of this contractTerminal's capacity
     // In this override we selectively increase capacity in the case of industries creating an essential resource we have a shortage of
     // This makes sure we try to develop those industries if at all possible when we need to
-    // We are also 
-    // This simulates the reduced transport capacity due to each contract
+    // We are also limiting each resource capacity by our transport capacity
 
     public override Contract RequestContract(Resource r, float amount, ContractTerminal importer)
     {
@@ -104,6 +111,7 @@ public class HubContractTerminal : ContractTerminal
         return newContract;
     }
 
+    // Triggers the owner to create resources and fulfills the contracts
     public override void FulfillContracts()
     {
         if (!owner.completedFirstStageContractFulfillment)
@@ -172,7 +180,7 @@ public class HubContractTerminal : ContractTerminal
 
     protected override void InitializeExportContracts()
     {
-        exportContracts = new Dictionary<Resource, List<Contract>>();
+        base.InitializeExportContracts();
         exportContracts.Add(Resource.Energy, new List<Contract>());
         exportContracts.Add(Resource.Water, new List<Contract>());
         exportContracts.Add(Resource.Food, new List<Contract>());
