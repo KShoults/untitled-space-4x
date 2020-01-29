@@ -161,5 +161,25 @@ namespace Tests
             // Assert that we have the expected amount of imports
             Assert.AreEqual(expectedImports, contractTerminal.CalculateTotalImports(Resource.Water));
         }
+        
+        [TestCase(.5f, .25f, .25f, Description="This tests the use case of having more capacity than is requested.")]
+        [TestCase(.5f, 1, .5f, Description="This tests the use case of having less capacity than is requested.")]
+        public void RequestContractReturnsLimitsByItsCapacity(float resourceCapacity, float requestAmount, float expectedAmount)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // Make contract terminal for testing
+            ContractTerminal contractTerminal = new ContractTerminalMock(new ContractEndpointMock(), Resource.Minerals, new List<Resource>());
+            contractTerminal.resourceCapacity[Resource.Minerals] = resourceCapacity;
+            contractTerminal.boughtResourceCapacity[Resource.Minerals] = 0;
+            contractTerminal.exportContracts.Add(Resource.Minerals, new List<Contract>());
+
+            // Call RequestContract
+            Contract contract = contractTerminal.RequestContract(Resource.Minerals, requestAmount, null);
+
+            // Assert that the contract has the expected amount
+            Assert.AreEqual(expectedAmount, contract.amount);
+        }
     }
 }
