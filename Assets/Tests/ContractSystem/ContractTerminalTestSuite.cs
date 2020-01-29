@@ -7,6 +7,40 @@ namespace Tests
 {
     public class ContractTerminalTestSuite
     {
+        private class ContractTerminalMock : ContractTerminal
+        {
+            public ContractTerminalMock(IContractEndpoint owner, Resource resource, List<Resource> importResources) : base(owner, resource, importResources)
+            { }
+        }
+
+        private class ContractEndpointMock : IContractEndpoint
+        {
+            public Dictionary<Resource, float> EstimateResourceCapacity()
+            {
+                return new Dictionary<Resource, float>() {{Resource.Energy, 0}};
+            }
+
+            public Dictionary<Resource, float> EstimateCost(float targetResourceCapacity)
+            {
+                return new Dictionary<Resource, float>();
+            }
+
+            public Dictionary<Resource, float> CalculateImportDemand(float targetResourceCapacity)
+            {
+                return new Dictionary<Resource, float>();
+            }
+
+            public float GenerateOutput(float boughtResourceCapacity)
+            {
+                return 0;
+            }
+
+            public Dictionary<Resource, float> CalculatePrice()
+            {
+                return new Dictionary<Resource, float>();
+            }
+        }
+
         [TestCase(10, 0, 10, ExpectedResult=0)]
         [TestCase(0, 10, 10, ExpectedResult=0)]
         [TestCase(5, 5, 15, ExpectedResult=5)]
@@ -17,7 +51,7 @@ namespace Tests
             GameManager.contractSystem = new ContractSystem();
 
             // Make contract terminal for testing
-            ContractTerminal contractTerminal = new IndustryContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
+            ContractTerminal contractTerminal = new ContractTerminalMock(null, Resource.Minerals, new List<Resource> {Resource.Energy});
 
             // Add some imports
             contractTerminal.importContracts[Resource.Energy].Add(new Contract(Resource.Energy, 0, totalImports / 2, 0, null, contractTerminal));
@@ -37,24 +71,24 @@ namespace Tests
         }
 
         [TestCase(new float[] {1}, new float[] {1},
-                  new float[] {1}, new float[] {2},
-                  1.5f, ExpectedResult=2)]
+                    new float[] {1}, new float[] {2},
+                    1.5f, ExpectedResult=2)]
         [TestCase(new float[] {1, 1.5f, 2}, new float[] {.5f, .75f, 1},
-                  new float[] {1}, new float[] {2},
-                  2, ExpectedResult=1.25f)]
+                    new float[] {1}, new float[] {2},
+                    2, ExpectedResult=1.25f)]
         [TestCase(new float[] {1}, new float[] {1},
-                  new float[] {1.5f, 1, 2}, new float[] {.75f, .5f, 1},
-                  3.5f, ExpectedResult=2.625f)]
+                    new float[] {1.5f, 1, 2}, new float[] {.75f, .5f, 1},
+                    3.5f, ExpectedResult=2.625f)]
         [TestCase(new float[] {1}, new float[] {1},
-                  new float[] {1}, new float[] {2},
-                  3, ExpectedResult=3)]
+                    new float[] {1}, new float[] {2},
+                    3, ExpectedResult=3)]
         public float EstimateImportCostReturnsCorrectCost(float[] imports, float[] importCosts, float[] suppliers, float [] supplierCosts, float demand)
         {
             // Make an empty contract system
             GameManager.contractSystem = new ContractSystem();
 
             // Make contract terminal for testing
-            ContractTerminal contractTerminal = new IndustryContractTerminal(null, Resource.Minerals, new List<Resource> {Resource.Energy});
+            ContractTerminal contractTerminal = new ContractTerminalMock(null, Resource.Minerals, new List<Resource> {Resource.Energy});
 
             // Add the imports
             for (int i = 0; i < imports.Length; i++)
@@ -72,11 +106,30 @@ namespace Tests
                 // We create a new contract terminal for each supplier because sorted set requires its elements to be unique
                 contractTerminal.suppliers[Resource.Energy].Add(new Tuple<ContractTerminal, float, float>(
                                                                 new IndustryContractTerminal(null, Resource.Energy, new List<Resource>()),
-                                                                                     suppliers[i], supplierCosts[i]));
+                                                                                        suppliers[i], supplierCosts[i]));
             }
 
             // Call EstimateImportCost
             return contractTerminal.EstimateImportCost(Resource.Energy, demand);
+        }
+
+        [Test]
+        public void EstimateResourceCapacityCleansBoughtResourceCapacity()
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // Make contract terminal for testing
+            ContractTerminal contractTerminal = new ContractTerminalMock(new ContractEndpointMock(), Resource.Energy, new List<Resource>());
+
+            // Set boughtResourceCapacity
+            contractTerminal.boughtResourceCapacity.Add(Resource.Energy, 20);
+
+            // Call EstimateResourceCapacity
+            contractTerminal.EstimateResourceCapacity();
+
+            // Assert that boughtResourceCapacity was cleaned up
+            Assert.AreEqual(0, contractTerminal.boughtResourceCapacity[Resource.Energy]);
         }
     }
 }

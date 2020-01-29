@@ -51,7 +51,7 @@ public abstract class ContractTerminal
     // Estimates the resourceCapacity and cost per unit of output of the owner
     public virtual void EstimateResourceCapacity()
     {
-        // Clean up outdated fields
+        // Clean up boughtResourceCapacity
         Resource[] boughtKeys = new Resource[boughtResourceCapacity.Keys.Count];
         boughtResourceCapacity.Keys.CopyTo(boughtKeys, 0);
         foreach (Resource r in boughtKeys)
