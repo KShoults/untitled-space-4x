@@ -84,7 +84,7 @@ public abstract class ContractTerminal
                     resourcesAdded += c.amount;
                 }
             }
-            if (importDemand[r] > 0)
+            if (importDemand[r] - resourcesAdded > 0)
             {
                 foreach (Tuple<ContractTerminal, float, float> c in suppliers[r])
                 {

@@ -27,7 +27,7 @@ namespace Tests
 
             public Dictionary<Resource, float> CalculateImportDemand(float targetResourceCapacity)
             {
-                return new Dictionary<Resource, float>();
+                return new Dictionary<Resource, float> {{Resource.Water, 1}};
             }
 
             public float GenerateOutput(float boughtResourceCapacity)
@@ -130,6 +130,36 @@ namespace Tests
 
             // Assert that boughtResourceCapacity was cleaned up
             Assert.AreEqual(0, contractTerminal.boughtResourceCapacity[Resource.Energy]);
+        }
+
+        // Demand in this test case is always 1
+        [TestCase(.5f, 10, 1, Description="This tests the use case of having more demand than our imports, but with plenty of supply")]
+        [TestCase(.5f, 0, .5f, Description="This tests the use case of having more demand than we can supply")]
+        public void EvaluateContractsCreatesContractsCorrectly(float imports, float supply, float expectedImports)
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // Make contract terminal for testing
+            ContractTerminal contractTerminal = new ContractTerminalMock(new ContractEndpointMock(), Resource.Minerals, new List<Resource> {Resource.Water});
+
+            // Set up our supplier
+            TransportHub supplier = new TransportHub();
+            supplier.tiles.Add(new Tile());
+            supplier.stockpile[Resource.Energy] = supply;
+            supplier.stockpile[Resource.Water] = supply;
+            supplier.stockpile[Resource.Food] = supply;
+            supplier.contractTerminal.EstimateResourceCapacity();
+            contractTerminal.suppliers[Resource.Water] = GameManager.contractSystem.FindHubSuppliers(Resource.Water);
+
+            // Set our imports
+            contractTerminal.importContracts[Resource.Water].Add(new Contract(Resource.Water, 0, imports, 0, null, contractTerminal));
+
+            // Call EvaluateContracts
+            contractTerminal.EvaluateContracts();
+
+            // Assert that we have the expected amount of imports
+            Assert.AreEqual(expectedImports, contractTerminal.CalculateTotalImports(Resource.Water));
         }
     }
 }
