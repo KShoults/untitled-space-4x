@@ -11,6 +11,12 @@ namespace Tests
         {
             public ContractTerminalMock(IContractEndpoint owner, Resource resource, List<Resource> importResources) : base(owner, resource, importResources)
             { }
+
+            protected override void InitializeExportContracts()
+            {
+                base.InitializeExportContracts();
+                exportContracts.Add(producedResource, new List<Contract>());
+            }
         }
 
         private class ContractEndpointMock : IContractEndpoint
@@ -32,12 +38,12 @@ namespace Tests
 
             public float GenerateOutput(float boughtResourceCapacity)
             {
-                return 0;
+                return 1;
             }
 
             public Dictionary<Resource, float> CalculatePrice()
             {
-                return new Dictionary<Resource, float>();
+                return new Dictionary<Resource, float> {{Resource.Minerals, 1}};
             }
         }
 
@@ -161,6 +167,28 @@ namespace Tests
             // Assert that we have the expected amount of imports
             Assert.AreEqual(expectedImports, contractTerminal.CalculateTotalImports(Resource.Water));
         }
+
+        [Test]
+        public void FulfillContractsLimitsContractsThatCantBeFulfilled()
+        {
+            // Make an empty contract system
+            GameManager.contractSystem = new ContractSystem();
+
+            // Make contract terminal for testing
+            ContractTerminal contractTerminal = new ContractTerminalMock(new ContractEndpointMock(), Resource.Minerals, new List<Resource>());
+
+            // Add an export contract
+            Contract contract = new Contract(Resource.Minerals, 0, 1.5f, 1, contractTerminal, null);
+            contractTerminal.exportContracts[Resource.Minerals].Add(contract);
+            contractTerminal.boughtResourceCapacity[Resource.Minerals] = 0;
+
+            // Call FulfillContracts
+            // Reminder: the mock outputs 1 unit of minerals at a price of 1
+            contractTerminal.FulfillContracts();
+
+            // Assert that the contract has the expected amount
+            Assert.AreEqual(1, contract.amount);
+        }
         
         [TestCase(.5f, .25f, .25f, Description="This tests the use case of having more capacity than is requested.")]
         [TestCase(.5f, 1, .5f, Description="This tests the use case of having less capacity than is requested.")]
@@ -173,7 +201,6 @@ namespace Tests
             ContractTerminal contractTerminal = new ContractTerminalMock(new ContractEndpointMock(), Resource.Minerals, new List<Resource>());
             contractTerminal.resourceCapacity[Resource.Minerals] = resourceCapacity;
             contractTerminal.boughtResourceCapacity[Resource.Minerals] = 0;
-            contractTerminal.exportContracts.Add(Resource.Minerals, new List<Contract>());
 
             // Call RequestContract
             Contract contract = contractTerminal.RequestContract(Resource.Minerals, requestAmount, null);
